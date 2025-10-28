@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -7,44 +6,164 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF0E0E0E), // negro suave, más moderno
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Vibra',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+
+              // Logo Placeholder de momento 
+              Container(
+                height: 110,
+                width: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.greenAccent.withOpacity(0.4),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/vibraLogo.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 40),
-              CustomButton(
-                text: 'Iniciar sesión con Spotify',
-                color: Colors.green,
-                icon: Icons.music_note,
-                onPressed: () {
-                  print("Spotify login");
-                },
+              const SizedBox(height: 24),
+
+              // Nombre de la app
+              const Text(
+                'VIBRA',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 42,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Montserrat', 
+                  letterSpacing: 1.5,
+                ),
               ),
-              
-              const SizedBox(height: 16),
-              CustomButton(
-                text: 'Iniciar sesión con Google',
-                color: Colors.blue,
-                icon: Icons.login,
-                onPressed: () {
-                  print("Google login");
-                },
+
+              const SizedBox(height: 50),
+
+              // Botón Spotify
+              _buildLoginButton(
+                gradientColors: [
+                  Colors.greenAccent.shade700,
+                  Colors.greenAccent.shade400,
+                ],
+                iconPath: 'assets/spotifyLogo.png',
+                text: 'Iniciar con Spotify',
+                onPressed: () => print("Spotify login"),
+              ),
+
+              const SizedBox(height: 25),
+
+              // Divider de botones
+              Row(
+                children: const [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.white24,
+                      thickness: 1,
+                      endIndent: 10,
+                    ),
+                  ),
+                  Text(
+                    'o',
+                    style: TextStyle(color: Colors.white54, fontSize: 14),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.white24,
+                      thickness: 1,
+                      indent: 10,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 25),
+
+              // Botón Google
+              _buildLoginButton(
+                gradientColors: [
+                  Colors.blueAccent.shade700,
+                  Colors.blueAccent.shade400,
+                ],
+                iconPath: 'assets/googleLogo.png',
+                text: 'Iniciar con Google',
+                onPressed: () => print("Google login"),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Texto final -> Fantasmada Terminos y condiciones.
+              const Text(
+                'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
+                style: TextStyle(
+                  color: Colors.white38,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Helper
+  Widget _buildLoginButton({
+    required List<Color> gradientColors,
+    required String iconPath,
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: gradientColors),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black45,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        icon: Image.asset(
+          iconPath,
+          height: 26,
+          width: 26,
+        ),
+        label: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: 0.5,
+          ),
+        ),
+        onPressed: onPressed,
       ),
     );
   }
