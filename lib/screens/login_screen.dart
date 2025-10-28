@@ -6,7 +6,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E), // negro suave, más moderno
+      backgroundColor: const Color(0xFF0E0E0E), 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -14,7 +14,7 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              // 🌟 Logo plano y rectangular
+              // Logo Vibra
               Container(
                 height: 110,
                 width: 110,
@@ -26,7 +26,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Nombre de la app
+              // Vibra Texto
               const Text(
                 'Vibra',
                 style: TextStyle(
@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              // Divider de botones
+              // Divider.
               Row(
                 children: const [
                   Expanded(
@@ -92,7 +92,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones
+              // Texto final -> Términos y condiciones - Fantasmada Gorda
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
