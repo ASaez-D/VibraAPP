@@ -26,7 +26,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Vibra Texto
+              // Nombre de la app
               const Text(
                 'Vibra',
                 style: TextStyle(
@@ -46,14 +46,15 @@ class LoginScreen extends StatelessWidget {
                   Colors.greenAccent.shade700,
                   Colors.greenAccent.shade400,
                 ],
-                iconPath: 'assets/spotifyLogo.png',
+                iconPath: 'assets/spotifyLogoBlanco.png',
                 text: 'Iniciar con Spotify',
+                //textColor: Colors.black, 
                 onPressed: () => print("Spotify login"),
               ),
 
               const SizedBox(height: 25),
 
-              // Divider.
+              // Divider
               Row(
                 children: const [
                   Expanded(
@@ -79,7 +80,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              // Botón Google
+              // Botón Google.
               _buildLoginButton(
                 gradientColors: [
                   Colors.blueAccent.shade700,
@@ -87,12 +88,14 @@ class LoginScreen extends StatelessWidget {
                 ],
                 iconPath: 'assets/googleLogo.png',
                 text: 'Iniciar con Google',
+                //textColor: Colors.black87, 
                 onPressed: () => print("Google login"),
+                isGoogle: true,
               ),
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones - Fantasmada Gorda
+              // Texto final -> Términos y condiciones. Fantasmada
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -109,12 +112,14 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Helper para crear botones
+  // Helper 
   Widget _buildLoginButton({
     required List<Color> gradientColors,
     required String iconPath,
     required String text,
     required VoidCallback onPressed,
+    Color textColor = Colors.white, 
+    bool isGoogle = false, 
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -137,15 +142,24 @@ class LoginScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        icon: Image.asset(
-          iconPath,
-          height: 26,
-          width: 26,
-        ),
+        icon: isGoogle
+            ? Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0), 
+                  child: Image.asset(iconPath),
+                ),
+              )
+            : Image.asset(iconPath, height: 26, width: 26),
         label: Text(
           text,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: textColor,
             fontWeight: FontWeight.bold,
             fontSize: 16,
             letterSpacing: 0.5,
