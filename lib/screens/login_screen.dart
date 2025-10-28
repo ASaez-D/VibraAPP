@@ -22,6 +22,7 @@ class LoginScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 40),
               CustomButton(
                 text: 'Iniciar sesión con Spotify',
@@ -31,6 +32,7 @@ class LoginScreen extends StatelessWidget {
                   print("Spotify login");
                 },
               ),
+              
               const SizedBox(height: 16),
               CustomButton(
                 text: 'Iniciar sesión con Google',
