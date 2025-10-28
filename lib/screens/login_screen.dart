@@ -14,25 +14,13 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              // Logo Placeholder de momento 
+              // 🌟 Logo plano y rectangular
               Container(
                 height: 110,
                 width: 110,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.greenAccent.withOpacity(0.4),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/vibraLogo.png',
-                    fit: BoxFit.cover,
-                  ),
+                child: Image.asset(
+                  'assets/vibraLogo.png',
+                  fit: BoxFit.cover,
                 ),
               ),
 
@@ -40,7 +28,7 @@ class LoginScreen extends StatelessWidget {
 
               // Nombre de la app
               const Text(
-                'VIBRA',
+                'Vibra',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 42,
@@ -104,7 +92,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Texto final -> Fantasmada Terminos y condiciones.
+              // Texto final -> Términos y condiciones
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -121,7 +109,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Helper
+  // Helper para crear botones
   Widget _buildLoginButton({
     required List<Color> gradientColors,
     required String iconPath,
