@@ -140,7 +140,7 @@ class LoginScreen extends StatelessWidget {
                 height: 28,
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  shape: BoxShape.circle, // <-- Aquí lo hacemos redondo
+                  shape: BoxShape.circle, 
                 ),
                 padding: const EdgeInsets.all(4.0),
                 child: Image.asset(iconPath),
