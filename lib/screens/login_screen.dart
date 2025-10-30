@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
+import '../services/google_auth.dart';
 import 'home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isLoadingSpotify = false;
+  bool _isLoadingGoogle = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,30 +54,37 @@ class LoginScreen extends StatelessWidget {
                   Colors.greenAccent.shade400,
                 ],
                 iconPath: 'assets/spotifyLogo.png',
-                text: 'Iniciar con Spotify',
+                text: _isLoadingSpotify ? 'Cargando...' : 'Iniciar con Spotify',
                 textColor: Colors.black,
-                onPressed: () async {
-                  final spotify = SpotifyAuth();
-                  try {
-                    final profile = await spotify.login();
-                    final displayName = profile['display_name'] ?? 'Usuario';
+                onPressed: _isLoadingSpotify
+                    ? null
+                    : () async {
+                        setState(() => _isLoadingSpotify = true);
+                        final spotify = SpotifyAuth();
+                        try {
+                          final profile = await spotify.login();
+                          if (profile == null) throw 'No se pudo obtener perfil';
+                          final displayName = profile['display_name'] ?? 'Usuario';
 
-                    // Va a HomeScreen.
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeScreen(displayName: displayName),
-                      ),
-                    );
-                  } catch (e) {
-                    // Excepcion.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al iniciar sesión con Spotify: $e'),
-                      ),
-                    );
-                  }
-                },
+                          if (!mounted) return;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(displayName: displayName),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Error al iniciar sesión con Spotify: $e'),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _isLoadingSpotify = false);
+                        }
+                      },
               ),
 
               const SizedBox(height: 25),
@@ -106,15 +122,43 @@ class LoginScreen extends StatelessWidget {
                   Colors.blueAccent.shade400,
                 ],
                 iconPath: 'assets/googleLogo.png',
-                text: 'Iniciar con Google',
+                text: _isLoadingGoogle ? 'Cargando...' : 'Iniciar con Google',
                 textColor: Colors.white,
-                onPressed: () => print("Google login"),
+                onPressed: _isLoadingGoogle
+                    ? null
+                    : () async {
+                        setState(() => _isLoadingGoogle = true);
+                        final googleAuth = GoogleAuth();
+                        try {
+                          final profile = await googleAuth.login();
+                          if (profile == null) throw 'No se pudo iniciar sesión';
+
+                          final displayName = profile['displayName'] ?? 'Usuario';
+
+                          if (!mounted) return;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(displayName: displayName),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error al iniciar sesión con Google: $e'),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _isLoadingGoogle = false);
+                        }
+                      },
                 isGoogle: true,
               ),
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones. Fantasmada
+              // Texto final -> Términos y condiciones
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -136,7 +180,7 @@ class LoginScreen extends StatelessWidget {
     required List<Color> gradientColors,
     required String iconPath,
     required String text,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     Color textColor = Colors.white,
     bool isGoogle = false,
   }) {
