@@ -136,13 +136,13 @@ class LoginScreen extends StatelessWidget {
         ),
         icon: isGoogle
             ? Container(
-                width: 28,
-                height: 28,
+                width: 24,
+                height: 24,
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  shape: BoxShape.circle, 
+                  shape: BoxShape.circle,
                 ),
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(4.0), 
                 child: Image.asset(iconPath),
               )
             : Image.asset(iconPath, height: 26, width: 26),
