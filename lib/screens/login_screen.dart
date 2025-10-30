@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/spotify_auth.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -45,7 +47,28 @@ class LoginScreen extends StatelessWidget {
                 iconPath: 'assets/spotifyLogo.png',
                 text: 'Iniciar con Spotify',
                 textColor: Colors.black,
-                onPressed: () => print("Spotify login"),
+                onPressed: () async {
+                  final spotify = SpotifyAuth();
+                  try {
+                    final profile = await spotify.login();
+                    final displayName = profile['display_name'] ?? 'Usuario';
+
+                    // Va a HomeScreen.
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(displayName: displayName),
+                      ),
+                    );
+                  } catch (e) {
+                    // Excepcion.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al iniciar sesión con Spotify: $e'),
+                      ),
+                    );
+                  }
+                },
               ),
 
               const SizedBox(height: 25),
@@ -91,7 +114,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones. Fantasmada.
+              // Texto final -> Términos y condiciones. Fantasmada
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -136,11 +159,11 @@ class LoginScreen extends StatelessWidget {
         ),
         icon: isGoogle
             ? SizedBox(
-                width: 26, 
-                height: 26, 
+                width: 26,
+                height: 26,
                 child: Center(
                   child: Container(
-                    width: 22, 
+                    width: 22,
                     height: 22,
                     decoration: const BoxDecoration(
                       color: Colors.white,
@@ -149,7 +172,7 @@ class LoginScreen extends StatelessWidget {
                     child: Center(
                       child: Image.asset(
                         iconPath,
-                        width: 14, 
+                        width: 14,
                         height: 14,
                         fit: BoxFit.contain,
                       ),
@@ -162,7 +185,6 @@ class LoginScreen extends StatelessWidget {
                 height: 26,
                 child: Image.asset(iconPath, fit: BoxFit.contain),
               ),
-
         label: Text(
           text,
           style: TextStyle(
