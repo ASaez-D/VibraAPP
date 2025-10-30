@@ -14,7 +14,7 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo Vibra
-              Container(
+              SizedBox(
                 height: 110,
                 width: 110,
                 child: Image.asset('assets/vibraLogo.png', fit: BoxFit.cover),
@@ -76,7 +76,7 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              // Botón Google.
+              // Botón Google
               _buildLoginButton(
                 gradientColors: [
                   Colors.blueAccent.shade700,
@@ -84,14 +84,14 @@ class LoginScreen extends StatelessWidget {
                 ],
                 iconPath: 'assets/googleLogo.png',
                 text: 'Iniciar con Google',
-                //textColor: Colors.black,
+                textColor: Colors.white,
                 onPressed: () => print("Google login"),
                 isGoogle: true,
               ),
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones. Fantasmada
+              // Texto final -> Términos y condiciones. Fantasmada.
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -135,22 +135,38 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
         icon: isGoogle
-            ? Container(
-                width: 24,
-                height: 24,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+            ? SizedBox(
+                width: 26, 
+                height: 26, 
+                child: Center(
+                  child: Container(
+                    width: 22, 
+                    height: 22,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        iconPath,
+                        width: 14, 
+                        height: 14,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
-                padding: const EdgeInsets.all(4.0), 
-                child: Image.asset(iconPath),
               )
-            : Image.asset(iconPath, height: 26, width: 26),
+            : SizedBox(
+                width: 26,
+                height: 26,
+                child: Image.asset(iconPath, fit: BoxFit.contain),
+              ),
+
         label: Text(
           text,
           style: TextStyle(
             color: textColor,
-            //fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
             fontSize: 16,
             letterSpacing: 0.5,
