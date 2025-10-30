@@ -6,22 +6,18 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E), 
+      backgroundColor: const Color(0xFF0E0E0E),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               // Logo Vibra
               Container(
                 height: 110,
                 width: 110,
-                child: Image.asset(
-                  'assets/vibraLogo.png',
-                  fit: BoxFit.cover,
-                ),
+                child: Image.asset('assets/vibraLogo.png', fit: BoxFit.cover),
               ),
 
               const SizedBox(height: 24),
@@ -33,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                   color: Colors.white,
                   fontSize: 42,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'Montserrat', 
+                  fontFamily: 'Montserrat',
                   letterSpacing: 1.5,
                 ),
               ),
@@ -46,9 +42,9 @@ class LoginScreen extends StatelessWidget {
                   Colors.greenAccent.shade700,
                   Colors.greenAccent.shade400,
                 ],
-                iconPath: 'assets/spotifyLogoBlanco.png',
+                iconPath: 'assets/spotifyLogo.png',
                 text: 'Iniciar con Spotify',
-                //textColor: Colors.black, 
+                textColor: Colors.black,
                 onPressed: () => print("Spotify login"),
               ),
 
@@ -88,7 +84,7 @@ class LoginScreen extends StatelessWidget {
                 ],
                 iconPath: 'assets/googleLogo.png',
                 text: 'Iniciar con Google',
-                //textColor: Colors.black87, 
+                //textColor: Colors.black,
                 onPressed: () => print("Google login"),
                 isGoogle: true,
               ),
@@ -112,25 +108,21 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Helper 
+  // Helper
   Widget _buildLoginButton({
     required List<Color> gradientColors,
     required String iconPath,
     required String text,
     required VoidCallback onPressed,
-    Color textColor = Colors.white, 
-    bool isGoogle = false, 
+    Color textColor = Colors.white,
+    bool isGoogle = false,
   }) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: gradientColors),
         borderRadius: BorderRadius.circular(30),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black45,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
       child: ElevatedButton.icon(
@@ -144,22 +136,21 @@ class LoginScreen extends StatelessWidget {
         ),
         icon: isGoogle
             ? Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
+                  shape: BoxShape.circle, // <-- Aquí lo hacemos redondo
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0), 
-                  child: Image.asset(iconPath),
-                ),
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset(iconPath),
               )
             : Image.asset(iconPath, height: 26, width: 26),
         label: Text(
           text,
           style: TextStyle(
             color: textColor,
+            //fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
             fontSize: 16,
             letterSpacing: 0.5,
