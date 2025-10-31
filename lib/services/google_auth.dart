@@ -1,58 +1,42 @@
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleAuth {
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  // Instancia de GoogleSignIn configurada con scopes y serverClientId.
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+    serverClientId: '756981178053-5tgv3oaenpdogipv3fcun1m7gmqi4jfv.apps.googleusercontent.com', 
+  );
 
-  bool _initialized = false;
-
-  Future<void> _ensureInitialized() async {
-    if (!_initialized) {
-      await _googleSignIn.initialize();
-      _initialized = true;
-    }
-  }
-
+  /// Inicia sesión con Google
   Future<Map<String, dynamic>?> login() async {
     try {
-      await _ensureInitialized();
+      // Lanza la ventana de login de Google
+      final GoogleSignInAccount? account = await _googleSignIn.signIn();
+      if (account == null) return null; // Usuario canceló login.
 
-      // Iniciar la autenticación (usuario interactivo)
-      final GoogleSignInAccount? account = await _googleSignIn.authenticate();
+      // Obtenemos idToken necesario para backend / Firebase.
+      final GoogleSignInAuthentication auth = await account.authentication;
 
-      if (account == null) {
-        print('Usuario canceló login de Google');
-        return null;
-      }
-
-      // Si solo necesitas perfil básico y correo:
-      final profile = <String, dynamic>{
+      return {
         'displayName': account.displayName,
         'email': account.email,
         'photoUrl': account.photoUrl,
         'id': account.id,
+        'idToken': auth.idToken,
       };
-
-      // Si necesitas tokens de autorización (para acceder a APIs adicionales):
-      // final GoogleSignInClientAuthorization authClient = await account.authorizationClient
-      //     .authorizationForScopes(<String>['https://www.googleapis.com/auth/userinfo.profile']);
-      // final accessToken = authClient.accessToken;
-      // Puedes añadirlo al perfil si lo necesitas.
-
-      print('Perfil Google: $profile');
-      return profile;
     } catch (e) {
-      print('Error en login de Google: $e');
+      print('Error login Google: $e');
       return null;
     }
   }
 
+  /// Cierra sesión.
   Future<void> logout() async {
     try {
-      await _ensureInitialized();
       await _googleSignIn.signOut();
       print('Usuario desconectado de Google');
     } catch (e) {
-      print('Error al cerrar sesión de Google: $e');
+      print('Error logout Google: $e');
     }
   }
 }

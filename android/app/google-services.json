@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "398436569641",
+    "project_id": "vibra-efbb2",
+    "storage_bucket": "vibra-efbb2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398436569641:android:1aa035f228139166508238",
+        "android_client_info": {
+          "package_name": "com.example.vibra_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrp9I1j9Gj6ApzoFdp9CdWNJ4g8tkyOng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
