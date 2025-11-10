@@ -1,26 +1,43 @@
 {
   "project_info": {
-    "project_number": "398436569641",
-    "project_id": "vibra-efbb2",
-    "storage_bucket": "vibra-efbb2.firebasestorage.app"
+    "project_number": "15580294749",
+    "project_id": "vibra-3ef1c",
+    "storage_bucket": "vibra-3ef1c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:398436569641:android:1aa035f228139166508238",
+        "mobilesdk_app_id": "1:15580294749:android:59450950c6a6e04151a7b4",
         "android_client_info": {
           "package_name": "com.example.vibra_project"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "15580294749-iq2kfgplcbg4dnmv65con4mqhhrrfbrf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDrp9I1j9Gj6ApzoFdp9CdWNJ4g8tkyOng"
+          "current_key": "AIzaSyCcvTxX5V7dzMZc_BsqjXD2w1D3u55obhU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15580294749-iq2kfgplcbg4dnmv65con4mqhhrrfbrf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "15580294749-0jtkh7pjar5bnko2cq0ebampnbalir3l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.vibra-project"
+              }
+            }
+          ]
         }
       }
     }

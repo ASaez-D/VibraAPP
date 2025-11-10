@@ -1,42 +1,35 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class GoogleAuth {
-  // Instancia de GoogleSignIn configurada con scopes y serverClientId.
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-    serverClientId: '756981178053-5tgv3oaenpdogipv3fcun1m7gmqi4jfv.apps.googleusercontent.com', 
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  /// Inicia sesión con Google
   Future<Map<String, dynamic>?> login() async {
-    try {
-      // Lanza la ventana de login de Google
-      final GoogleSignInAccount? account = await _googleSignIn.signIn();
-      if (account == null) return null; // Usuario canceló login.
+    // Paso 1: Seleccionar la cuenta
+    final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
+    if (gUser == null) return null;
 
-      // Obtenemos idToken necesario para backend / Firebase.
-      final GoogleSignInAuthentication auth = await account.authentication;
+    // Paso 2: Obtener credenciales
+    final GoogleSignInAuthentication gAuth = await gUser.authentication;
 
-      return {
-        'displayName': account.displayName,
-        'email': account.email,
-        'photoUrl': account.photoUrl,
-        'id': account.id,
-        'idToken': auth.idToken,
-      };
-    } catch (e) {
-      print('Error login Google: $e');
-      return null;
-    }
-  }
+    final credential = GoogleAuthProvider.credential(
+      accessToken: gAuth.accessToken,
+      idToken: gAuth.idToken,
+    );
 
-  /// Cierra sesión.
-  Future<void> logout() async {
-    try {
-      await _googleSignIn.signOut();
-      print('Usuario desconectado de Google');
-    } catch (e) {
-      print('Error logout Google: $e');
-    }
+    // Paso 3: Login Firebase
+    final userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+    final user = userCredential.user;
+    if (user == null) return null;
+
+    // Retornar exactamente lo que espera tu LoginScreen
+    return {
+      'displayName': user.displayName,
+      'email': user.email,
+      'photoURL': user.photoURL,
+      'uid': user.uid,
+    };
   }
 }

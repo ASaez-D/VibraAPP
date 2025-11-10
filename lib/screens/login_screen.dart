@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
-import '../services/google_auth.dart';
+import '../services/AuthServices.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -77,8 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                                  Text('Error al iniciar sesión con Spotify: $e'),
+                              content: Text(
+                                  'Error al iniciar sesión con Spotify: $e'),
                             ),
                           );
                         } finally {
@@ -128,12 +128,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? null
                     : () async {
                         setState(() => _isLoadingGoogle = true);
-                        final googleAuth = GoogleAuth();
+                        final authService = AuthServices();
                         try {
-                          final profile = await googleAuth.login();
-                          if (profile == null) throw 'No se pudo iniciar sesión';
+                          final userCredential =
+                              await authService.signInWithGoogle();
+                          if (userCredential == null)
+                            throw 'No se pudo iniciar sesión';
 
-                          final displayName = profile['displayName'] ?? 'Usuario';
+                          final displayName =
+                              userCredential.user?.displayName ?? 'Usuario';
 
                           if (!mounted) return;
                           Navigator.pushReplacement(
@@ -146,7 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Error al iniciar sesión con Google: $e'),
+                              content: Text(
+                                  'Error al iniciar sesión con Google: $e'),
                             ),
                           );
                         } finally {

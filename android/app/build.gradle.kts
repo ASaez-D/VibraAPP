@@ -2,8 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    // Plugin de Google Services necesario para Firebase / Google Sign-In
-    id("com.google.gms.google-services")
+    id("com.google.gms.google-services") // Firebase / Google Sign-In
 }
 
 android {
@@ -24,6 +23,21 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false       // Desactivamos code shrinking para evitar errores
+            isShrinkResources = false     // Desactivamos eliminar recursos no usados
+            // Si quieres habilitar shrinking, activa lo siguiente y crea proguard-rules.pro
+            /*
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            */
+        }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
@@ -39,7 +53,7 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
 
