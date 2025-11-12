@@ -15,6 +15,7 @@ class AuthServices {
         idToken: gAuth.idToken,
       );
 
+      // ✅ Aquí solo usamos UserCredential directamente
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
       print('Error Google Sign In: $e');

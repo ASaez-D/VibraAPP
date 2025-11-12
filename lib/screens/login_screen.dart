@@ -130,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _isLoadingGoogle = true);
                         final authService = AuthServices();
                         try {
+                          // ✅ Aquí usamos UserCredential directamente
                           final userCredential =
                               await authService.signInWithGoogle();
                           if (userCredential == null)
