@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
 import '../services/AuthServices.dart';
 import 'home_screen.dart';
+import 'music_preferences_screen.dart'; // <-- Importamos la pantalla de cuestionario
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -130,7 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _isLoadingGoogle = true);
                         final authService = AuthServices();
                         try {
-                          // ✅ Aquí usamos UserCredential directamente
                           final userCredential =
                               await authService.signInWithGoogle();
                           if (userCredential == null)
@@ -140,11 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               userCredential.user?.displayName ?? 'Usuario';
 
                           if (!mounted) return;
+
+                          // ✅ Redirigir a cuestionario de música
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  HomeScreen(displayName: displayName),
+                                  MusicPreferencesScreen(displayName: displayName),
                             ),
                           );
                         } catch (e) {
