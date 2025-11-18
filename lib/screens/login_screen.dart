@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
-import '../services/AuthServices.dart';
+import '../services/google_auth.dart';
 import 'home_screen.dart';
-import 'music_preferences_screen.dart'; // <-- Importamos la pantalla de cuestionario
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +9,31 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+class HomePage extends StatelessWidget {
+  final String displayName;
+
+  const HomePage({super.key, required this.displayName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1B1A1A),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Hola, $displayName 👋',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: const Center(
+        child: Text('Contenido de la página principal',
+            style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+}
+
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoadingSpotify = false;
@@ -72,14 +96,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  HomeScreen(displayName: displayName),
+                                  HomePage(displayName: displayName),
                             ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                  'Error al iniciar sesión con Spotify: $e'),
+                              content:
+                                  Text('Error al iniciar sesión con Spotify: $e'),
                             ),
                           );
                         } finally {
@@ -129,31 +153,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? null
                     : () async {
                         setState(() => _isLoadingGoogle = true);
-                        final authService = AuthServices();
+                        final googleAuth = GoogleAuth();
                         try {
-                          final userCredential =
-                              await authService.signInWithGoogle();
-                          if (userCredential == null)
-                            throw 'No se pudo iniciar sesión';
+                          final profile = await googleAuth.login();
+                          if (profile == null) throw 'No se pudo iniciar sesión';
 
-                          final displayName =
-                              userCredential.user?.displayName ?? 'Usuario';
+                          final displayName = profile['displayName'] ?? 'Usuario';
 
                           if (!mounted) return;
-
-                          // ✅ Redirigir a cuestionario de música
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  MusicPreferencesScreen(displayName: displayName),
+                                  HomePage(displayName: displayName),
                             ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                  'Error al iniciar sesión con Google: $e'),
+                              content: Text('Error al iniciar sesión con Google: $e'),
                             ),
                           );
                         } finally {

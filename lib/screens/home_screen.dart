@@ -1,88 +1,198 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'login_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  final String displayName;
-  final bool isGoogle; // Nuevo: indica si el usuario vino de Google
 
-  const HomeScreen({super.key, required this.displayName, this.isGoogle = false});
-
-  Future<void> _signOut(BuildContext context) async {
-    try {
-      // Si es Google, cerrar sesión de Firebase y Google
-      if (isGoogle) {
-        await FirebaseAuth.instance.signOut();
-        await GoogleSignIn().signOut();
-      }
-
-      // Volver al LoginScreen limpiando la pila
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cerrar sesión: $e')),
-      );
-    }
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
-      appBar: AppBar(
-        title: const Text('Vibra'),
-        backgroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '¡Hola, $displayName!',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Montserrat',
-              ),
-              textAlign: TextAlign.center,
+      backgroundColor: const Color(0xFF1B1A1A), // Fondo oscuro
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                // 🔍 Barra de búsqueda
+                Expanded(
+                  child: Container(
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Buscar',
+                        hintStyle: TextStyle(color: Colors.white54),
+                        prefixIcon: Icon(Icons.search, color: Colors.white54),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(top: 6),
+                      ),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // 👤 Icono perfil
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white10,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.person, color: Colors.white),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+          ),
+        ),
+      ),
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             const Text(
-              'Bienvenido a Vibra 🎵',
+              'RECOMENDACIONES',
               style: TextStyle(
                 color: Colors.white70,
-                fontSize: 18,
-                fontFamily: 'Montserrat',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
               ),
             ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () => _signOut(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.greenAccent.shade700,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+            const SizedBox(height: 8),
+
+            // 🎟️ Card de recomendación
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF242323),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Text(
-                'Cerrar sesión',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(16)),
+                    child: Image.asset(
+                      'assets/quevedo.jpg', // tu imagen local
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'De tus artistas:',
+                          style:
+                              TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Quevedo - Buenas Noches Tour España',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Mié - 30 oct.  WiZink Center',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.account_circle,
+                                      color: Colors.white54, size: 16),
+                                  SizedBox(width: 4),
+                                  Text('Kassandra',
+                                      style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(Icons.favorite_border,
+                                color: Colors.white70, size: 18),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.share,
+                                color: Colors.white70, size: 18),
+                          ],
+                        )
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
+
+            const SizedBox(height: 20),
+
+            // 👥 Sección "Tus artistas"
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Tus artistas',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      SizedBox(height: 4),
+                      Text('Quien escuchas y sigues',
+                          style:
+                              TextStyle(color: Colors.white60, fontSize: 12)),
+                    ]),
+                const CircleAvatar(
+                  radius: 14,
+                  backgroundColor: Colors.white10,
+                  child: Icon(Icons.arrow_forward_ios,
+                      color: Colors.white, size: 14),
+                ),
+              ],
+            ),
+            const SizedBox(height: 80), // espacio para el nav bar
           ],
         ),
+      ),
+
+      // ⚫ Barra inferior de navegación
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1B1A1A),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+        ],
       ),
     );
   }
