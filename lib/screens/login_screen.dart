@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
-import 'home_screen.dart';
+import 'music_preferences_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,6 +9,7 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class HomePage extends StatelessWidget {
   final String displayName;
 
@@ -27,13 +28,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: const Center(
-        child: Text('Contenido de la página principal',
-            style: TextStyle(color: Colors.white)),
+        child: Text(
+          'Contenido de la página principal',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
 }
-
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoadingSpotify = false;
@@ -58,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 24),
 
-              // Nombre de la app
               const Text(
                 'Vibra',
                 style: TextStyle(
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 50),
 
-              // Botón Spotify
+              // LOGIN SPOTIFY
               _buildLoginButton(
                 gradientColors: [
                   Colors.greenAccent.shade700,
@@ -86,12 +87,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     : () async {
                         setState(() => _isLoadingSpotify = true);
                         final spotify = SpotifyAuth();
+
                         try {
                           final profile = await spotify.login();
                           if (profile == null) throw 'No se pudo obtener perfil';
-                          final displayName = profile['display_name'] ?? 'Usuario';
+
+                          final displayName =
+                              profile['display_name'] ?? 'Usuario';
 
                           if (!mounted) return;
+
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -114,7 +119,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              // Divider
               Row(
                 children: const [
                   Expanded(
@@ -140,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              // Botón Google
+              // LOGIN GOOGLE
               _buildLoginButton(
                 gradientColors: [
                   Colors.blueAccent.shade700,
@@ -153,25 +157,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? null
                     : () async {
                         setState(() => _isLoadingGoogle = true);
-                        final googleAuth = GoogleAuth();
+
                         try {
+                          final googleAuth = GoogleAuth();
                           final profile = await googleAuth.login();
+
                           if (profile == null) throw 'No se pudo iniciar sesión';
 
-                          final displayName = profile['displayName'] ?? 'Usuario';
+                          final displayName =
+                              profile['displayName'] ?? 'Usuario';
 
                           if (!mounted) return;
+
+                          // ENVIAR AL PANTALLA DE GÉNEROS
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  HomePage(displayName: displayName),
+                              builder: (context) => MusicPreferencesScreen(
+                                displayName: displayName,
+                              ),
                             ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Error al iniciar sesión con Google: $e'),
+                              content:
+                                  Text('Error al iniciar sesión con Google: $e'),
                             ),
                           );
                         } finally {
@@ -183,7 +194,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 40),
 
-              // Texto final -> Términos y condiciones
               const Text(
                 'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
                 style: TextStyle(
@@ -200,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Helper
+  // REUSABLE LOGIN BUTTON
   Widget _buildLoginButton({
     required List<Color> gradientColors,
     required String iconPath,

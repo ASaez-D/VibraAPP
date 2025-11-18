@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/spotify_api_service.dart';
-import 'home_screen.dart';
+import '../screens/home_screen.dart';
+
 
 class MusicPreferencesScreen extends StatefulWidget {
   final String displayName;
@@ -11,7 +12,6 @@ class MusicPreferencesScreen extends StatefulWidget {
 
   @override
   State<MusicPreferencesScreen> createState() => _MusicPreferencesScreenState();
-
 }
 
 class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
@@ -21,6 +21,8 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
   List<Map<String, String>> searchResults = [];
   final Set<Map<String, String>> selectedArtists = {};
   final Set<String> selectedGenres = {};
+
+  bool _isSearching = false;
 
   final List<String> genres = [
     'Pop',
@@ -41,8 +43,6 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
     'Funk',
   ];
 
-  bool _isSearching = false;
-
   Future<void> _searchArtists(String query) async {
     if (query.isEmpty) {
       setState(() => searchResults = []);
@@ -54,20 +54,20 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
       final results = await _spotifyService.searchArtists(query);
       setState(() => searchResults = results);
     } catch (e) {
-      print('Error buscando artistas: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error buscando artistas: $e')),
+      );
     } finally {
       setState(() => _isSearching = false);
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // Lista de generos marcados y no seleccionados
-
-    final selectedGenreList = genres.where((g) => selectedGenres.contains(g)).toList();
-    final unselectedGenres = genres.where((g) => !selectedGenres.contains(g)).toList();
+    final selectedGenreList =
+        genres.where((g) => selectedGenres.contains(g)).toList();
+    final unselectedGenres =
+        genres.where((g) => !selectedGenres.contains(g)).toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -77,9 +77,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // Header
-
+              // HEADER
               Text(
                 '¡Hola, ${widget.displayName}! 🎧',
                 style: GoogleFonts.montserrat(
@@ -89,17 +87,17 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                 ),
               ),
               const SizedBox(height: 8),
+
               Text(
                 'Queremos saber más de ti. Cuéntanos qué música te gusta.',
                 style: GoogleFonts.montserrat(
                   color: Colors.white70,
                   fontSize: 15,
-                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-              // Buscador 
+              // BUSCADOR
               TextField(
                 controller: _searchController,
                 onChanged: _searchArtists,
@@ -107,8 +105,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                 decoration: InputDecoration(
                   hintText: 'Busca tus artistas favoritos...',
                   hintStyle: const TextStyle(color: Colors.white38),
-                  prefixIcon:
-                      const Icon(Icons.search, color: Colors.white38, size: 22),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white38),
                   filled: true,
                   fillColor: const Color(0xFF1A1A1A),
                   contentPadding:
@@ -119,21 +116,20 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 10),
 
-              // Resultados busqueda
+              // RESULTADOS BÚSQUEDA
               if (_isSearching)
-                const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.greenAccent,
-                    ),
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(color: Colors.greenAccent),
                   ),
                 )
               else if (searchResults.isNotEmpty)
                 Container(
-                  constraints: const BoxConstraints(maxHeight: 200),
+                  constraints: const BoxConstraints(maxHeight: 220),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(20),
@@ -144,6 +140,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                       final artist = searchResults[index];
                       final isSelected = selectedArtists
                           .any((a) => a['name'] == artist['name']);
+
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(artist['image']!),
@@ -152,11 +149,14 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                           artist['name']!,
                           style: const TextStyle(color: Colors.white),
                         ),
-                        trailing: isSelected
-                            ? const Icon(Icons.check_circle,
-                                color: Colors.greenAccent)
-                            : const Icon(Icons.add_circle_outline,
-                                color: Colors.white38),
+                        trailing: Icon(
+                          isSelected
+                              ? Icons.check_circle
+                              : Icons.add_circle_outline,
+                          color: isSelected
+                              ? Colors.greenAccent
+                              : Colors.white38,
+                        ),
                         onTap: () {
                           HapticFeedback.lightImpact();
                           setState(() {
@@ -177,15 +177,13 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
               const SizedBox(height: 20),
 
-              // Scroll
+              // SCROLL
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      // Artistas marcados
-
+                      // ARTISTAS SELECCIONADOS
                       if (selectedArtists.isNotEmpty)
                         Wrap(
                           spacing: 12,
@@ -196,7 +194,6 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                                 artist['name']!,
                                 style: GoogleFonts.montserrat(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               avatar: CircleAvatar(
@@ -204,8 +201,8 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                               ),
                               backgroundColor:
                                   Colors.greenAccent.withOpacity(0.2),
-                              deleteIcon:
-                                  const Icon(Icons.close, color: Colors.white70),
+                              deleteIcon: const Icon(Icons.close,
+                                  color: Colors.white70),
                               onDeleted: () {
                                 setState(() {
                                   selectedArtists.removeWhere(
@@ -213,16 +210,16 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                                 });
                               },
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             );
                           }).toList(),
                         ),
-                      if (selectedArtists.isNotEmpty) const SizedBox(height: 20),
 
-                      // Header generos
+                      if (selectedArtists.isNotEmpty)
+                        const SizedBox(height: 20),
 
+                      // TEXTO GÉNEROS
                       Text(
                         'Selecciona tus géneros favoritos:',
                         style: GoogleFonts.montserrat(
@@ -235,8 +232,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                       const Divider(color: Colors.white24),
                       const SizedBox(height: 10),
 
-                      // Generos marcados
-
+                      // GÉNEROS SELECCIONADOS
                       if (selectedGenreList.isNotEmpty)
                         Wrap(
                           spacing: 12,
@@ -255,8 +251,8 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                                   Text(
                                     genre,
                                     style: GoogleFonts.montserrat(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500),
+                                      color: Colors.white,
+                                    ),
                                   ),
                                   const SizedBox(width: 6),
                                   GestureDetector(
@@ -265,30 +261,25 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                                         selectedGenres.remove(genre);
                                       });
                                     },
-                                    child: const Icon(
-                                      Icons.close,
-                                      size: 18,
-                                      color: Colors.white,
-                                    ),
-                                  )
+                                    child: const Icon(Icons.close,
+                                        color: Colors.white, size: 18),
+                                  ),
                                 ],
                               ),
                             );
                           }).toList(),
                         ),
-                      if (selectedGenreList.isNotEmpty) const SizedBox(height: 10),
 
-                      // Texto generos no marcados
+                      if (selectedGenreList.isNotEmpty)
+                        const SizedBox(height: 15),
 
-                      if (unselectedGenres.isNotEmpty)
-                        Text(
-                          'Géneros disponibles:',
-                          style: GoogleFonts.montserrat(
-                              color: Colors.white38, fontSize: 14),
-                        ),
-                      if (unselectedGenres.isNotEmpty) const SizedBox(height: 5),
-
-                      // Generos no marcados
+                      // GÉNEROS DISPONIBLES
+                      Text(
+                        'Géneros disponibles:',
+                        style: GoogleFonts.montserrat(
+                            color: Colors.white38, fontSize: 14),
+                      ),
+                      const SizedBox(height: 5),
 
                       Wrap(
                         spacing: 12,
@@ -298,16 +289,15 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                             label: Text(
                               genre,
                               style: GoogleFonts.montserrat(
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500),
+                                  color: Colors.white70),
                             ),
                             selected: false,
-                            selectedColor: Colors.greenAccent,
                             backgroundColor: const Color(0xFF1F1F1F),
+                            selectedColor: Colors.greenAccent,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                            onSelected: (selected) {
-                              HapticFeedback.lightImpact();
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            onSelected: (_) {
                               setState(() {
                                 selectedGenres.add(genre);
                               });
@@ -322,8 +312,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
               const SizedBox(height: 20),
 
-              // Boton continuar.
-
+              // BOTÓN CONTINUAR
               Center(
                 child: Container(
                   decoration: BoxDecoration(
@@ -331,12 +320,6 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                       colors: [Colors.greenAccent, Colors.lightGreenAccent],
                     ),
                     borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.greenAccent.withOpacity(0.5),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4))
-                    ],
                   ),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -351,13 +334,12 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                     onPressed: selectedArtists.isNotEmpty ||
                             selectedGenres.isNotEmpty
                         ? () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    HomeScreen(displayName: widget.displayName),
-                              ),
-                            );
+                           Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(displayName: widget.displayName),
+                            ),
+                          );
                           }
                         : null,
                     child: const Text(

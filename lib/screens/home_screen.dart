@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+class HomeScreen extends StatelessWidget {
+  final String displayName; // ✅ Añadido
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomeScreen({super.key, required this.displayName}); // ✅ Constructor con displayName
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +57,14 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              '¡Hola, $displayName! 👋', // ✅ Mostramos el nombre
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
             const Text(
               'RECOMENDACIONES',
               style: TextStyle(
