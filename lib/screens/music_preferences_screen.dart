@@ -355,7 +355,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    HomeScreen(displayName: widget.displayName),
+                                  const HomePage(),
                               ),
                             );
                           }
