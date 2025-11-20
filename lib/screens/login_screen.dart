@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
+import 'home_screen.dart';
 import 'music_preferences_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -8,33 +9,6 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class HomePage extends StatelessWidget {
-  final String displayName;
-
-  const HomePage({super.key, required this.displayName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1A1A),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Hola, $displayName 👋',
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      body: const Center(
-        child: Text(
-          'Contenido de la página principal',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -90,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         try {
                           final profile = await spotify.login();
-                          if (profile == null) throw 'No se pudo obtener perfil';
+                          if (profile == null) throw 'No se obtuvo perfil';
 
                           final displayName =
                               profile['display_name'] ?? 'Usuario';
@@ -100,19 +74,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  HomePage(displayName: displayName),
+                              builder: (_) =>
+                                  HomeScreen(displayName: displayName),
                             ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                                  Text('Error al iniciar sesión con Spotify: $e'),
+                              content: Text(
+                                  'Error al iniciar sesión con Spotify: $e'),
                             ),
                           );
                         } finally {
-                          if (mounted) setState(() => _isLoadingSpotify = false);
+                          if (mounted) {
+                            setState(() => _isLoadingSpotify = false);
+                          }
                         }
                       },
               ),
@@ -153,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 iconPath: 'assets/googleLogo.png',
                 text: _isLoadingGoogle ? 'Cargando...' : 'Iniciar con Google',
                 textColor: Colors.white,
+                isGoogle: true,
                 onPressed: _isLoadingGoogle
                     ? null
                     : () async {
@@ -169,13 +146,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           if (!mounted) return;
 
-                          // ENVIAR AL PANTALLA DE GÉNEROS
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MusicPreferencesScreen(
-                                displayName: displayName,
-                              ),
+                              builder: (_) =>
+                                  MusicPreferencesScreen(displayName: displayName),
                             ),
                           );
                         } catch (e) {
@@ -186,16 +161,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         } finally {
-                          if (mounted) setState(() => _isLoadingGoogle = false);
+                          if (mounted) {
+                            setState(() => _isLoadingGoogle = false);
+                          }
                         }
                       },
-                isGoogle: true,
               ),
 
               const SizedBox(height: 40),
 
               const Text(
-                'Al continuar, aceptas nuestros Términos de servicio y Política de privacidad.',
+                'Al continuar, aceptas nuestros Términos y Política de privacidad.',
                 style: TextStyle(
                   color: Colors.white38,
                   fontSize: 12,
@@ -210,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // REUSABLE LOGIN BUTTON
+  // ---- REUSABLE BUTTON ----
   Widget _buildLoginButton({
     required List<Color> gradientColors,
     required String iconPath,
@@ -227,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
           BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
-      child: ElevatedButton.icon(
+      child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -236,44 +212,43 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        icon: isGoogle
-            ? SizedBox(
-                width: 26,
-                height: 26,
-                child: Center(
-                  child: Container(
-                    width: 22,
-                    height: 22,
-                    decoration: const BoxDecoration(
+        onPressed: onPressed,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ICONO
+            Container(
+              width: 26,
+              height: 26,
+              decoration: isGoogle
+                  ? const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        iconPath,
-                        width: 14,
-                        height: 14,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
+                    )
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Image.asset(
+                  iconPath,
+                  fit: BoxFit.contain,
                 ),
-              )
-            : SizedBox(
-                width: 26,
-                height: 26,
-                child: Image.asset(iconPath, fit: BoxFit.contain),
               ),
-        label: Text(
-          text,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            letterSpacing: 0.5,
-          ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // TEXTO
+            Text(
+              text,
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
-        onPressed: onPressed,
       ),
     );
   }
