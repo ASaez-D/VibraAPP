@@ -89,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(16)),
                     child: Image.asset(
-                      'assets/quevedo.jpg', // tu imagen local
+                      '', // tu imagen local
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
