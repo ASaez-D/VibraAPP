@@ -1,16 +1,14 @@
+// lib/services/ticketmaster_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/concert.dart';
+import '../models/concert_detail.dart';
 
 class TicketmasterService {
-  final String apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6';
+  final String apiKey = 'TU_API_KEY_AQUI';
 
-  String formatDate(DateTime dt) =>
-      dt.toUtc().toIso8601String().split('.').first + 'Z';
-
-  Future<List<Concert>> getConcerts(DateTime start, DateTime end) async {
-    final startStr = formatDate(start);
-    final endStr = formatDate(end);
+  Future<List<ConcertDetail>> getConcerts(DateTime start, DateTime end) async {
+    final startStr = start.toUtc().toIso8601String();
+    final endStr = end.toUtc().toIso8601String();
 
     final url = Uri.parse(
         'https://app.ticketmaster.com/discovery/v2/events.json?apikey=$apiKey&startDateTime=$startStr&endDateTime=$endStr&classificationName=music');
@@ -19,15 +17,15 @@ class TicketmasterService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+
       if (data['_embedded'] != null && data['_embedded']['events'] != null) {
         final events = data['_embedded']['events'] as List<dynamic>;
-        return events.map((e) => Concert.fromJson(e)).toList();
+        return events.map((e) => ConcertDetail.fromJson(e)).toList();
       } else {
         return [];
       }
     } else {
-      throw Exception(
-          'Error al cargar conciertos (${response.statusCode}): ${response.body}');
+      throw Exception('Error al cargar conciertos (${response.statusCode})');
     }
   }
 }
