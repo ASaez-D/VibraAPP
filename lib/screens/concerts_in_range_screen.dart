@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// Importa el modelo
+import 'package:intl/date_symbol_data_local.dart';
+
+// Asegúrate de que estas importaciones apunten a tus archivos correctos
 import '../models/concert_detail.dart';
-// Importa el servicio
 import '../services/ticketmaster_service.dart';
-// IMPORTANTE: Importa la pantalla de detalle para que la navegación funcione
 import 'concert_detail_screen.dart'; 
 
 class ConcertsInRangeScreen extends StatefulWidget {
@@ -28,27 +28,32 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   @override
   void initState() {
     super.initState();
+    // Inicializa el formato de fecha para español
+    initializeDateFormatting('es_ES', null);
     concertsFuture = service.getConcerts(widget.startDate, widget.endDate);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E), // Fondo negro premium
+      backgroundColor: const Color(0xFF0E0E0E),
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // AppBar transparente
+        backgroundColor: const Color(0xFF0E0E0E),
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           "EVENTOS DISPONIBLES",
           style: TextStyle(
-            color: Colors.white, 
+            color: Colors.white,
             fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-            fontSize: 16
+            letterSpacing: 1.2,
+            fontSize: 16,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<List<ConcertDetail>>(
         future: concertsFuture,
@@ -58,46 +63,18 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
               child: CircularProgressIndicator(color: Colors.greenAccent),
             );
           } else if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 50, color: Colors.redAccent),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Ocurrió un error:\n${snapshot.error}',
-                      style: const TextStyle(color: Colors.white70),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return _buildErrorState(snapshot.error.toString());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.event_busy, size: 80, color: Colors.grey[800]),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No hay conciertos en estas fechas',
-                    style: TextStyle(color: Colors.white54, fontSize: 16),
-                  ),
-                ],
-              ),
-            );
+            return _buildEmptyState();
           } else {
             final concerts = snapshot.data!;
             return ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.all(20),
+              physics: const BouncingScrollPhysics(),
               itemCount: concerts.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                final concert = concerts[index];
-                return _buildConcertCard(context, concert);
+                return _buildConcertCard(context, concerts[index]);
               },
             );
           }
@@ -106,11 +83,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 
+  // --- WIDGET DE LA TARJETA ---
   Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
-    // Formateo de fecha para el diseño de calendario
     final String day = DateFormat('d', 'es_ES').format(concert.date);
     final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
     final String time = DateFormat('HH:mm', 'es_ES').format(concert.date);
+
+    String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
+    if (priceLabel.length > 8) priceLabel = "Ver más";
 
     return GestureDetector(
       onTap: () {
@@ -122,138 +102,209 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         );
       },
       child: Container(
-        height: 130, // Altura fija para uniformidad
+        // Aumentado a 145 para evitar las barras amarillas (overflow)
+        height: 145, 
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E), // Gris oscuro tipo iOS/Glass
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.05)), // Borde muy sutil
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF252525), 
+              const Color(0xFF151515), 
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Row(
           children: [
-            // 1. IMAGEN (Izquierda)
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              child: SizedBox(
-                width: 110,
+            // 1. IMAGEN
+            Hero( 
+              tag: concert.name + concert.date.toString(), 
+              child: Container(
+                width: 115,
                 height: double.infinity,
-                child: concert.imageUrl.isNotEmpty
-                    ? Image.network(
-                        concert.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, e, s) => Container(
-                          color: Colors.grey[850],
-                          child: const Icon(Icons.music_note, color: Colors.white24),
-                        ),
-                      )
-                    : Container(
-                        color: Colors.grey[850],
-                        child: const Icon(Icons.music_note, color: Colors.white24),
-                      ),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    bottomLeft: Radius.circular(24),
+                  ),
+                  image: DecorationImage(
+                    image: NetworkImage(concert.imageUrl),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.1), 
+                      BlendMode.darken
+                    ),
+                  ),
+                ),
+                child: concert.imageUrl.isEmpty 
+                    ? const Center(child: Icon(Icons.music_note, color: Colors.white24)) 
+                    : null,
               ),
             ),
 
-            // 2. INFORMACIÓN (Centro)
+            // 2. CONTENIDO
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                // Ajustado el padding vertical a 10 para ganar espacio interno
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center, 
                   children: [
-                    // Fecha pequeña en verde
+                    // A. FECHA y HORA
                     Row(
                       children: [
                         Text(
                           "$day $month",
                           style: const TextStyle(
-                            color: Colors.greenAccent,
+                            color: Colors.greenAccent, 
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 13,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Container(
-                          width: 4, 
-                          height: 4, 
-                          decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle)
-                        ),
+                        Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle)),
                         const SizedBox(width: 8),
                         Text(
                           time,
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.grey[400], fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 6),
-                    
-                    // Título
-                    Text(
-                      concert.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        height: 1.2,
+
+                    // B. TÍTULO (Usamos Flexible para evitar overflow horizontal/vertical)
+                    Flexible(
+                      child: Text(
+                        concert.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          height: 1.1, 
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                    
+                    const SizedBox(height: 4),
 
-                    const SizedBox(height: 6),
-
-                    // Lugar (Venue)
+                    // C. UBICACIÓN
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.white38),
+                        Icon(Icons.location_on, size: 12, color: Colors.grey[500]),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             concert.venue,
-                            style: const TextStyle(
-                              color: Colors.white38,
-                              fontSize: 12,
-                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                         ),
                       ],
                     ),
+
+                    // Espacio ajustado para que suba un poquito
+                    const SizedBox(height: 8),
+
+                    // D. PRECIO Y FLECHA
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Badge Precio
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white24),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            priceLabel,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        
+                        // FLECHA (Estilo: Círculo negro con borde)
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white12),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            // 3. FLECHA (Derecha)
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black, // Círculo negro fondo flecha
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Colors.white,
-                  size: 14,
-                ),
-              ),
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.event_busy_rounded, size: 60, color: Colors.grey[800]),
+          const SizedBox(height: 16),
+          Text(
+            'No hay conciertos',
+            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Prueba con otras fechas',
+            style: TextStyle(color: Colors.grey[800], fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.wifi_off_rounded, size: 50, color: Colors.redAccent),
+            const SizedBox(height: 16),
+            const Text(
+              'Ups, algo falló',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'No pudimos cargar los eventos.\n$error',
+              style: const TextStyle(color: Colors.white54, fontSize: 13),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
