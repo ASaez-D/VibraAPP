@@ -1,8 +1,3 @@
-// lib/models/concert_detail.dart
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 class ConcertDetail {
   final String name;
   final String venue;
@@ -13,6 +8,10 @@ class ConcertDetail {
   final String imageUrl;
   final String ticketUrl;
   final String genre;
+  final String priceRange;
+  // Nuevas variables para coordenadas
+  final double? latitude;
+  final double? longitude;
 
   ConcertDetail({
     required this.name,
@@ -24,140 +23,86 @@ class ConcertDetail {
     required this.imageUrl,
     this.ticketUrl = '',
     this.genre = '',
+    this.priceRange = 'Consultar',
+    this.latitude,
+    this.longitude,
   });
 
   factory ConcertDetail.fromJson(Map<String, dynamic> json) {
-    final venue = json['_embedded']?['venues']?[0];
+    // 1. VENUE
+    String venueName = "Desconocido";
+    String venueAddress = "";
+    String venueCity = "";
+    String venueCountry = "";
+    double? lat;
+    double? lng;
+
+    try {
+      final venues = json["_embedded"]?["venues"];
+      if (venues is List && venues.isNotEmpty) {
+        final v = venues[0];
+        venueName = v["name"] ?? "Desconocido";
+        venueAddress = v["address"]?["line1"] ?? "";
+        venueCity = v["city"]?["name"] ?? "";
+        venueCountry = v["country"]?["name"] ?? "";
+        
+        // Extracción de coordenadas
+        if (v["location"] != null) {
+          lat = double.tryParse(v["location"]["latitude"] ?? "");
+          lng = double.tryParse(v["location"]["longitude"] ?? "");
+        }
+      }
+    } catch (e) {}
+
+    // 2. IMAGEN
+    String finalImageUrl = "";
+    try {
+      final images = json["images"];
+      if (images is List && images.isNotEmpty) {
+        finalImageUrl = images[0]["url"] ?? "";
+      }
+    } catch (e) {}
+
+    // 3. GÉNERO
+    String finalGenre = "";
+    try {
+      final classifications = json["classifications"];
+      if (classifications is List && classifications.isNotEmpty) {
+        finalGenre = classifications[0]["genre"]?["name"] ?? "";
+      }
+    } catch (e) {}
+
+    // 4. PRECIO
+    String finalPrice = "No disponible";
+    try {
+      final prices = json["priceRanges"];
+      if (prices is List && prices.isNotEmpty) {
+        final min = prices[0]["min"];
+        final max = prices[0]["max"];
+        final currency = prices[0]["currency"] ?? "";
+        if (min != null && max != null) {
+          finalPrice = "$min - $max $currency";
+        } else {
+          finalPrice = "Desde $min $currency";
+        }
+      }
+    } catch (e) {}
+
     return ConcertDetail(
-      name: json['name'] ?? 'Sin nombre',
-      venue: venue?['name'] ?? 'Desconocido',
-      address: venue?['address']?['line1'] ?? '',
-      city: venue?['city']?['name'] ?? '',
-      country: venue?['country']?['name'] ?? '',
-      date: DateTime.parse(json['dates']?['start']?['dateTime'] ?? DateTime.now().toIso8601String()),
-      imageUrl: (json['images'] != null && json['images'].isNotEmpty)
-          ? json['images'][0]['url']
-          : '',
-      ticketUrl: json['url'] ?? '',
-      genre: (json['classifications'] != null && json['classifications'].isNotEmpty)
-          ? json['classifications'][0]['genre']?['name'] ?? ''
-          : '',
-    );
-  }
-}
-
-class ConcertDetailScreen extends StatelessWidget {
-  final ConcertDetail concert;
-
-  const ConcertDetailScreen({super.key, required this.concert});
-
-  Future<void> _launchTickets(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint('No se pudo abrir el link: $url');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(concert.name, style: const TextStyle(color: Colors.white)),
+      name: json["name"] ?? "Sin nombre",
+      venue: venueName,
+      address: venueAddress,
+      city: venueCity,
+      country: venueCountry,
+      date: DateTime.parse(
+        json["dates"]?["start"]?["dateTime"] ?? DateTime.now().toIso8601String(),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // IMAGEN PRINCIPAL
-            concert.imageUrl.isNotEmpty
-                ? Image.network(concert.imageUrl,
-                    width: double.infinity, height: 250, fit: BoxFit.cover)
-                : Container(
-                    width: double.infinity,
-                    height: 250,
-                    color: Colors.grey[900],
-                    child: const Icon(Icons.music_note,
-                        color: Colors.white38, size: 80),
-                  ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    concert.name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    DateFormat('EEEE, d MMMM yyyy, HH:mm', 'es_ES')
-                        .format(concert.date),
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  if (concert.genre.isNotEmpty)
-                    Row(
-                      children: [
-                        const Icon(Icons.category, color: Colors.greenAccent),
-                        const SizedBox(width: 8),
-                        Text(concert.genre,
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 16)),
-                      ],
-                    ),
-                  const SizedBox(height: 16),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.location_on, color: Colors.greenAccent),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${concert.venue}\n${concert.address}\n${concert.city}, ${concert.country}',
-                          style:
-                              const TextStyle(color: Colors.white70, fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: concert.ticketUrl.isNotEmpty
-                          ? () => _launchTickets(concert.ticketUrl)
-                          : null,
-                      child: const Text(
-                        'Comprar Entradas',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      imageUrl: finalImageUrl,
+      ticketUrl: json["url"] ?? "",
+      genre: finalGenre,
+      priceRange: finalPrice,
+      latitude: lat,
+      longitude: lng,
     );
   }
 }
