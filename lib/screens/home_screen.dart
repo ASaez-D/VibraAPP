@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'login_screen.dart';
+import 'settings_screen.dart';
+import 'payments_screen.dart';
+import 'privacity_screen.dart';
+import 'notifications_screen.dart';
+import 'customizeProfile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String displayName;
@@ -41,14 +47,19 @@ class HomeScreen extends StatelessWidget {
 
                 const SizedBox(width: 10),
 
-                // 👤 Icono perfil
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white10,
+                // 👤 Icono perfil con Drawer
+                Builder(
+                  builder: (context) => GestureDetector(
+                    onTap: () => Scaffold.of(context).openEndDrawer(),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white10,
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(Icons.person, color: Colors.white),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(Icons.person, color: Colors.white),
                 ),
               ],
             ),
@@ -100,22 +111,17 @@ class HomeScreen extends StatelessWidget {
                     style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 4),
-
                   const Text(
                     'Concierto destacado',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 4),
-
                   const Text(
                     'Fecha por confirmar',
                     style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-
                   const SizedBox(height: 10),
-
                   Row(
                     children: [
                       Container(
@@ -138,9 +144,7 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       const Spacer(),
-
                       const Icon(Icons.favorite_border,
                           color: Colors.white70, size: 18),
                       const SizedBox(width: 8),
@@ -200,6 +204,99 @@ class HomeScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
         ],
       ),
+
+      // 🔘 Drawer derecho
+      endDrawer: Drawer(
+        backgroundColor: const Color(0xFF0E0E0E),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Nombre + editar perfil
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayName,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const CustomizeProfileScreen()),
+                        );
+                      },
+                      child: const Text(
+                        "Editar perfil",
+                        style: TextStyle(
+                            color: Colors.white70, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(color: Colors.white24),
+
+              // Opciones del menú
+              _menuItem(context, "Pagos", Icons.payment,
+                  const PaymentsScreen()),
+              _menuItem(context, "Notificaciones", Icons.notifications,
+                  const NotificationsScreen()),
+              _menuItem(context, "Privacidad", Icons.vpn_key,
+                  const PrivacityScreen()),
+              _menuItem(context, "Configuración", Icons.settings,
+                  const SettingsScreen()),
+
+              const Spacer(),
+
+              const Divider(color: Colors.white24),
+
+              // Cerrar sesión
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.redAccent),
+                title: const Text(
+                  "Cerrar sesión",
+                  style: TextStyle(
+                      color: Colors.redAccent, fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const LoginScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Método reusable para items del menú
+  Widget _menuItem(
+      BuildContext context, String title, IconData icon, Widget screen) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white70),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      onTap: () {
+        Navigator.of(context).pop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+      },
     );
   }
 }
