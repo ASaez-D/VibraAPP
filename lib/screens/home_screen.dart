@@ -5,18 +5,72 @@ import 'payments_screen.dart';
 import 'privacity_screen.dart';
 import 'notifications_screen.dart';
 import 'customizeProfile_screen.dart';
+import 'calendar_screen.dart';
+import 'ticket_screen.dart';
+import 'social_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final String displayName;
 
   const HomeScreen({super.key, required this.displayName});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  // Lista de tickets de ejemplo
+  final List<Ticket> myTickets = [
+    Ticket(
+      eventName: "Concierto de Kassandra",
+      eventDate: DateTime(2025, 12, 20),
+      location: "Auditorio Nacional",
+      status: "Activa",
+    ),
+    Ticket(
+      eventName: "Festival de Música",
+      eventDate: DateTime(2026, 1, 15),
+      location: "Estadio Central",
+      status: "Usada",
+    ),
+  ];
+
+  // Navegación inferior
+  void _onTabTapped(int index) {
+    switch (index) {
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CalendarScreen()),
+        );
+        break;
+
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)),
+        );
+        break;
+
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SocialScreen()),
+        );
+        break;
+    }
+
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1A1A), // Fondo oscuro
-
-      // 🔝 AppBar personalizado
+      backgroundColor: const Color(0xFF1B1A1A),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
@@ -24,7 +78,6 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                // 🔍 Barra de búsqueda
                 Expanded(
                   child: Container(
                     height: 38,
@@ -44,10 +97,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
-                // 👤 Icono perfil con Drawer
                 Builder(
                   builder: (context) => GestureDetector(
                     onTap: () => Scaffold.of(context).openEndDrawer(),
@@ -66,24 +116,19 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-
-      // 📜 CUERPO PRINCIPAL
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 👋 Saludo con el nombre
             Text(
-              '¡Hola, $displayName! 👋',
+              '¡Hola, ${widget.displayName}! 👋',
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 12),
-
             const Text(
               'RECOMENDACIONES',
               style: TextStyle(
@@ -93,10 +138,7 @@ class HomeScreen extends StatelessWidget {
                 letterSpacing: 1,
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // 🎟️ Card de recomendación (SIN IMÁGENES)
             Container(
               decoration: BoxDecoration(
                 color: const Color(0xFF242323),
@@ -106,21 +148,15 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'De tus artistas:',
-                    style: TextStyle(color: Colors.white70),
-                  ),
+                  const Text('De tus artistas:',
+                      style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Concierto destacado',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Concierto destacado',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Fecha por confirmar',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
+                  const Text('Fecha por confirmar',
+                      style: TextStyle(color: Colors.white70, fontSize: 12)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -155,10 +191,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // 👥 Sección "Tus artistas"
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -185,34 +218,31 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 80),
           ],
         ),
       ),
-
-      // ⚫ Barra de navegación inferior
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1B1A1A),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white54,
         type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: ''),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.confirmation_num), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: ''),
         ],
       ),
-
-      // 🔘 Drawer derecho
       endDrawer: Drawer(
         backgroundColor: const Color(0xFF0E0E0E),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Nombre + editar perfil
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -220,7 +250,7 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      displayName,
+                      widget.displayName,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -245,22 +275,16 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const Divider(color: Colors.white24),
-
-              // Opciones del menú
-              _menuItem(context, "Pagos", Icons.payment,
-                  const PaymentsScreen()),
+              _menuItem(
+                  context, "Pagos", Icons.payment, const PaymentsScreen()),
               _menuItem(context, "Notificaciones", Icons.notifications,
                   const NotificationsScreen()),
               _menuItem(context, "Privacidad", Icons.vpn_key,
                   const PrivacityScreen()),
               _menuItem(context, "Configuración", Icons.settings,
                   const SettingsScreen()),
-
               const Spacer(),
-
               const Divider(color: Colors.white24),
-
-              // Cerrar sesión
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.redAccent),
                 title: const Text(
@@ -272,8 +296,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const LoginScreen()),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
                 },
               ),
@@ -284,7 +307,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Método reusable para items del menú
   Widget _menuItem(
       BuildContext context, String title, IconData icon, Widget screen) {
     return ListTile(
