@@ -131,4 +131,3 @@ class TickerScreen extends StatelessWidget {
     );
   }
 }
-
