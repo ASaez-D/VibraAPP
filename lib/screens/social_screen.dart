@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SocialScreen extends StatelessWidget {
-  const SocialScreen({super.key});
+  // Quitar const del constructor
+  SocialScreen({super.key});
 
-  final Color accentColor = Colors.greenAccent;
-  final Color backgroundColor = const Color(0xFF0E0E0E);
+  // Morado más suave y elegante
+  final Color accentColor = Colors.purple.shade300;
+  final Color backgroundColor = const Color(0xFF0E0E1A);
 
-  // Datos de ejemplo
   final List<Map<String, dynamic>> friends = const [
     {"name": "Ana García", "status": "En línea", "img": "https://i.pravatar.cc/150?u=1"},
     {"name": "Carlos Ruiz", "status": "Escuchando Jazz", "img": "https://i.pravatar.cc/150?u=2"},
@@ -20,7 +21,7 @@ class SocialScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.black,
         elevation: 0,
         title: const Text(
           "Mis Amigos",
@@ -35,27 +36,24 @@ class SocialScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Barra de búsqueda simple
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: "Buscar amigo...",
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                hintStyle: TextStyle(color: Colors.white54),
+                prefixIcon: Icon(Icons.search, color: Colors.white54),
                 filled: true,
-                fillColor: const Color(0xFF1C1C1E),
+                fillColor: const Color(0xFF1B1B2A),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
             ),
           ),
-
-          // Lista de amigos
           Expanded(
             child: ListView.separated(
               itemCount: friends.length,
@@ -64,49 +62,58 @@ class SocialScreen extends StatelessWidget {
                 final friend = friends[index];
                 final isOnline = friend['status'] == "En línea";
 
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  // Avatar con indicador de estado
-                  leading: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundImage: NetworkImage(friend['img']),
-                        backgroundColor: Colors.grey[800],
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.deepPurple.shade900, Colors.deepPurple.shade800], // morado más suave
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 4),
                       ),
-                      if (isOnline)
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: accentColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: backgroundColor, width: 2),
-                            ),
-                          ),
-                        ),
                     ],
                   ),
-                  // Nombre
-                  title: Text(
-                    friend['name'],
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  // Estado
-                  subtitle: Text(
-                    friend['status'],
-                    style: TextStyle(
-                      color: isOnline ? accentColor : Colors.grey[500],
-                      fontSize: 13,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundImage: NetworkImage(friend['img']),
+                          backgroundColor: Colors.grey[800],
+                        ),
+                        if (isOnline)
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: backgroundColor, width: 2),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                  // Botón de chat
-                  trailing: IconButton(
-                    icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white54, size: 22),
-                    onPressed: () {},
+                    title: Text(
+                      friend['name'],
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    subtitle: Text(
+                      friend['status'],
+                      style: TextStyle(color: isOnline ? accentColor : Colors.white54, fontSize: 13),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white54, size: 22),
+                      onPressed: () {},
+                    ),
                   ),
                 );
               },

@@ -16,15 +16,15 @@ class Ticket {
   });
 }
 
-class TickerScreen extends StatelessWidget {
+class TicketScreen extends StatelessWidget {
   final List<Ticket> tickets;
 
-  const TickerScreen({super.key, required this.tickets});
+  const TicketScreen({super.key, required this.tickets});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: const Color(0xFF0E0E1A),
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
@@ -59,7 +59,7 @@ class TickerScreen extends StatelessWidget {
     Color statusColor;
     switch (ticket.status) {
       case "Activa":
-        statusColor = Colors.greenAccent;
+        statusColor = Colors.purpleAccent;
         break;
       case "Usada":
         statusColor = Colors.grey;
@@ -75,11 +75,14 @@ class TickerScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C),
+        gradient: ticket.status == "Activa"
+            ? LinearGradient(colors: [Colors.purple.shade800, Colors.deepPurple.shade900])
+            : null,
+        color: ticket.status != "Activa" ? const Color(0xFF1B1B2A) : null,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.greenAccent.withOpacity(0.2),
+            color: Colors.purpleAccent.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -110,16 +113,15 @@ class TickerScreen extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: statusColor,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
                 ticket.status.toUpperCase(),
-                style: TextStyle(
-                  color: ticket.status == "Usada" ? Colors.black : Colors.black,
+                style: const TextStyle(
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),

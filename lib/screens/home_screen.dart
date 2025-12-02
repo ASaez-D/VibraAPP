@@ -8,10 +8,10 @@ import 'customizeProfile_screen.dart';
 import 'calendar_screen.dart';
 import 'ticket_screen.dart';
 import 'social_screen.dart';
+import 'help_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String displayName;
-
   const HomeScreen({super.key, required this.displayName});
 
   @override
@@ -21,7 +21,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // Lista de tickets de ejemplo
   final List<Ticket> myTickets = [
     Ticket(
       eventName: "Concierto de Kassandra",
@@ -37,59 +36,56 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
-  // Navegación inferior
   void _onTabTapped(int index) {
     switch (index) {
       case 1:
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CalendarScreen()),
-        );
+            context, MaterialPageRoute(builder: (_) => CalendarScreen()));
         break;
-
       case 2:
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)),
-        );
+            context, MaterialPageRoute(builder: (_) => TicketScreen(tickets: myTickets)));
         break;
-
       case 3:
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const SocialScreen()),
-        );
+            context, MaterialPageRoute(builder: (_) => SocialScreen()));
         break;
     }
 
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() => _currentIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1A1A),
+      backgroundColor: const Color(0xFF0B0710),
+
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
+        preferredSize: const Size.fromHeight(90),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 38,
+                    height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF1A1324),
+                          Color(0xFF120C18)
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
                     ),
                     child: const TextField(
                       decoration: InputDecoration(
-                        hintText: 'Buscar',
-                        hintStyle: TextStyle(color: Colors.white54),
                         prefixIcon: Icon(Icons.search, color: Colors.white54),
+                        hintText: "Buscar conciertos, artistas...",
+                        hintStyle: TextStyle(color: Colors.white60),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.only(top: 6),
                       ),
@@ -97,17 +93,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+
+                const SizedBox(width: 12),
+
                 Builder(
                   builder: (context) => GestureDetector(
                     onTap: () => Scaffold.of(context).openEndDrawer(),
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white10,
+                        border: Border.all(
+                          color: Colors.purpleAccent.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                        color: const Color(0xFF1A1324),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.purple.withOpacity(0.25),
+                            blurRadius: 10,
+                          )
+                        ],
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.person, color: Colors.white),
+                      child: const Icon(Icons.person,
+                          color: Colors.white, size: 22),
                     ),
                   ),
                 ),
@@ -116,82 +125,78 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '¡Hola, ${widget.displayName}! 👋',
+              "¡Hola, ${widget.displayName}! 👋",
               style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 20),
+
             const Text(
-              'RECOMENDACIONES',
+              "RECOMENDADO PARA TI",
               style: TextStyle(
                 color: Colors.white70,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
               ),
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 12),
+
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF242323),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF25182F),
+                    Color(0xFF120C18),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.purple.withOpacity(0.18),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  )
+                ],
               ),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('De tus artistas:',
+                children: const [
+                  Text("De tus artistas favoritos",
                       style: TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 4),
-                  const Text('Concierto destacado',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  const Text('Fecha por confirmar',
-                      style: TextStyle(color: Colors.white70, fontSize: 12)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white10,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.account_circle,
-                                color: Colors.white54, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              'Kassandra',
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.favorite_border,
-                          color: Colors.white70, size: 18),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.share,
-                          color: Colors.white70, size: 18),
-                    ],
+                  SizedBox(height: 6),
+                  Text(
+                    "Concierto destacado",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 19,
+                    ),
                   ),
+                  SizedBox(height: 6),
+                  Text("Fecha por confirmar",
+                      style: TextStyle(color: Colors.white60, fontSize: 13)),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 25),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -199,53 +204,59 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      'Tus artistas',
+                      "Tus artistas",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 5),
                     Text(
-                      'Quien escuchas y sigues',
-                      style: TextStyle(color: Colors.white60, fontSize: 12),
+                      "Lo que más escuchas",
+                      style: TextStyle(color: Colors.white60, fontSize: 13),
                     ),
                   ],
                 ),
-                const CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Colors.white10,
-                  child: Icon(Icons.arrow_forward_ios,
-                      color: Colors.white, size: 14),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1324),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.arrow_forward_ios,
+                      size: 16, color: Colors.white),
                 ),
               ],
             ),
-            const SizedBox(height: 80),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),
+
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF1B1A1A),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white54,
-        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0B0710),
+        selectedItemColor: Colors.purpleAccent,
+        unselectedItemColor: Colors.white38,
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
-        items: const [
+        type: BottomNavigationBarType.fixed,
+        items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: ''),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.confirmation_num), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.confirmation_num), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: ''),
         ],
       ),
+
       endDrawer: Drawer(
-        backgroundColor: const Color(0xFF0E0E0E),
+        backgroundColor: const Color(0xFF0A060F),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -253,38 +264,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       widget.displayName,
                       style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 21,
                           fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const CustomizeProfileScreen()),
+                              builder: (_) => CustomizeProfileScreen()),
                         );
                       },
                       child: const Text(
                         "Editar perfil",
                         style: TextStyle(
-                            color: Colors.white70, fontWeight: FontWeight.w500),
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
                 ),
               ),
+
               const Divider(color: Colors.white24),
-              _menuItem(
-                  context, "Pagos", Icons.payment, const PaymentsScreen()),
-              _menuItem(context, "Notificaciones", Icons.notifications,
-                  const NotificationsScreen()),
-              _menuItem(context, "Privacidad", Icons.vpn_key,
-                  const PrivacityScreen()),
-              _menuItem(context, "Configuración", Icons.settings,
-                  const SettingsScreen()),
+
+              _menuItem(context, "Pagos", Icons.payment, PaymentsScreen()),
+              _menuItem(context, "Notificaciones", Icons.notifications, NotificationsScreen()),
+              _menuItem(context, "Privacidad", Icons.vpn_key, PrivacityScreen()),
+              _menuItem(context, "Configuración", Icons.settings, SettingsScreen()),
+              _menuItem(context, "Ayuda", Icons.help_outline, HelpScreen()),
+
               const Spacer(),
               const Divider(color: Colors.white24),
+
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.redAccent),
                 title: const Text(
@@ -295,9 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  );
+                      context, MaterialPageRoute(builder: (_) => LoginScreen()));
                 },
               ),
             ],
@@ -307,19 +318,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _menuItem(
-      BuildContext context, String title, IconData icon, Widget screen) {
+  Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {
     return ListTile(
       leading: Icon(icon, color: Colors.white70),
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () {
         Navigator.of(context).pop();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => screen),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
       },
     );
   }
 }
-
