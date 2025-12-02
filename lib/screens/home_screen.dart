@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'settings_screen.dart';
 import 'payments_screen.dart';
-import 'privacity_screen.dart';
-import 'notifications_screen.dart';
+import 'ayuda_screen.dart';
+import 'account_screen.dart';
 import 'customizeProfile_screen.dart';
 import 'calendar_screen.dart';
 import 'ticket_screen.dart';
@@ -244,8 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -275,14 +274,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const Divider(color: Colors.white24),
-              _menuItem(
-                  context, "Pagos", Icons.payment, const PaymentsScreen()),
-              _menuItem(context, "Notificaciones", Icons.notifications,
-                  const NotificationsScreen()),
-              _menuItem(context, "Privacidad", Icons.vpn_key,
-                  const PrivacityScreen()),
-              _menuItem(context, "Configuración", Icons.settings,
-                  const SettingsScreen()),
+
+              // --- MENÚ LATERAL CON NUEVAS PANTALLAS ---
+              _menuItem(context, "Cuenta", Icons.account_circle, const AccountScreen()),
+              _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen()),
+              _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
+              _menuItem(context, "Ayuda", Icons.help_outline, const AyudaScreen()),
+
               const Spacer(),
               const Divider(color: Colors.white24),
               ListTile(
@@ -322,4 +320,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
