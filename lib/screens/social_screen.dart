@@ -4,8 +4,8 @@ class SocialScreen extends StatelessWidget {
   // Quitar const del constructor
   SocialScreen({super.key});
 
-  // Morado más suave y elegante
-  final Color accentColor = Colors.purple.shade300;
+  // Morado aún más oscuro
+  final Color accentColor = Colors.deepPurple.shade900;
   final Color backgroundColor = const Color(0xFF0E0E1A);
 
   final List<Map<String, dynamic>> friends = const [
@@ -57,7 +57,8 @@ class SocialScreen extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               itemCount: friends.length,
-              separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+              separatorBuilder: (context, index) =>
+                  Divider(color: Colors.white.withOpacity(0.05), height: 1),
               itemBuilder: (context, index) {
                 final friend = friends[index];
                 final isOnline = friend['status'] == "En línea";
@@ -65,13 +66,11 @@ class SocialScreen extends StatelessWidget {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.deepPurple.shade900, Colors.deepPurple.shade800], // morado más suave
-                    ),
+                    color: const Color(0xFF0A0013), // 🔥 un solo color morado oscuro
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: accentColor.withOpacity(0.2),
+                        color: accentColor.withOpacity(0.25),
                         blurRadius: 6,
                         offset: const Offset(0, 4),
                       ),
@@ -104,14 +103,17 @@ class SocialScreen extends StatelessWidget {
                     ),
                     title: Text(
                       friend['name'],
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     subtitle: Text(
                       friend['status'],
-                      style: TextStyle(color: isOnline ? accentColor : Colors.white54, fontSize: 13),
+                      style: TextStyle(
+                          color: isOnline ? accentColor : Colors.white54, fontSize: 13),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white54, size: 22),
+                      icon: const Icon(Icons.chat_bubble_outline_rounded,
+                          color: Colors.white54, size: 22),
                       onPressed: () {},
                     ),
                   ),
@@ -124,6 +126,3 @@ class SocialScreen extends StatelessWidget {
     );
   }
 }
-
-
-

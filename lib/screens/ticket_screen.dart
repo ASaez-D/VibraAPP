@@ -71,18 +71,19 @@ class TicketScreen extends StatelessWidget {
         statusColor = Colors.white;
     }
 
+    // Mismo morado oscuro que SocialScreen
+    const Color darkPurple = Color(0xFF0A0013);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: ticket.status == "Activa"
-            ? LinearGradient(colors: [Colors.purple.shade800, Colors.deepPurple.shade900])
-            : null,
-        color: ticket.status != "Activa" ? const Color(0xFF1B1B2A) : null,
+        // Sin degradado, color sólido
+        color: ticket.status == "Activa" ? darkPurple : const Color(0xFF1B1B2A),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.purpleAccent.withOpacity(0.2),
+            color: Colors.deepPurple.shade900.withOpacity(0.25),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -133,6 +134,3 @@ class TicketScreen extends StatelessWidget {
     );
   }
 }
-
-
-
