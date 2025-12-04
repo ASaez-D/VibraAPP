@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
 
-
 class SettingsScreen extends StatelessWidget {
   final Color accentColor = const Color(0xFF54FF78); 
   final Color backgroundColor = const Color(0xFF0C0C0C);
@@ -140,40 +139,43 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+// ------------------------------------------------------------
+  // Tile con flecha (CÓDIGO CORREGIDO)
   // ------------------------------------------------------------
-  // Tile con flecha
-  // ------------------------------------------------------------
-Widget _linkTile(IconData icon, String text) {
-  return InkWell(
-    onTap: () {
-      if (text == "Permisos de ubicación") {
-        AppSettings.openLocationSettings(); // abre los ajustes de ubicación
-      } else {
-        // manejar otras opciones
-      }
-    },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white.withOpacity(0.95), size: 22),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+  Widget _linkTile(IconData icon, String text) {
+    return InkWell(
+      onTap: () {
+        if (text == "Permisos de ubicación") {
+          // --- CORRECCIÓN AQUÍ ---
+          // La versión nueva usa openAppSettings con un tipo
+          AppSettings.openAppSettings(type: AppSettingsType.location);
+        } else {
+          // Ejemplo para las otras opciones:
+          // if (text == "Notificaciones") AppSettings.openAppSettings(type: AppSettingsType.notification);
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white.withOpacity(0.95), size: 22),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 22),
-        ],
+            const Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 22),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
 
   // ------------------------------------------------------------
