@@ -5,25 +5,29 @@ import '../models/concert_detail.dart';
 class TicketmasterService {
   final String apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6';
 
-  // Función auxiliar para formatear la fecha como le gusta a Ticketmaster
-  // Elimina los milisegundos y asegura que termine en 'Z'
   String _formatDate(DateTime date) {
     final utcDate = date.toUtc();
     final isoString = utcDate.toIso8601String();
-    // Tomamos la parte antes del punto (si hay milisegundos) y añadimos Z
     return "${isoString.split('.')[0]}Z";
   }
 
-  Future<List<ConcertDetail>> getConcerts(DateTime start, DateTime end) async {
-    // Usamos la función de formateo
+  // AHORA ACEPTA UN PARÁMETRO OPCIONAL classificationId
+  Future<List<ConcertDetail>> getConcerts(DateTime start, DateTime end, {String? classificationId}) async {
     final startStr = _formatDate(start);
     final endStr = _formatDate(end);
 
-    final url = Uri.parse(
-        'https://app.ticketmaster.com/discovery/v2/events.json?apikey=$apiKey&startDateTime=$startStr&endDateTime=$endStr&classificationName=music&sort=date,asc');
+    // Construimos la URL base
+    String baseUrl = 'https://app.ticketmaster.com/discovery/v2/events.json?apikey=$apiKey&startDateTime=$startStr&endDateTime=$endStr&sort=date,asc';
+    
+    // Si nos pasan una clasificación (Género, Segmento...), la añadimos, si no, por defecto música
+    if (classificationId != null && classificationId.isNotEmpty) {
+      baseUrl += '&classificationId=$classificationId';
+    } else {
+      baseUrl += '&classificationName=music';
+    }
 
-    // Imprimir para depuración (mira esto en tu consola si falla)
-    print("Llamando a API: $url");
+    final url = Uri.parse(baseUrl);
+    // print("Llamando a API: $url"); // Debug
 
     try {
       final response = await http.get(url);
@@ -38,13 +42,12 @@ class TicketmasterService {
           return [];
         }
       } else {
-        // Imprimir el cuerpo del error para saber qué pasó
         print("Error Ticketmaster: ${response.statusCode} - ${response.body}");
-        throw Exception('Error al cargar conciertos (${response.statusCode})');
+        throw Exception('Error al cargar conciertos');
       }
     } catch (e) {
       print("Excepción en servicio: $e");
-      rethrow;
+      return []; // Retornamos lista vacía en vez de explotar
     }
   }
 }
