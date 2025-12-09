@@ -10,10 +10,8 @@ import '../models/concert_detail.dart';
 class ConcertDetailScreen extends StatefulWidget {
   final ConcertDetail concert;
   
-  // Nuevo: Para evitar choques de animaciones Hero
   final String? heroTag;
-  
-  // Parámetros para sincronizar estado con la Home
+
   final bool initialIsLiked;
   final bool initialIsSaved;
   final Function(bool isLiked, bool isSaved)? onStateChanged;
@@ -123,7 +121,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     final String formattedDate = DateFormat('EEE d MMM, HH:mm', 'es_ES').format(widget.concert.date);
     String mainPrice = widget.concert.priceRange.isNotEmpty ? widget.concert.priceRange.split('-')[0].trim() : "Info";
     
-    // Tag único para el Hero
+
     final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
 
     return Scaffold(
@@ -145,7 +143,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         ],
       ),
 
-      // CONTENIDO PRINCIPAL (CON SCROLL)
+      // CONTENIDO PRINCIPAL 
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -155,7 +153,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
             children: [
               const SizedBox(height: 10),
               
-              // 1. IMAGEN DEL CONCIERTO (HERO)
+              // 1. IMAGEN DEL CONCIERTO 
               Hero(
                 tag: heroTagToUse,
                 child: AspectRatio(
@@ -253,7 +251,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               
               const SizedBox(height: 32),
               
-              // 5. UBICACIÓN (MAPA ARREGLADO)
+              // 5. UBICACIÓN 
               _buildSectionTitle("Ubicación"),
               const SizedBox(height: 16),
               
@@ -297,7 +295,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       ),
                     ),
 
-                    // MAPA PREVIEW (IMAGEN SEGURA)
+                    // MAPA PREVIEW 
                     GestureDetector(
                       onTap: () => _openMap(context),
                       child: Container(
@@ -316,7 +314,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                             children: [
                               Positioned.fill(
                                 child: Image.network(
-                                  // Mapa oscuro de Unsplash (estable)
+                                  // Mapa oscuro de Unsplash 
                                   'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFF2A2A2A)),
@@ -359,7 +357,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         ),
       ),
 
-      // --- 6. FOOTER DE COMPRA (FIJO ABAJO) ---
+      // --- 6. FOOTER DE COMPRA ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         decoration: BoxDecoration(

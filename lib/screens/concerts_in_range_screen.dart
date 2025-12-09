@@ -29,7 +29,6 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     initializeDateFormatting('es_ES', null);
     
     DateTime start = widget.startDate;
-    // Aseguramos final del día
     DateTime end = DateTime(widget.endDate.year, widget.endDate.month, widget.endDate.day, 23, 59, 59);
 
     concertsFuture = service.getConcerts(start, end);
@@ -100,7 +99,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 
-  // --- TARJETA PREMIUM (Copia el diseño nuevo de Home) ---
+  // --- TARJETA ---
   Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
     final String day = DateFormat('d', 'es_ES').format(concert.date);
     final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
