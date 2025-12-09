@@ -22,7 +22,7 @@ class ConcertDetail {
     required this.imageUrl,
     this.ticketUrl = '',
     this.genre = '',
-    this.priceRange = 'Tickets', // Valor por defecto 
+    this.priceRange = 'Ver precios', // Valor por defecto 
     this.latitude,
     this.longitude,
   });
@@ -76,7 +76,7 @@ class ConcertDetail {
     } catch (e) {}
 
     // 4. PRECIO PREMIUM 
-    String finalPrice = "Tickets"; 
+    String finalPrice = "Ver precios"; 
     
     try {
       final prices = json["priceRanges"];
