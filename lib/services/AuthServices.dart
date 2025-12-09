@@ -7,14 +7,11 @@ class AuthServices {
     try {
       final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
       if (gUser == null) return null; // Usuario canceló login
-
       final GoogleSignInAuthentication gAuth = await gUser.authentication;
-
       final credential = GoogleAuthProvider.credential(
         accessToken: gAuth.accessToken,
         idToken: gAuth.idToken,
       );
-
       // ✅ Aquí solo usamos UserCredential directamente
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
@@ -23,4 +20,3 @@ class AuthServices {
     }
   }
 }
-

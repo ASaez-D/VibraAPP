@@ -38,17 +38,21 @@ class SavedEventsScreen extends StatelessWidget {
               itemCount: savedConcerts.length,
               separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, savedConcerts[index]);
+                // Aquí usamos el índice para evitar duplicados en el tag
+                return _buildConcertCard(context, savedConcerts[index], index);
               },
             ),
     );
   }
 
-  // --- WIDGET DE LA TARJETA PREMIUM (Copiado y adaptado de tu referencia) ---
-  Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
+  // Aceptamos el INDEX para crear un tag único
+  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, int index) {
     final String day = DateFormat('d', 'es_ES').format(concert.date);
     final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
     final String time = DateFormat('HH:mm', 'es_ES').format(concert.date);
+
+    // TAG ÚNICO: Nombre + Index. Así si tienes el mismo concierto 2 veces, no crashea.
+    final String uniqueHeroTag = "saved_${concert.name}_$index";
 
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
     if (priceLabel.length > 8) priceLabel = "Ver más";
@@ -58,36 +62,33 @@ class SavedEventsScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ConcertDetailScreen(concert: concert),
+            builder: (context) => ConcertDetailScreen(
+              concert: concert,
+              heroTag: uniqueHeroTag, // PASAMOS EL TAG ÚNICO
+              initialIsSaved: true, // Ya sabemos que está guardado
+            ),
           ),
         );
       },
       child: Container(
-        height: 145, // Altura fija Premium
+        height: 145, 
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF252525),
-              Color(0xFF151515),
-            ],
+            colors: [Color(0xFF252525), Color(0xFF151515)],
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withOpacity(0.08)),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8)),
           ],
         ),
         child: Row(
           children: [
-            // 1. IMAGEN (HERO)
+            // HERO CON TAG ÚNICO
             Hero(
-              tag: "${concert.name}_saved", // Tag único para evitar conflictos con la home
+              tag: uniqueHeroTag, 
               child: Container(
                 width: 115,
                 height: double.infinity,
@@ -96,22 +97,21 @@ class SavedEventsScreen extends StatelessWidget {
                     topLeft: Radius.circular(24),
                     bottomLeft: Radius.circular(24),
                   ),
-                  image: DecorationImage(
-                    image: NetworkImage(concert.imageUrl),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.1),
-                      BlendMode.darken,
-                    ),
-                  ),
                 ),
-                child: concert.imageUrl.isEmpty
-                    ? const Center(child: Icon(Icons.music_note, color: Colors.white24))
-                    : null,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), bottomLeft: Radius.circular(24)),
+                  child: concert.imageUrl.isNotEmpty
+                      ? Image.network(
+                          concert.imageUrl, 
+                          fit: BoxFit.cover,
+                          cacheWidth: 300, // Optimización
+                        )
+                      : const Center(child: Icon(Icons.music_note, color: Colors.white24)),
+                ),
               ),
             ),
 
-            // 2. CONTENIDO
+            // CONTENIDO
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -119,109 +119,47 @@ class SavedEventsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // A. FECHA y HORA
                     Row(
                       children: [
-                        Text(
-                          "$day $month",
-                          style: const TextStyle(
-                            color: Colors.greenAccent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
+                        Text("$day $month", style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(width: 8),
-                        Container(
-                            width: 4,
-                            height: 4,
-                            decoration: const BoxDecoration(
-                                color: Colors.white24, shape: BoxShape.circle)),
+                        Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle)),
                         const SizedBox(width: 8),
-                        Text(
-                          time,
-                          style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500),
-                        ),
+                        Text(time, style: TextStyle(color: Colors.grey[400], fontSize: 13, fontWeight: FontWeight.w500)),
                       ],
                     ),
-
                     const SizedBox(height: 6),
-
-                    // B. TÍTULO
                     Flexible(
                       child: Text(
                         concert.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          height: 1.1,
-                        ),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1),
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
-                    // C. UBICACIÓN
                     Row(
                       children: [
                         Icon(Icons.location_on, size: 12, color: Colors.grey[500]),
                         const SizedBox(width: 4),
                         Expanded(
-                          child: Text(
-                            concert.venue,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                          ),
+                          child: Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500)),
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 8),
-
-                    // D. PRECIO Y FLECHA
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Badge Precio
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            priceLabel,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(border: Border.all(color: Colors.white24), borderRadius: BorderRadius.circular(20)),
+                          child: Text(priceLabel, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
                         ),
-
-                        // FLECHA (Círculo negro)
                         Container(
                           padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white12),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                            size: 12,
-                          ),
+                          decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle, border: Border.all(color: Colors.white12)),
+                          child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 12),
                         ),
                       ],
                     )
@@ -242,18 +180,9 @@ class SavedEventsScreen extends StatelessWidget {
         children: [
           Icon(Icons.bookmark_border, size: 80, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(
-            'No tienes conciertos guardados',
-            style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          ),
+          Text('No tienes conciertos guardados', style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text(
-            '¡Dale al icono de guardar en la Home!',
-            style: TextStyle(color: Colors.grey[800], fontSize: 14),
-          ),
+          Text('¡Dale al icono de guardar en la Home!', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
         ],
       ),
     );

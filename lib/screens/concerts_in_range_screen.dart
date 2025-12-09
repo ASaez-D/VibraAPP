@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
-// Asegúrate de que estas importaciones apunten a tus archivos correctos
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart';
 import 'concert_detail_screen.dart'; 
@@ -28,13 +26,24 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializa el formato de fecha para español
     initializeDateFormatting('es_ES', null);
-    concertsFuture = service.getConcerts(widget.startDate, widget.endDate);
+    
+    DateTime start = widget.startDate;
+    // Aseguramos final del día
+    DateTime end = DateTime(widget.endDate.year, widget.endDate.month, widget.endDate.day, 23, 59, 59);
+
+    concertsFuture = service.getConcerts(start, end);
   }
 
   @override
   Widget build(BuildContext context) {
+    String titleDate = "";
+    if (widget.startDate.day == widget.endDate.day && widget.startDate.month == widget.endDate.month) {
+      titleDate = DateFormat('d MMM', 'es_ES').format(widget.startDate).toUpperCase();
+    } else {
+      titleDate = "${DateFormat('d MMM', 'es_ES').format(widget.startDate)} - ${DateFormat('d MMM', 'es_ES').format(widget.endDate)}".toUpperCase();
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF0E0E0E),
       appBar: AppBar(
@@ -45,36 +54,44 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "EVENTOS DISPONIBLES",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.2,
-            fontSize: 16,
-          ),
+        title: Column(
+          children: [
+            const Text(
+              "EVENTOS DISPONIBLES",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: 14),
+            ),
+            Text(titleDate, style: const TextStyle(color: Colors.greenAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+          ],
         ),
       ),
       body: FutureBuilder<List<ConcertDetail>>(
         future: concertsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.greenAccent),
-            );
+            return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
           } else if (snapshot.hasError) {
             return _buildErrorState(snapshot.error.toString());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return _buildEmptyState();
           } else {
-            final concerts = snapshot.data!;
+            // --- FILTRADO MANUAL ESTRICTO ---
+            // Esto elimina cualquier evento que la API haya colado por error de zona horaria
+            final allConcerts = snapshot.data!;
+            final validConcerts = allConcerts.where((c) {
+              // Comprobamos que la fecha local esté dentro del rango local seleccionado
+              return c.date.isAfter(widget.startDate.subtract(const Duration(seconds: 1))) && 
+                     c.date.isBefore(widget.endDate.add(const Duration(days: 1))); // Margen de seguridad fin del día
+            }).toList();
+
+            if (validConcerts.isEmpty) return _buildEmptyState();
+
             return ListView.separated(
               padding: const EdgeInsets.all(20),
               physics: const BouncingScrollPhysics(),
-              itemCount: concerts.length,
+              itemCount: validConcerts.length,
               separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, concerts[index]);
+                return _buildConcertCard(context, validConcerts[index]);
               },
             );
           }
@@ -83,7 +100,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 
-  // --- WIDGET DE LA TARJETA ---
+  // --- TARJETA PREMIUM (Copia el diseño nuevo de Home) ---
   Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
     final String day = DateFormat('d', 'es_ES').format(concert.date);
     final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
@@ -94,168 +111,65 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ConcertDetailScreen(concert: concert),
-          ),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ConcertDetailScreen(concert: concert)));
       },
       child: Container(
-        // Aumentado a 145 para evitar las barras amarillas (overflow)
         height: 145, 
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF252525), 
-              const Color(0xFF151515), 
-            ],
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [Color(0xFF252525), Color(0xFF151515)],
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withOpacity(0.08)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))],
         ),
         child: Row(
           children: [
-            // 1. IMAGEN
             Hero( 
-              tag: concert.name + concert.date.toString(), 
+              tag: "${concert.name}_calendar_${concert.date}", 
               child: Container(
-                width: 115,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    bottomLeft: Radius.circular(24),
-                  ),
-                  image: DecorationImage(
-                    image: NetworkImage(concert.imageUrl),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.1), 
-                      BlendMode.darken
-                    ),
-                  ),
+                width: 115, height: double.infinity,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(24), bottomLeft: Radius.circular(24)),
                 ),
-                child: concert.imageUrl.isEmpty 
-                    ? const Center(child: Icon(Icons.music_note, color: Colors.white24)) 
-                    : null,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), bottomLeft: Radius.circular(24)),
+                  child: concert.imageUrl.isNotEmpty
+                    ? Image.network(concert.imageUrl, fit: BoxFit.cover, cacheWidth: 300, errorBuilder: (c,e,s) => Container(color: Colors.grey[900], child: const Icon(Icons.music_note, color: Colors.white24)))
+                    : Container(color: Colors.grey[900], child: const Icon(Icons.music_note, color: Colors.white24)),
+                ),
               ),
             ),
-
-            // 2. CONTENIDO
             Expanded(
               child: Padding(
-                // Ajustado el padding vertical a 10 para ganar espacio interno
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center, 
                   children: [
-                    // A. FECHA y HORA
                     Row(
                       children: [
-                        Text(
-                          "$day $month",
-                          style: const TextStyle(
-                            color: Colors.greenAccent, 
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
+                        Text("$day $month", style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(width: 8),
                         Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle)),
                         const SizedBox(width: 8),
-                        Text(
-                          time,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 13, fontWeight: FontWeight.w500),
-                        ),
+                        Text(time, style: TextStyle(color: Colors.grey[400], fontSize: 13, fontWeight: FontWeight.w500)),
                       ],
                     ),
-
                     const SizedBox(height: 6),
-
-                    // B. TÍTULO (Usamos Flexible para evitar overflow horizontal/vertical)
-                    Flexible(
-                      child: Text(
-                        concert.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          height: 1.1, 
-                        ),
-                      ),
-                    ),
-                    
+                    Flexible(child: Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1))),
                     const SizedBox(height: 4),
-
-                    // C. UBICACIÓN
-                    Row(
-                      children: [
+                    Row(children: [
                         Icon(Icons.location_on, size: 12, color: Colors.grey[500]),
                         const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            concert.venue,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Espacio ajustado para que suba un poquito
+                        Expanded(child: Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500))),
+                    ]),
                     const SizedBox(height: 8),
-
-                    // D. PRECIO Y FLECHA
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Badge Precio
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            priceLabel,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                        
-                        // FLECHA (Estilo: Círculo negro con borde)
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white12),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                        ),
-                      ],
-                    )
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(border: Border.all(color: Colors.white24), borderRadius: BorderRadius.circular(20)), child: Text(priceLabel, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11))),
+                        Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle, border: Border.all(color: Colors.white12)), child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 12)),
+                    ])
                   ],
                 ),
               ),
@@ -273,42 +187,15 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         children: [
           Icon(Icons.event_busy_rounded, size: 60, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(
-            'No hay conciertos',
-            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          Text('No hay conciertos', style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text(
-            'Prueba con otras fechas',
-            style: TextStyle(color: Colors.grey[800], fontSize: 14),
-          ),
+          Text('Prueba con otras fechas', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
         ],
       ),
     );
   }
 
   Widget _buildErrorState(String error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.wifi_off_rounded, size: 50, color: Colors.redAccent),
-            const SizedBox(height: 16),
-            const Text(
-              'Ups, algo falló',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'No pudimos cargar los eventos.\n$error',
-              style: const TextStyle(color: Colors.white54, fontSize: 13),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+    return Center(child: Text('Error: $error', style: const TextStyle(color: Colors.white)));
   }
 }

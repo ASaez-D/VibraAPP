@@ -3,12 +3,29 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="google.navigation" />
+        </intent>
+    </queries>
     <application
         android:name="${applicationName}"
         android:label="Vibra"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- MainActivity de Flutter -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,7 +45,6 @@
             </intent-filter>
         </activity>
 
-        <!-- CallbackActivity para FlutterWebAuth2 -->
         <activity
             android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
             android:exported="true">

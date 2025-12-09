@@ -4,12 +4,11 @@ class ConcertDetail {
   final String address;
   final String city;
   final String country;
-  final DateTime date;
+  final DateTime date; // Esto ahora será Hora Local
   final String imageUrl;
   final String ticketUrl;
   final String genre;
   final String priceRange;
-  // Nuevas variables para coordenadas
   final double? latitude;
   final double? longitude;
 
@@ -46,7 +45,6 @@ class ConcertDetail {
         venueCity = v["city"]?["name"] ?? "";
         venueCountry = v["country"]?["name"] ?? "";
         
-        // Extracción de coordenadas
         if (v["location"] != null) {
           lat = double.tryParse(v["location"]["latitude"] ?? "");
           lng = double.tryParse(v["location"]["longitude"] ?? "");
@@ -59,6 +57,7 @@ class ConcertDetail {
     try {
       final images = json["images"];
       if (images is List && images.isNotEmpty) {
+        // Intentamos buscar la imagen de mejor calidad (16_9 o 3_2)
         finalImageUrl = images[0]["url"] ?? "";
       }
     } catch (e) {}
@@ -88,15 +87,23 @@ class ConcertDetail {
       }
     } catch (e) {}
 
+    // 5. FECHA (CORREGIDO: .toLocal())
+    DateTime parsedDate;
+    try {
+      parsedDate = DateTime.parse(
+        json["dates"]?["start"]?["dateTime"] ?? DateTime.now().toIso8601String(),
+      ).toLocal(); // <--- IMPORTANTE: Convertir a hora local del móvil
+    } catch (e) {
+      parsedDate = DateTime.now();
+    }
+
     return ConcertDetail(
       name: json["name"] ?? "Sin nombre",
       venue: venueName,
       address: venueAddress,
       city: venueCity,
       country: venueCountry,
-      date: DateTime.parse(
-        json["dates"]?["start"]?["dateTime"] ?? DateTime.now().toIso8601String(),
-      ),
+      date: parsedDate,
       imageUrl: finalImageUrl,
       ticketUrl: json["url"] ?? "",
       genre: finalGenre,

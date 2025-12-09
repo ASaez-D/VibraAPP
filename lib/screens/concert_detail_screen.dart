@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Para HapticFeedback
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -9,7 +10,10 @@ import '../models/concert_detail.dart';
 class ConcertDetailScreen extends StatefulWidget {
   final ConcertDetail concert;
   
-  // NUEVOS PARÁMETROS PARA SINCRONIZAR
+  // NUEVO: Para evitar choques de animaciones Hero
+  final String? heroTag;
+  
+  // Parámetros para sincronizar
   final bool initialIsLiked;
   final bool initialIsSaved;
   final Function(bool isLiked, bool isSaved)? onStateChanged;
@@ -17,7 +21,8 @@ class ConcertDetailScreen extends StatefulWidget {
   const ConcertDetailScreen({
     super.key, 
     required this.concert,
-    this.initialIsLiked = false, // Por defecto false si no se pasa
+    this.heroTag, // <--- AÑADIDO
+    this.initialIsLiked = false,
     this.initialIsSaved = false,
     this.onStateChanged,
   });
@@ -26,7 +31,7 @@ class ConcertDetailScreen extends StatefulWidget {
   State<ConcertDetailScreen> createState() => _ConcertDetailScreenState();
 }
 
-class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
+class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerProviderStateMixin {
   final Color accentColor = Colors.greenAccent;
   final Color backgroundColor = const Color(0xFF0E0E0E);
   final Color cardColor = const Color(0xFF1C1C1E);
@@ -34,12 +39,29 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
   late bool isLiked;
   late bool isSaved;
 
+  late AnimationController _likeController;
+  late Animation<double> _likeAnimation;
+  late AnimationController _saveController;
+  late Animation<double> _saveAnimation;
+
   @override
   void initState() {
     super.initState();
-    // Inicializamos con lo que nos manda la Home
     isLiked = widget.initialIsLiked;
     isSaved = widget.initialIsSaved;
+
+    _likeController = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
+    _likeAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(parent: _likeController, curve: Curves.easeOutBack));
+
+    _saveController = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
+    _saveAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(parent: _saveController, curve: Curves.easeOutBack));
+  }
+
+  @override
+  void dispose() {
+    _likeController.dispose();
+    _saveController.dispose();
+    super.dispose();
   }
 
   void _launchURL(String url) async {
@@ -51,9 +73,13 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
   }
 
   void _openMap(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: const Text("Abriendo mapa..."), backgroundColor: accentColor, duration: const Duration(seconds: 1))
-    );
+    final Uri googleMapsUrl;
+    if (widget.concert.latitude != null && widget.concert.longitude != null) {
+      googleMapsUrl = Uri.parse("geo:${widget.concert.latitude},${widget.concert.longitude}?q=${widget.concert.latitude},${widget.concert.longitude}(${Uri.encodeComponent(widget.concert.venue)})");
+    } else {
+      googleMapsUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${widget.concert.venue}, ${widget.concert.city}')}");
+    }
+    _launchURL(googleMapsUrl.toString());
   }
 
   void _shareEvent() {
@@ -61,8 +87,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
     Share.share('¡Mira este planazo en Vibra! 🎸\n${widget.concert.name}\n📅 $dateStr\n📍 ${widget.concert.venue}\n${widget.concert.ticketUrl}');
   }
 
-  // --- LÓGICA DE SINCRONIZACIÓN ---
   void _toggleLike() {
+    HapticFeedback.lightImpact();
+    _likeController.forward().then((_) => _likeController.reverse());
     setState(() {
       isLiked = !isLiked;
     });
@@ -70,19 +97,19 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
   }
 
   void _toggleSave() {
+    HapticFeedback.lightImpact();
+    _saveController.forward().then((_) => _saveController.reverse());
     setState(() {
       isSaved = !isSaved;
     });
-    
     if (isSaved) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text("Guardado"), backgroundColor: accentColor, duration: const Duration(milliseconds: 500))
+        SnackBar(content: const Text("Guardado"), backgroundColor: accentColor, duration: const Duration(milliseconds: 800))
       );
     }
     _notifyChanges();
   }
 
-  // Avisamos a la pantalla anterior (Home) que ha habido cambios
   void _notifyChanges() {
     if (widget.onStateChanged != null) {
       widget.onStateChanged!(isLiked, isSaved);
@@ -92,7 +119,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final String formattedDate = DateFormat('EEE d MMM, HH:mm', 'es_ES').format(widget.concert.date);
-    String mainPrice = widget.concert.priceRange.isNotEmpty ? widget.concert.priceRange.split('-')[0].trim() : "";
+
+    // USAMOS EL TAG PERSONALIZADO SI EXISTE, SI NO, EL DE POR DEFECTO
+    final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -124,49 +153,63 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
+                    
+                    // IMAGEN CON HERO DINÁMICO
                     Hero(
-                      tag: widget.concert.name + widget.concert.date.toString(),
+                      tag: heroTagToUse, // <--- AQUÍ ESTÁ EL ARREGLO
                       child: AspectRatio(
                         aspectRatio: 1.0,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: Colors.grey[900],
-                            image: widget.concert.imageUrl.isNotEmpty
-                                ? DecorationImage(image: NetworkImage(widget.concert.imageUrl), fit: BoxFit.cover)
-                                : null,
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20, offset: const Offset(0,10))
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: widget.concert.imageUrl.isNotEmpty
+                                ? Image.network(widget.concert.imageUrl, fit: BoxFit.cover)
+                                : const Center(child: Icon(Icons.music_note, size: 50, color: Colors.white24)),
                           ),
                         ),
                       ),
                     ),
+
+                    // ... (El resto del diseño es igual, lo resumo para no ocupar tanto) ...
                     const SizedBox(height: 24),
                     Text(widget.concert.name, style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1, letterSpacing: -0.5)),
                     const SizedBox(height: 12),
                     Text(formattedDate.toUpperCase(), style: TextStyle(color: accentColor, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                     const SizedBox(height: 6),
                     Text(widget.concert.venue, style: const TextStyle(color: Colors.white54, fontSize: 18, fontWeight: FontWeight.w500)),
+                    
                     const SizedBox(height: 32),
 
-                    // BOTONES CONECTADOS
+                    // BOTONES DE ACCIÓN
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildBigActionButton(
+                        _buildAnimatedActionButton(
                           icon: isSaved ? Icons.bookmark : Icons.bookmark_border_rounded, 
                           label: isSaved ? "Guardado" : "Guardar",
-                          color: isSaved ? accentColor : Colors.white, 
+                          color: isSaved ? accentColor : Colors.white,
                           onTap: _toggleSave,
+                          animation: _saveAnimation,
                         ),
-                        _buildBigActionButton(
+                        _buildAnimatedActionButton(
                           icon: Icons.ios_share_rounded, 
                           label: "Compartir",
+                          color: Colors.white,
                           onTap: _shareEvent,
                         ),
-                        _buildBigActionButton(
+                        _buildAnimatedActionButton(
                           icon: isLiked ? Icons.favorite : Icons.thumb_up_off_alt_rounded, 
                           label: "Me gusta",
                           color: isLiked ? Colors.redAccent : Colors.white, 
                           onTap: _toggleLike,
+                          animation: _likeAnimation,
                         ),
                       ],
                     ),
@@ -218,11 +261,36 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
                             onTap: () => _openMap(context),
                             child: Container(
                               height: 180, width: double.infinity, margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), image: const DecorationImage(image: NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dark_map.png/800px-Dark_map.png'), fit: BoxFit.cover)),
-                              child: Stack(alignment: Alignment.center, children: [
-                                  Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: Colors.black.withOpacity(0.3))),
-                                  Icon(Icons.location_on, color: accentColor, size: 48),
-                              ]),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                color: const Color(0xFF1C1C1E),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Positioned.fill(
+                                      child: Image.network(
+                                        'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop',
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFF2A2A2A)),
+                                      ),
+                                    ),
+                                    Container(color: Colors.black.withOpacity(0.3)),
+                                    Icon(Icons.location_on, color: accentColor, size: 48),
+                                    Positioned(
+                                      bottom: 12, right: 12,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(color: Colors.black.withOpacity(0.8), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white24)),
+                                        child: Row(mainAxisSize: MainAxisSize.min, children: const [Text("Ver mapa", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)), SizedBox(width: 6), Icon(Icons.open_in_new, color: Colors.white, size: 14)]),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -241,7 +309,8 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> {
 
   Widget _buildSectionTitle(String title) => Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800));
   Widget _buildInfoRow(IconData icon, String text) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(icon, color: Colors.grey[400], size: 22), const SizedBox(width: 14), Expanded(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.3)))]);
-  Widget _buildBigActionButton({required IconData icon, required String label, required VoidCallback onTap, Color color = Colors.white}) {
-    return GestureDetector(onTap: onTap, child: Column(children: [Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(18), border: Border.all(color: color.withOpacity(0.5), width: 1.5)), child: Icon(icon, color: color, size: 26)), const SizedBox(height: 8), Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500))]));
+  Widget _buildAnimatedActionButton({required IconData icon, required String label, required VoidCallback onTap, Color color = Colors.white, Animation<double>? animation}) {
+    Widget content = Column(children: [Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(18), border: Border.all(color: color.withOpacity(0.5), width: 1.5)), child: Icon(icon, color: color, size: 26)), const SizedBox(height: 8), Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500))]);
+    return GestureDetector(onTap: onTap, child: animation != null ? ScaleTransition(scale: animation, child: content) : content);
   }
 }
