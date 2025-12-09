@@ -4,7 +4,7 @@ class ConcertDetail {
   final String address;
   final String city;
   final String country;
-  final DateTime date; // Esto ahora será Hora Local
+  final DateTime date;
   final String imageUrl;
   final String ticketUrl;
   final String genre;
@@ -22,7 +22,7 @@ class ConcertDetail {
     required this.imageUrl,
     this.ticketUrl = '',
     this.genre = '',
-    this.priceRange = 'Consultar',
+    this.priceRange = 'Tickets', // Valor por defecto elegante
     this.latitude,
     this.longitude,
   });
@@ -57,8 +57,12 @@ class ConcertDetail {
     try {
       final images = json["images"];
       if (images is List && images.isNotEmpty) {
-        // Intentamos buscar la imagen de mejor calidad (16_9 o 3_2)
-        finalImageUrl = images[0]["url"] ?? "";
+        // Buscamos calidad > 600px
+        final highQualityImg = images.firstWhere(
+          (img) => (img["width"] ?? 0) > 600, 
+          orElse: () => images[0]
+        );
+        finalImageUrl = highQualityImg["url"] ?? "";
       }
     } catch (e) {}
 
@@ -71,28 +75,46 @@ class ConcertDetail {
       }
     } catch (e) {}
 
-    // 4. PRECIO
-    String finalPrice = "No disponible";
+    // 4. PRECIO PREMIUM (Lógica Limpia)
+    String finalPrice = "Tickets"; // Si no hay precio, ponemos "Tickets" (queda pro)
+    
     try {
       final prices = json["priceRanges"];
       if (prices is List && prices.isNotEmpty) {
-        final min = prices[0]["min"];
-        final max = prices[0]["max"];
-        final currency = prices[0]["currency"] ?? "";
-        if (min != null && max != null) {
-          finalPrice = "$min - $max $currency";
-        } else {
-          finalPrice = "Desde $min $currency";
+        final priceData = prices[0];
+        final double? min = priceData["min"]?.toDouble();
+        final double? max = priceData["max"]?.toDouble();
+        String currency = priceData["currency"] ?? "EUR";
+
+        // Símbolos de moneda
+        if (currency == "EUR") currency = "€";
+        else if (currency == "USD") currency = "\$";
+        else if (currency == "GBP") currency = "£";
+
+        if (min != null) {
+          if (min == 0) {
+            finalPrice = "GRATIS";
+          } else {
+            // Quitamos decimales si es redondo (ej: 30.0 -> 30)
+            String priceStr = min.toStringAsFixed(min.truncateToDouble() == min ? 0 : 2);
+            
+            // Si hay rango, ponemos "Desde"
+            if (max != null && max > min) {
+              finalPrice = "Desde $priceStr$currency";
+            } else {
+              finalPrice = "$priceStr$currency";
+            }
+          }
         }
       }
     } catch (e) {}
 
-    // 5. FECHA (CORREGIDO: .toLocal())
+    // 5. FECHA
     DateTime parsedDate;
     try {
       parsedDate = DateTime.parse(
         json["dates"]?["start"]?["dateTime"] ?? DateTime.now().toIso8601String(),
-      ).toLocal(); // <--- IMPORTANTE: Convertir a hora local del móvil
+      ).toLocal();
     } catch (e) {
       parsedDate = DateTime.now();
     }
