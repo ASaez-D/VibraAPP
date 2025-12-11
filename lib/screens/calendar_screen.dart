@@ -20,6 +20,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   bool isQuickSelection = false;
   final ScrollController _scrollController = ScrollController();
 
+  final Color accentColor = Colors.greenAccent;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +36,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Obtener el estado del tema
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mainTextColor = isDark ? Colors.white : Colors.black;
+    final headerBgColor = isDark ? Colors.black : Colors.white;
+    final bodyBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final disabledQuickButtonColor = isDark
+        ? Colors.greenAccent.withOpacity(0.2)
+        : Colors.greenAccent.withOpacity(0.1);
+    final disabledQuickButtonTextColor = isDark ? Colors.white : Colors.black;
+    final weekdayLabelColor = isDark ? Colors.white54 : Colors.black54;
+    final disabledDayColor = isDark ? Colors.white38 : Colors.black38;
+    final disabledButtonBgColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
+
+
     final monthsList = <DateTime>[];
 
     for (int i = 0; i < 12; i++) {
@@ -41,21 +57,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      // Usamos el color de fondo del tema
+      backgroundColor: bodyBgColor,
       body: SafeArea(
         child: Column(
           children: [
             // HEADER
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              color: Colors.black,
+              // Color de fondo del encabezado adaptado
+              color: headerBgColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "¿Cuándo quieres salir?",
                     style: TextStyle(
-                      color: Colors.white,
+                      // Color de texto adaptado
+                      color: mainTextColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
                     ),
@@ -67,12 +86,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _quickSelectButton("Hoy", DateTime.now()),
                       _quickSelectButton(
-                          "Mañana", DateTime.now().add(const Duration(days: 1))),
-                      _quickSelectButton("Esta semana", null, rangeWeek: true),
+                        "Hoy",
+                        DateTime.now(),
+                        disabledColor: disabledQuickButtonColor,
+                        activeColor: accentColor,
+                        disabledTextColor: disabledQuickButtonTextColor,
+                      ),
+                      _quickSelectButton(
+                          "Mañana", DateTime.now().add(const Duration(days: 1)),
+                          disabledColor: disabledQuickButtonColor,
+                          activeColor: accentColor,
+                          disabledTextColor: disabledQuickButtonTextColor),
+                      _quickSelectButton("Esta semana", null,
+                          rangeWeek: true,
+                          disabledColor: disabledQuickButtonColor,
+                          activeColor: accentColor,
+                          disabledTextColor: disabledQuickButtonTextColor),
                       _quickSelectButton("Próximos 30 días", null,
-                          rangeNext30Days: true),
+                          rangeNext30Days: true,
+                          disabledColor: disabledQuickButtonColor,
+                          activeColor: accentColor,
+                          disabledTextColor: disabledQuickButtonTextColor),
                     ],
                   ),
 
@@ -85,8 +120,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         .map(
                           (d) => Text(
                             d,
-                            style: const TextStyle(
-                              color: Colors.white54,
+                            style: TextStyle(
+                              // Color de etiqueta adaptado
+                              color: weekdayLabelColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -106,7 +142,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 itemCount: monthsList.length,
                 itemBuilder: (context, index) {
-                  return _buildMonthCalendar(monthsList[index]);
+                  return _buildMonthCalendar(
+                    monthsList[index], 
+                    mainTextColor: mainTextColor,
+                    accentColor: accentColor,
+                    disabledDayColor: disabledDayColor,
+                  );
                 },
               ),
             ),
@@ -135,14 +176,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       : null,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.greenAccent,
-                    disabledBackgroundColor: Colors.grey.shade800,
+                    backgroundColor: accentColor,
+                    // Color de fondo desactivado adaptado
+                    disabledBackgroundColor: disabledButtonBgColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: Text(
                     _getButtonLabel(),
+                    // Color de texto adaptado (siempre negro en este acento)
                     style: const TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ),
@@ -165,7 +208,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       return "ESCOGER FECHA";
     }
 
-    // Si solo queda endDate
+    // Si solo queda endDate (o si sd es posterior a ed, se intercambian antes de aquí)
     if (sd == null && ed != null) {
       return DateFormat('d MMMM', 'es_ES').format(ed).toUpperCase();
     }
@@ -175,21 +218,29 @@ class _CalendarScreenState extends State<CalendarScreen> {
       return DateFormat('d MMMM', 'es_ES').format(sd).toUpperCase();
     }
 
-    // Si ambos existen
+    // Si ambos existen y son el mismo día
     if (sd!.isAtSameMomentAs(ed!)) {
       return DateFormat('d MMMM', 'es_ES').format(sd).toUpperCase();
     }
 
+    // Si ambos existen y son rango
     return "${DateFormat('d MMMM', 'es_ES').format(sd)} -> "
-            "${DateFormat('d MMMM', 'es_ES').format(ed)}"
+        "${DateFormat('d MMMM', 'es_ES').format(ed)}"
         .toUpperCase();
   }
 
   // ---------------------------------------------------------
-  // QUICK SELECT BUTTONS
+  // QUICK SELECT BUTTONS (Añadimos argumentos de color)
   // ---------------------------------------------------------
-  Widget _quickSelectButton(String label, DateTime? date,
-      {bool rangeWeek = false, bool rangeNext30Days = false}) {
+  Widget _quickSelectButton(
+    String label,
+    DateTime? date, {
+    bool rangeWeek = false,
+    bool rangeNext30Days = false,
+    required Color activeColor,
+    required Color disabledColor,
+    required Color disabledTextColor,
+  }) {
     final isActive = activeQuickButton == label;
 
     return GestureDetector(
@@ -214,15 +265,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive
-              ? Colors.greenAccent
-              : Colors.greenAccent.withOpacity(0.2),
+          color: isActive ? activeColor : disabledColor,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.black : Colors.white,
+            // Color adaptado
+            color: isActive ? Colors.black : disabledTextColor,
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),
@@ -232,20 +282,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   // ---------------------------------------------------------
-  // MONTH CALENDAR
+  // MONTH CALENDAR (Añadimos argumentos de color)
   // ---------------------------------------------------------
-  Widget _buildMonthCalendar(DateTime month) {
+  Widget _buildMonthCalendar(
+    DateTime month, {
+    required Color mainTextColor,
+    required Color accentColor,
+    required Color disabledDayColor,
+  }) {
     final monthName = _getMonthName(month.month);
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
 
+    // Obtener el primer día del mes y su WeekDay (lunes = 1, domingo = 7)
+    final firstDayOfMonth = DateTime(month.year, month.month, 1);
+    // Calcular el desfase: Dart WeekDay (1-7) -> GridView (0-6) (Lunes = 0, Domingo = 6)
+    // Usamos el estándar que el primer día de la semana es Lunes (1 en Dart)
+    int startWeekdayOffset = firstDayOfMonth.weekday - 1; 
+
+    // Ajuste para el número total de celdas
+    final totalCells = daysInMonth + startWeekdayOffset;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
         Text(
           "$monthName ${month.year}",
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            // Color adaptado
+            color: mainTextColor,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -255,32 +320,40 @@ class _CalendarScreenState extends State<CalendarScreen> {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: daysInMonth,
+          itemCount: totalCells, // Usamos el total de celdas necesarias
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
           ),
-          itemBuilder: (context, dayIndex) {
-            final day = dayIndex + 1;
+          itemBuilder: (context, index) {
+            // Celdas vacías al inicio si el mes no comienza en lunes
+            if (index < startWeekdayOffset) {
+              return Container(); 
+            }
+
+            final day = index - startWeekdayOffset + 1;
             final date = DateTime(month.year, month.month, day);
 
-            final isPast = date.isBefore(DateTime(
-              currentDate.year,
-              currentDate.month,
-              currentDate.day,
-            ));
+            // Reseteamos la hora para la comparación
+            final today = DateTime(currentDate.year, currentDate.month, currentDate.day);
+            final dateOnly = DateTime(date.year, date.month, date.day);
 
-            final isSelectedStart = startDate != null && date == startDate;
-            final isSelectedEnd = endDate != null && date == endDate;
+            final isPast = dateOnly.isBefore(today);
+            final isSelectedStart = startDate != null && dateOnly.isAtSameMomentAs(startDate!);
+            final isSelectedEnd = endDate != null && dateOnly.isAtSameMomentAs(endDate!);
             final isBetween = startDate != null &&
                 endDate != null &&
-                date.isAfter(startDate!) &&
-                date.isBefore(endDate!);
+                // Aseguramos que la fecha es estrictamente entre el inicio y el fin
+                dateOnly.isAfter(startDate!) &&
+                dateOnly.isBefore(endDate!);
 
-            final isToday = date ==
-                DateTime(
-                    currentDate.year, currentDate.month, currentDate.day);
+            final isToday = dateOnly.isAtSameMomentAs(today);
+            
+            // Si el día supera el número de días del mes, devuelve un contenedor vacío
+            if (day > daysInMonth) {
+              return Container();
+            }
 
             return GestureDetector(
               onTap: isPast
@@ -292,31 +365,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           // Si venimos de un botón rápido, desactivamos el modo rápido
                           isQuickSelection = false;
                           activeQuickButton = '';
-                        } else {
-                          if (isSelectedStart) {
-                            startDate = null;
-                          } else if (isSelectedEnd) {
-                            endDate = null;
-                          } else if (startDate == null) {
-                            startDate = date;
-                          } else if (endDate == null) {
-                            endDate = date;
-                          } else {
-                            startDate = date;
-                            endDate = null;
-                          }
-
-                          // Swap si hace falta
-                          if (startDate != null &&
-                              endDate != null &&
-                              startDate!.isAfter(endDate!)) {
-                            final temp = startDate;
-                            startDate = endDate;
-                            endDate = temp;
-                          }
-
-                          activeQuickButton = '';
                         }
+                        
+                        // Lógica de selección de rango
+                        if (isSelectedStart) {
+                          startDate = null;
+                        } else if (isSelectedEnd) {
+                          endDate = null;
+                        } else if (startDate == null) {
+                          startDate = dateOnly;
+                          endDate = null; // Reiniciar end date si seleccionamos un nuevo inicio
+                        } else if (endDate == null) {
+                          endDate = dateOnly;
+                        } else {
+                          // Si ambos están seleccionados, empezar un nuevo rango
+                          startDate = dateOnly;
+                          endDate = null;
+                        }
+
+                        // Swap si hace falta
+                        if (startDate != null &&
+                            endDate != null &&
+                            startDate!.isAfter(endDate!)) {
+                          final temp = startDate;
+                          startDate = endDate;
+                          endDate = temp;
+                        }
+
+                        // Si seleccionamos dos veces el mismo día, se queda solo ese día
+                        if (startDate != null && endDate != null && startDate!.isAtSameMomentAs(endDate!)) {
+                          endDate = startDate;
+                        }
+
+                        activeQuickButton = ''; // Desactiva cualquier botón rápido
                       });
                     },
               child: Center(
@@ -327,13 +408,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelectedStart || isSelectedEnd
-                        ? Colors.greenAccent
-                        : isBetween
-                            ? Colors.greenAccent.withOpacity(0.3)
-                            : Colors.transparent,
+                        ? accentColor
+                        // Color de rango adaptado
+                        : isBetween ? accentColor.withOpacity(0.3) : Colors.transparent, 
                     shape: BoxShape.circle,
+                    // Borde de "hoy" adaptado
                     border: isToday
-                        ? Border.all(color: Colors.greenAccent, width: 1.5)
+                        ? Border.all(color: accentColor, width: 1.5)
                         : null,
                   ),
                   child: AnimatedScale(
@@ -342,13 +423,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     child: Text(
                       day.toString(),
                       style: TextStyle(
+                        // Color del día adaptado
                         color: isPast
-                            ? Colors.white38
-                            : isSelectedStart ||
-                                    isSelectedEnd ||
-                                    isBetween
-                                ? Colors.black
-                                : Colors.white,
+                            ? disabledDayColor
+                            : isSelectedStart || isSelectedEnd
+                                ? Colors.black // Texto negro sobre acento verde
+                                : isBetween
+                                    ? mainTextColor // Texto normal en rango
+                                    : mainTextColor, // Texto normal
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -364,20 +446,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre"
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
     return months[month - 1];
   }
 }
-

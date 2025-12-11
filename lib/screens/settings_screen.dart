@@ -1,33 +1,60 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
+// Asegúrate de que esta importación apunte correctamente a main.dart
+import '../main.dart'; 
 
+// -----------------------------------------------------------------
 // Definición de la pantalla principal de Configuración
+// -----------------------------------------------------------------
 class SettingsScreen extends StatelessWidget {
   final Color accentColor = const Color(0xFF54FF78);
-  final Color backgroundColor = const Color(0xFF0C0C0C);
 
   const SettingsScreen({super.key});
 
+  // Función para obtener el valor actual del interruptor de texto grande
+  // Es TRUE si la escala es mayor a 1.0 (es decir, está activo)
+  bool _isLargeTextActive() {
+    return textScaleNotifier.value > 1.0;
+  }
+
+  // Función para cambiar el estado de la escala de texto global
+  void _toggleLargeText(bool newValue) {
+    // 1.3 es un buen factor de escalado para "grande"
+    textScaleNotifier.value = newValue ? 1.3 : 1.0; 
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Detectamos si estamos en modo oscuro para ajustar los textos
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Definimos colores dinámicos
+    final textColor = isDark ? Colors.white : Colors.black;
+    final cardColor = isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.05);
+    final leadingIconColor = isDark ? Colors.white : Colors.black;
+    final chevronColor = isDark ? Colors.white24 : Colors.black54;
+
+
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // USAMOS EL COLOR DEL TEMA (Blanco o Negro definido en main.dart)
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
+
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Configuración",
           style: TextStyle(
-            color: Colors.white,
+            color: textColor, // Color dinámico
             fontSize: 18,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.2,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: leadingIconColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -35,39 +62,62 @@ class SettingsScreen extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         children: [
-          _buildHeader("Notificaciones"),
-          _buildCard([
-            _switchTile(Icons.notifications, "Notificaciones generales"),
-            _divider(),
-            _switchTile(Icons.event_available, "Recordatorios de eventos"),
-            _divider(),
-            _switchTile(Icons.new_releases, "Lanzamiento de entradas"),
-            _divider(),
-            _switchTile(Icons.auto_awesome, "Recomendaciones"),
-          ]),
+          _buildHeader("Notificaciones", isDark), // Pasamos isDark
+          _buildCard(
+            children: [
+              // Los switches de Notificaciones tienen un valor fijo (simulado) y onChanged vacío,
+              // pero ahora usan la versión refactorizada de _switchTile
+              _switchTile(Icons.notifications, "Notificaciones generales", isDark, accentColor, value: true, onChanged: (_){}),
+              _divider(isDark),
+              _switchTile(Icons.event_available, "Recordatorios de eventos", isDark, accentColor, value: true, onChanged: (_){}),
+              _divider(isDark),
+              _switchTile(Icons.new_releases, "Lanzamiento de entradas", isDark, accentColor, value: false, onChanged: (_){}),
+            ],
+            cardColor: cardColor, // Pasamos el color de tarjeta dinámico
+          ),
           const SizedBox(height: 28),
-          _buildHeader("Privacidad"),
-          _buildCard([
-            // Se pasa context para la navegación y se usa la nueva sintaxis de AppSettings
-            _linkTile(context, Icons.location_on, "Permisos de ubicación"),
-            _divider(),
-            _linkTile(context, Icons.shield, "Datos compartidos"),
-            _divider(),
-            _linkTile(context, Icons.download, "Descargar mis datos"),
-            _divider(),
-            _linkTile(context, Icons.delete_forever, "Eliminar cuenta"),
-          ]),
+
+          _buildHeader("Privacidad", isDark),
+          _buildCard(
+            children: [
+              _linkTile(context, Icons.location_on, "Permisos de ubicación", isDark, chevronColor),
+              _divider(isDark),
+              _linkTile(context, Icons.shield, "Datos compartidos", isDark, chevronColor),
+              _divider(isDark),
+              _linkTile(context, Icons.download, "Descargar mis datos", isDark, chevronColor),
+              _divider(isDark),
+              _linkTile(context, Icons.delete_forever, "Eliminar cuenta", isDark, chevronColor),
+            ],
+            cardColor: cardColor,
+          ),
           const SizedBox(height: 28),
-          _buildHeader("Preferencias"),
-          _buildCard([
-            _linkTile(context, Icons.language, "Idioma"),
-            _divider(),
-            _linkTile(context, Icons.dark_mode, "Tema oscuro / claro"),
-            _divider(),
-            _switchTile(Icons.text_fields, "Texto grande"),
-            _divider(),
-            _switchTile(Icons.play_circle_outline, "Autoplay previews"),
-          ]),
+
+          _buildHeader("Preferencias", isDark),
+          // USAMOS ValueListenableBuilder para escuchar cambios en la escala de texto y actualizar el switch
+          ValueListenableBuilder<double>(
+            valueListenable: textScaleNotifier,
+            builder: (context, scale, child) {
+              return _buildCard(
+                children: [
+                  _linkTile(context, Icons.language, "Idioma", isDark, chevronColor),
+                  _divider(isDark),
+                  // BOTÓN DE CAMBIO DE TEMA
+                  _themeSwitcherTile(context, isDark, accentColor),
+                  _divider(isDark),
+                  // SWITCH DE TEXTO GRANDE (AHORA CON FUNCIONALIDAD)
+                  _switchTile(
+                    Icons.text_fields, 
+                    "Texto grande", 
+                    isDark, 
+                    accentColor,
+                    value: _isLargeTextActive(), // Usa la función de estado
+                    onChanged: _toggleLargeText, // Usa la función de cambio
+                  ),
+                ],
+                cardColor: cardColor,
+              );
+            },
+          ),
           const SizedBox(height: 50),
         ],
       ),
@@ -75,15 +125,70 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // ------------------------------------------------------------
-  // Headers más grandes y modernos
+  // WIDGET ESPECÍFICO PARA CAMBIAR EL TEMA (Refactorizado para ser limpio)
   // ------------------------------------------------------------
-  Widget _buildHeader(String text) {
+  Widget _themeSwitcherTile(BuildContext context, bool isDark, Color accentColor) {
+    // Usamos ValueListenableBuilder para escuchar el tema
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, mode, child) {
+        final bool isCurrentlyDark = mode == ThemeMode.dark || (mode == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark);
+        
+        return InkWell(
+          onTap: () {
+            // Cambiamos el tema al opuesto al actual
+            themeNotifier.value = isCurrentlyDark ? ThemeMode.light : ThemeMode.dark;
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              children: [
+                Icon(isCurrentlyDark ? Icons.dark_mode : Icons.light_mode, 
+                    color: isCurrentlyDark ? Colors.white.withOpacity(0.95) : Colors.black87, 
+                    size: 22),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    "Tema oscuro / claro",
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                 // Usamos un Switch real para mejor UX
+                Transform.scale(
+                  scale: 0.85,
+                  child: Switch(
+                    value: isCurrentlyDark, 
+                    onChanged: (newValue) {
+                      themeNotifier.value = newValue ? ThemeMode.dark : ThemeMode.light;
+                    },
+                    activeColor: accentColor,
+                    activeTrackColor: accentColor.withOpacity(0.3),
+                    inactiveThumbColor: isDark ? Colors.white54 : Colors.grey,
+                    inactiveTrackColor: isDark ? Colors.white12 : Colors.grey.withOpacity(0.2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ------------------------------------------------------------
+  // Headers más grandes y modernos (Adaptado al tema)
+  // ------------------------------------------------------------
+  Widget _buildHeader(String text, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 12),
       child: Text(
         text.toUpperCase(),
         style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
+          color: isDark ? Colors.white.withOpacity(0.6) : Colors.black.withOpacity(0.6),
           fontSize: 13,
           fontWeight: FontWeight.w700,
           letterSpacing: 1,
@@ -93,18 +198,18 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // ------------------------------------------------------------
-  // Card con sombra suave
+  // Card con sombra suave (Adaptado al tema)
   // ------------------------------------------------------------
-  Widget _buildCard(List<Widget> children) {
+  Widget _buildCard({required List<Widget> children, required Color cardColor}) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.white.withOpacity(0.04),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        color: cardColor, // Color dinámico
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -121,11 +226,11 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // ------------------------------------------------------------
-  // Divider fino tipo iOS
+  // Divider fino tipo iOS (Adaptado al tema)
   // ------------------------------------------------------------
-  Widget _divider() {
+  Widget _divider(bool isDark) {
     return Divider(
-      color: Colors.white.withOpacity(0.08),
+      color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.08),
       height: 1,
       thickness: 0.4,
       indent: 50,
@@ -134,13 +239,14 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // ------------------------------------------------------------
-  // Tile con flecha (CORREGIDO Y CON NAVEGACIÓN)
+  // Tile con flecha (CORREGIDO Y CON NAVEGACIÓN - Adaptado al tema)
   // ------------------------------------------------------------
-  Widget _linkTile(BuildContext context, IconData icon, String text) {
+  Widget _linkTile(BuildContext context, IconData icon, String text, bool isDark, Color chevronColor) {
+    final contentColor = isDark ? Colors.white : Colors.black;
+
     return InkWell(
       onTap: () {
         if (text == "Permisos de ubicación") {
-          // CORRECCIÓN: Sintaxis actualizada para app_settings ^5.0.0
           AppSettings.openAppSettings(type: AppSettingsType.location);
         } else if (text == "Datos compartidos") {
           // NAVEGACIÓN: Ir a la pantalla de datos compartidos
@@ -149,7 +255,7 @@ class SettingsScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const SharedDataScreen()),
           );
         } else {
-          // Aquí puedes agregar lógica para las otras opciones
+          // Aquí puedes agregar lógica para las otras opciones (Idioma, Descargar, Eliminar)
           debugPrint("Tocaste: $text");
         }
       },
@@ -157,19 +263,19 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withOpacity(0.95), size: 22),
+            Icon(icon, color: contentColor.withOpacity(0.95), size: 22),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: contentColor,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 22),
+            Icon(Icons.chevron_right_rounded, color: chevronColor, size: 22),
           ],
         ),
       ),
@@ -177,20 +283,31 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // ------------------------------------------------------------
-  // Tile con switch
+  // Tile con switch (REFECTORIZADO para recibir 'value' y 'onChanged')
   // ------------------------------------------------------------
-  Widget _switchTile(IconData icon, String text) {
+  Widget _switchTile(
+    IconData icon, 
+    String text, 
+    bool isDark, 
+    Color accentColor,
+    {
+      // NUEVOS PARÁMETROS REQUERIDOS
+      required bool value, 
+      required ValueChanged<bool> onChanged
+    }) {
+    final contentColor = isDark ? Colors.white : Colors.black;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.95), size: 22),
+          Icon(icon, color: contentColor.withOpacity(0.95), size: 22),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: contentColor,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -199,12 +316,12 @@ class SettingsScreen extends StatelessWidget {
           Transform.scale(
             scale: 0.85,
             child: Switch(
-              value: true,
-              onChanged: (_) {},
+              value: value, // Utiliza el valor pasado
+              onChanged: onChanged, // Utiliza la función pasada
               activeColor: accentColor,
               activeTrackColor: accentColor.withOpacity(0.3),
-              inactiveThumbColor: Colors.white54,
-              inactiveTrackColor: Colors.white12,
+              inactiveThumbColor: isDark ? Colors.white54 : Colors.grey,
+              inactiveTrackColor: isDark ? Colors.white12 : Colors.grey.withOpacity(0.2),
             ),
           ),
         ],
@@ -214,35 +331,42 @@ class SettingsScreen extends StatelessWidget {
 }
 
 // ------------------------------------------------------------
-// Pantalla de Datos Compartidos (Adaptada a Vibra y SIN pasarela de pago directa)
+// Pantalla de Datos Compartidos (Se mantuvo igual, pero ahora se beneficia de la escala de texto global)
 // ------------------------------------------------------------
 class SharedDataScreen extends StatelessWidget {
   const SharedDataScreen({super.key});
 
-  // Widget auxiliar para las tarjetas de información
+  // Widget auxiliar para las tarjetas de información (Adaptado al tema)
   Widget _buildInfoCard({
     required String title,
     required IconData icon,
     required String content,
+    required bool isDark,
   }) {
+    final textColor = isDark ? Colors.white : Colors.black;
+    final contentColor = isDark ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7);
+    final cardColor = isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05);
+    final borderColor = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.1);
+    final accentColor = const Color(0xFF54FF78);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFF54FF78), size: 20),
+              Icon(icon, color: accentColor, size: 20),
               const SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -253,7 +377,7 @@ class SharedDataScreen extends StatelessWidget {
           Text(
             content,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: contentColor,
               fontSize: 14,
               height: 1.6,
             ),
@@ -265,20 +389,23 @@ class SharedDataScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0C0C0C),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Datos compartidos",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: textColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      backgroundColor: const Color(0xFF0C0C0C),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(20),
@@ -289,19 +416,21 @@ class SharedDataScreen extends StatelessWidget {
             icon: Icons.folder_shared_outlined,
             content:
                 "• Perfil de usuario: Información básica para gestionar tu cuenta y agenda de eventos.\n"
-                "• Preferencias Musicales: Sincronización con tus plataformas de streaming para recomendarte conciertos.\n"
+                "• Preferencias Musicales: Sincronización con Spotify para recomendarte conciertos.\n"
                 "• Historial de Compras: Solo registramos el historial de las entradas adquiridas (fecha, evento, cantidad).",
+            isDark: isDark,
           ),
 
           const SizedBox(height: 16),
 
-          // SECCIÓN 2: TERCEROS (INTEGRACIONES) - TEXTO MODIFICADO
+          // SECCIÓN 2: TERCEROS (INTEGRACIONES)
           _buildInfoCard(
             title: "Servicios de terceros y Compra",
             icon: Icons.hub_outlined,
             content:
                 "• Plataformas de Streaming: Conectamos con tu proveedor (ej. Spotify) solo para leer tus artistas favoritos.\n"
                 "• Proceso de Compra: La aplicación te redirige a una plataforma web externa para finalizar el pago. Vibra no almacena ni procesa tu información financiera.",
+            isDark: isDark,
           ),
 
           const SizedBox(height: 16),
@@ -313,6 +442,7 @@ class SharedDataScreen extends StatelessWidget {
             content:
                 "• Invitaciones: Al invitar o regalar entradas, compartimos los detalles del evento con los contactos que selecciones.\n"
                 "• Privacidad: Tus datos personales no son visibles para otros usuarios salvo que tú lo autorices explícitamente.",
+            isDark: isDark,
           ),
 
           const SizedBox(height: 16),
@@ -324,6 +454,7 @@ class SharedDataScreen extends StatelessWidget {
             content:
                 "• Encriptación: Toda tu información sensible viaja cifrada mediante protocolos seguros.\n"
                 "• Tus derechos: Tienes control total para descargar tus datos o eliminar tu cuenta permanentemente desde los ajustes.",
+            isDark: isDark,
           ),
 
           const SizedBox(height: 30),
@@ -333,7 +464,7 @@ class SharedDataScreen extends StatelessWidget {
             child: Text(
               "Tu privacidad es nuestra prioridad en Vibra.",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: textColor.withOpacity(0.5),
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
               ),

@@ -24,6 +24,8 @@ class ConcertsInRangeScreen extends StatefulWidget {
 class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   final TicketmasterService service = TicketmasterService();
   late Future<List<ConcertDetail>> concertsFuture;
+  // Color de acento constante (verde)
+  final Color accentColor = Colors.greenAccent; 
 
   @override
   void initState() {
@@ -35,20 +37,26 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Obtener el estado del tema y los colores dinámicos
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mainTextColor = isDark ? Colors.white : Colors.black;
+    final titleBgColor = isDark ? Colors.transparent : Colors.white;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0E0E0E),
+        backgroundColor: titleBgColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: mainTextColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "EVENTOS DISPONIBLES",
           style: TextStyle(
-            color: Colors.white,
+            color: mainTextColor,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.2,
             fontSize: 16,
@@ -59,13 +67,13 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         future: concertsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.greenAccent),
+            return Center(
+              child: CircularProgressIndicator(color: accentColor), 
             );
           } else if (snapshot.hasError) {
-            return _buildErrorState(snapshot.error.toString());
+            return _buildErrorState(snapshot.error.toString(), isDark); 
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return _buildEmptyState();
+            return _buildEmptyState(isDark); 
           } else {
             final concerts = snapshot.data!;
             return ListView.separated(
@@ -74,7 +82,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
               itemCount: concerts.length,
               separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, concerts[index]);
+                return _buildConcertCard(context, concerts[index], isDark); 
               },
             );
           }
@@ -84,7 +92,18 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   }
 
   // --- WIDGET DE LA TARJETA ---
-  Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
+  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, bool isDark) {
+    
+    // Colores dinámicos para la tarjeta
+    final cardColorLight = Colors.white;
+    final cardColorDark1 = const Color(0xFF252525);
+    final cardColorDark2 = const Color(0xFF151515);
+
+    final cardTextColor = isDark ? Colors.white : Colors.black;
+    final cardDetailColor = isDark ? Colors.grey[500] : Colors.grey[700];
+    final dotColor = isDark ? Colors.white24 : Colors.black26;
+    final borderColor = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.1);
+    
     final String day = DateFormat('d', 'es_ES').format(concert.date);
     final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
     final String time = DateFormat('HH:mm', 'es_ES').format(concert.date);
@@ -102,24 +121,24 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         );
       },
       child: Container(
-        // Aumentado a 145 para evitar las barras amarillas (overflow)
         height: 145, 
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF252525), 
-              const Color(0xFF151515), 
-            ],
-          ),
+          gradient: isDark 
+              ? LinearGradient( // Modo Oscuro: Gradiente oscuro
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [cardColorDark1, cardColorDark2],
+                )
+              : null, // Modo Claro: Color sólido
+          color: isDark ? null : cardColorLight, 
+          
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: borderColor), 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.1), 
+              blurRadius: isDark ? 15 : 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -139,14 +158,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
                   image: DecorationImage(
                     image: NetworkImage(concert.imageUrl),
                     fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
+                    colorFilter: isDark ? ColorFilter.mode(
                       Colors.black.withOpacity(0.1), 
                       BlendMode.darken
-                    ),
+                    ) : null,
                   ),
                 ),
                 child: concert.imageUrl.isEmpty 
-                    ? const Center(child: Icon(Icons.music_note, color: Colors.white24)) 
+                    ? Center(child: Icon(Icons.music_note, color: dotColor)) 
                     : null,
               ),
             ),
@@ -154,7 +173,6 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
             // 2. CONTENIDO
             Expanded(
               child: Padding(
-                // Ajustado el padding vertical a 10 para ganar espacio interno
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,32 +183,32 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
                       children: [
                         Text(
                           "$day $month",
-                          style: const TextStyle(
-                            color: Colors.greenAccent, 
+                          style: TextStyle(
+                            color: accentColor, 
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle)),
+                        Container(width: 4, height: 4, decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
                         const SizedBox(width: 8),
                         Text(
                           time,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 13, fontWeight: FontWeight.w500),
+                          style: TextStyle(color: cardDetailColor, fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
 
                     const SizedBox(height: 6),
 
-                    // B. TÍTULO (Usamos Flexible para evitar overflow horizontal/vertical)
+                    // B. TÍTULO
                     Flexible(
                       child: Text(
                         concert.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: cardTextColor, 
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                           height: 1.1, 
@@ -203,20 +221,19 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
                     // C. UBICACIÓN
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 12, color: Colors.grey[500]),
+                        Icon(Icons.location_on, size: 12, color: cardDetailColor), 
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             concert.venue,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: cardDetailColor, fontSize: 12, fontWeight: FontWeight.w500), 
                           ),
                         ),
                       ],
                     ),
 
-                    // Espacio ajustado para que suba un poquito
                     const SizedBox(height: 8),
 
                     // D. PRECIO Y FLECHA
@@ -227,30 +244,30 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24),
+                            border: Border.all(color: dotColor!), 
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             priceLabel,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: cardTextColor, 
                               fontWeight: FontWeight.bold,
                               fontSize: 11,
                             ),
                           ),
                         ),
                         
-                        // FLECHA (Estilo: Círculo negro con borde)
+                        // FLECHA
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: isDark ? Colors.black : Colors.black.withOpacity(0.05),
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white12),
+                            border: Border.all(color: isDark ? Colors.white12 : Colors.black12), 
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
+                            color: cardTextColor, 
                             size: 12,
                           ),
                         ),
@@ -266,44 +283,55 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  // --- WIDGET DE ESTADO VACÍO ---
+  Widget _buildEmptyState(bool isDark) {
+    // Definimos las variables de color localmente, resolviendo el error.
+    final textColor = isDark ? Colors.grey[600] : Colors.grey[500];
+    final detailColor = isDark ? Colors.grey[800] : Colors.grey[400];
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.event_busy_rounded, size: 60, color: Colors.grey[800]),
+          Icon(Icons.event_busy_rounded, size: 60, color: detailColor), 
           const SizedBox(height: 16),
           Text(
             'No hay conciertos',
-            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold), 
           ),
           const SizedBox(height: 8),
           Text(
             'Prueba con otras fechas',
-            style: TextStyle(color: Colors.grey[800], fontSize: 14),
+            // Corregido para usar detailColor en lugar de secondaryTextColor
+            style: TextStyle(color: detailColor, fontSize: 14), 
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorState(String error) {
+  // --- WIDGET DE ESTADO DE ERROR ---
+  Widget _buildErrorState(String error, bool isDark) {
+    // Definimos las variables de color localmente
+    final textColor = isDark ? Colors.white : Colors.black;
+    final detailColor = isDark ? Colors.white54 : Colors.black54;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.wifi_off_rounded, size: 50, color: Colors.redAccent),
+            const Icon(Icons.wifi_off_rounded, size: 50, color: Colors.redAccent), 
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Ups, algo falló',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'No pudimos cargar los eventos.\n$error',
-              style: const TextStyle(color: Colors.white54, fontSize: 13),
+              style: TextStyle(color: detailColor, fontSize: 13), 
               textAlign: TextAlign.center,
             ),
           ],
