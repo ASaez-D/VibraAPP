@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:vibra_project/screens/calendar_screen.dart'; // Asegúrate de que esto sea correcto
 import 'screens/login_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+// ¡IMPORTACIÓN NECESARIA!
+import 'package:shared_preferences/shared_preferences.dart'; 
 
 // --------------------------------------------------------
 // NOTIFICADORES GLOBALES
@@ -18,13 +20,48 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 final ValueNotifier<double> textScaleNotifier = ValueNotifier(1.0); 
 
 // --------------------------------------------------------
-// MAIN
+// LÓGICA DE PERSISTENCIA (AÑADIDA)
+// --------------------------------------------------------
+
+const String _themeKey = 'userThemeMode';
+
+// Función para cargar el tema guardado
+Future<ThemeMode> _loadThemeMode() async {
+  final prefs = await SharedPreferences.getInstance();
+  final String? savedTheme = prefs.getString(_themeKey);
+
+  if (savedTheme == 'light') {
+    return ThemeMode.light;
+  } else if (savedTheme == 'dark') {
+    return ThemeMode.dark;
+  } 
+  // Valor por defecto si no hay nada guardado o si es 'system'
+  return ThemeMode.system;
+}
+
+// Función para guardar el tema actual
+Future<void> _saveThemeMode(ThemeMode mode) async {
+  final prefs = await SharedPreferences.getInstance();
+  // Guardamos el enum como un string ('light', 'dark', o 'system')
+  await prefs.setString(_themeKey, mode.toString().split('.').last);
+}
+
+// --------------------------------------------------------
+// MAIN (MODIFICADO)
 // --------------------------------------------------------
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await initializeDateFormatting('es_ES', null);
+
+  // 1. Cargar el tema guardado ANTES de ejecutar la app
+  themeNotifier.value = await _loadThemeMode(); 
+  
+  // 2. Escuchar cambios en el notifier y guardar el nuevo valor automáticamente
+  themeNotifier.addListener(() {
+    _saveThemeMode(themeNotifier.value);
+  });
 
   runApp(const MyApp());
 }

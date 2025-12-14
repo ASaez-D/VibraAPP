@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Filtramos la lista cacheada por Nombre o por Venue
         _searchResults = _cachedConcerts.where((concert) {
           return concert.name.toLowerCase().contains(query) || 
-                 concert.venue.toLowerCase().contains(query);
+                      concert.venue.toLowerCase().contains(query);
         }).toList();
       }
     });
@@ -129,11 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onTabTapped(int index) {
-    switch (index) {
-      case 1: Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen())); break;
-      case 2: Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets))); break;
-      case 3: Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen())); break;
+    // Solo navegamos a las pantallas si no es la Home (índice 0)
+    if (index != 0) {
+      switch (index) {
+        case 1: Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen())); break;
+        case 2: Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets))); break;
+        case 3: Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen())); break;
+      }
     }
+    // Si es la Home, solo cambiamos el índice
     setState(() => _currentIndex = index);
   }
 
@@ -162,6 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eliminado de guardados"), duration: Duration(seconds: 1)));
       } else {
         _savedIds.add(id);
+        // Usamos Colors.greenAccent que tiene buen contraste en ambos modos
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Guardado en tu lista"), backgroundColor: Colors.greenAccent, duration: Duration(seconds: 1)));
       }
     });
@@ -169,8 +174,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Detección del tema y Colores Dinámicos
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color accentColor = Colors.greenAccent; 
+    
+    // Colores base dinámicos
+    final Color scaffoldBg = isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
+    final Color cardBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
+    final Color primaryText = isDarkMode ? Colors.white : const Color(0xFF222222);
+    final Color secondaryText = isDarkMode ? Colors.white54 : Colors.grey.shade600;
+    final Color hintText = isDarkMode ? Colors.white.withOpacity(0.4) : Colors.grey.shade400;
+    final Color searchBarBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.grey.shade200;
+    final Color dividerColor = isDarkMode ? Colors.white12 : Colors.grey.shade300;
+
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: scaffoldBg, // Dinámico
       
       // --- APP BAR PREMIUM ---
       appBar: PreferredSize(
@@ -185,24 +204,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1C1C1E),
+                      color: searchBarBg, // Dinámico
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white.withOpacity(0.08), width: 1), // Borde sutil
+                      border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.shade300, width: 1), // Borde sutil
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
+                        BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.2) : Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
                       ]
                     ),
                     child: TextField(
                       controller: _searchController,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                      cursorColor: Colors.greenAccent,
+                      style: TextStyle(color: primaryText, fontSize: 15), // Dinámico
+                      cursorColor: accentColor,
                       decoration: InputDecoration(
                         hintText: 'Buscar artistas, salas...',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14),
-                        prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.4), size: 22),
+                        hintStyle: TextStyle(color: hintText, fontSize: 14), // Dinámico
+                        prefixIcon: Icon(Icons.search, color: hintText, size: 22), // Dinámico
                         suffixIcon: _searchController.text.isNotEmpty 
                           ? IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                              icon: Icon(Icons.close, color: secondaryText, size: 20), // Dinámico
                               onPressed: _clearSearch,
                             )
                           : null,
@@ -224,12 +243,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(2), // Espacio para el borde
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.greenAccent, width: 1.5), // Borde Neón
+                          border: Border.all(color: accentColor, width: 1.5), // Borde Neón (Accent)
                         ),
-                        child: const CircleAvatar(
+                        child: CircleAvatar(
                           radius: 22,
-                          backgroundColor: Color(0xFF1C1C1E),
-                          child: Icon(Icons.person, color: Colors.white, size: 24),
+                          backgroundColor: cardBg, // Dinámico
+                          child: Icon(Icons.person, color: primaryText, size: 24), // Dinámico
                         ),
                       ),
                     );
@@ -243,14 +262,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // --- BODY CON LÓGICA DE BÚSQUEDA ---
       body: _isSearching 
-        ? _buildSearchResults() // Si busca, muestra resultados
-        : _buildHomeContent(),  // Si no, muestra la home normal
+        ? _buildSearchResults(primaryText, secondaryText, cardBg) // Pasamos colores
+        : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg), // Pasamos colores
       
       // BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0E0E0E),
-        selectedItemColor: Colors.greenAccent,
-        unselectedItemColor: Colors.white38,
+        backgroundColor: scaffoldBg, // Dinámico
+        selectedItemColor: accentColor,
+        unselectedItemColor: secondaryText, // Dinámico
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -264,20 +283,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      endDrawer: _buildDrawer(context),
+      endDrawer: _buildDrawer(context, primaryText, accentColor, scaffoldBg, dividerColor), // Pasamos colores
     );
   }
 
   // --- VISTA DE RESULTADOS DE BÚSQUEDA ---
-  Widget _buildSearchResults() {
+  Widget _buildSearchResults(Color primaryText, Color secondaryText, Color cardBg) {
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 60, color: Colors.white.withOpacity(0.2)),
+            Icon(Icons.search_off, size: 60, color: secondaryText.withOpacity(0.5)), // Dinámico
             const SizedBox(height: 16),
-            const Text("No hemos encontrado nada", style: TextStyle(color: Colors.white54, fontSize: 16)),
+            Text("No hemos encontrado nada", style: TextStyle(color: secondaryText, fontSize: 16)), // Dinámico
           ],
         ),
       );
@@ -289,27 +308,27 @@ class _HomeScreenState extends State<HomeScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (context, index) {
         // Reutilizamos la tarjeta de lista filtrada para los resultados
-        return _buildListCard(_searchResults[index]);
+        return _buildListCard(_searchResults[index], primaryText, secondaryText, cardBg); // Pasamos colores
       },
     );
   }
 
   // --- VISTA NORMAL DE HOME ---
-  Widget _buildHomeContent() {
+  Widget _buildHomeContent(Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     return FutureBuilder<List<ConcertDetail>>(
       future: _concertsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
+          return Center(child: CircularProgressIndicator(color: accentColor)); // Accent
         } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.event_busy, color: Colors.white24, size: 50),
+                Icon(Icons.event_busy, color: secondaryText.withOpacity(0.5), size: 50), // Dinámico
                 const SizedBox(height: 10),
-                const Text("No hay eventos disponibles", style: TextStyle(color: Colors.white54)),
-                TextButton(onPressed: _loadData, child: const Text("Reintentar", style: TextStyle(color: Colors.greenAccent)))
+                Text("No hay eventos disponibles", style: TextStyle(color: secondaryText)), // Dinámico
+                TextButton(onPressed: _loadData, child: Text("Reintentar", style: TextStyle(color: accentColor))) // Accent
               ],
             ),
           );
@@ -326,8 +345,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hola, ${widget.displayName}', style: const TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w500)),
-                    const Text('Descubre lo mejor', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                    Text('Hola, ${widget.displayName}', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)), // Dinámico
+                    Text('Descubre lo mejor', style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)), // Dinámico
                   ],
                 ),
               ),
@@ -336,14 +355,14 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  if (index == 2) return _buildArtistsCarousel();
-                  if (index == 6) return _buildCollectionsCarousel();
+                  if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg); // Pasamos colores
+                  if (index == 6) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor); // Pasamos colores
                   
                   if (index >= concerts.length) return null;
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: _buildDiceCard(context, concerts[index]),
+                    child: _buildDiceCard(context, concerts[index], primaryText, secondaryText, accentColor, cardBg), // Pasamos colores
                   );
                 },
                 childCount: concerts.length,
@@ -361,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // WIDGETS AUXILIARES
   // ==========================================
 
-  Widget _buildSectionHeader({required String title, required String subtitle, VoidCallback? onMoreTap}) {
+  Widget _buildSectionHeader({required String title, required String subtitle, required Color primaryText, required Color secondaryText, required Color accentColor, required Color cardBg, VoidCallback? onMoreTap}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 16),
       child: Row(
@@ -371,11 +390,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5, height: 1.1)),
+              Text(title, style: TextStyle(color: primaryText, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5, height: 1.1)), // Dinámico
               const SizedBox(height: 4),
-              Container(height: 3, width: 40, decoration: BoxDecoration(color: Colors.greenAccent, borderRadius: BorderRadius.circular(2))),
+              Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))), // Accent
               const SizedBox(height: 6),
-              Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500)),
+              Text(subtitle, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500)), // Dinámico
             ],
           ),
           if (onMoreTap != null)
@@ -383,8 +402,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: onMoreTap,
               child: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12)), // Dinámico
+                child: Icon(Icons.arrow_forward, color: primaryText, size: 18), // Dinámico
               ),
             ),
         ],
@@ -392,17 +411,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildArtistsCarousel() {
+  Widget _buildArtistsCarousel(Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(title: "ARTISTAS TOP", subtitle: "Lo más escuchado ahora"),
+        _buildSectionHeader(title: "ARTISTAS TOP", subtitle: "Lo más escuchado ahora", primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg),
         SizedBox(
           height: 110,
           child: FutureBuilder<List<Map<String, String>>>(
             future: _artistsFuture,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator(color: accentColor)); // Accent
+              }
+              if (!snapshot.hasData) return const SizedBox.shrink(); // No mostramos nada si no hay datos
+              
               final artists = snapshot.data!;
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -415,15 +438,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(3),
+                          // Dejamos el gradiente fijo para un look 'Premium'
                           decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [Colors.greenAccent, Colors.blueAccent])),
                           child: CircleAvatar(
                             radius: 32,
-                            backgroundColor: const Color(0xFF1C1C1E),
+                            backgroundColor: cardBg, // Dinámico
                             backgroundImage: ResizeImage(NetworkImage(artists[index]['image']!), width: 150),
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(artists[index]['name']!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                        Text(artists[index]['name']!, style: TextStyle(color: secondaryText, fontSize: 12)), // Dinámico
                       ],
                     ),
                   );
@@ -437,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCollectionsCarousel() {
+  Widget _buildCollectionsCarousel(Color primaryText, Color secondaryText, Color accentColor) {
     final collections = [
       {"name": "Esta noche", "id": "tonight", "color": Colors.purpleAccent, "img": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400&auto=format&fit=crop"},
       {"name": "Urbano & Latino", "id": "KnvZfZ7vAj6", "color": const Color(0xFFFF4500), "img": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=400&auto=format&fit=crop"},
@@ -447,10 +471,12 @@ class _HomeScreenState extends State<HomeScreen> {
       {"name": "Jazz & Blues", "id": "KnvZfZ7vAvE", "color": Colors.amber, "img": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?q=80&w=400&auto=format&fit=crop"},
     ];
 
+    final Color cardBg = Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1C1E) : Colors.white;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(title: "EXPLORA VIBRAS", subtitle: "Encuentra tu plan ideal"),
+        _buildSectionHeader(title: "EXPLORA VIBRAS", subtitle: "Encuentra tu plan ideal", primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg),
         SizedBox(
           height: 110,
           child: ListView.builder(
@@ -471,7 +497,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
+                        // Dejamos la imagen con oscurecimiento fijo para el efecto
                         Image.network(col["img"] as String, fit: BoxFit.cover, cacheWidth: 400, color: Colors.black.withOpacity(0.3), colorBlendMode: BlendMode.darken, errorBuilder: (c,e,s) => Container(color: color.withOpacity(0.3))),
+                        // Dejamos el gradiente fijo para el efecto
                         Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color.withOpacity(0.9), color.withOpacity(0.2), Colors.black.withOpacity(0.8)], stops: const [0.0, 0.5, 1.0]))),
                         Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.6), width: 1.5))),
                         Positioned(bottom: 12, left: 14, child: Row(children: [Container(height: 20, width: 4, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2))), const SizedBox(width: 8), Text(col["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5))])),
@@ -489,7 +517,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // --- TARJETA PRINCIPAL (HOME) ---
-  Widget _buildDiceCard(BuildContext context, ConcertDetail concert) {
+  Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     final String dayNum = DateFormat('d').format(concert.date);
     final String monthName = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase().replaceAll('.', '');
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
@@ -521,43 +551,68 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 320,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: const Color(0xFF1C1C1E),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 15, offset: const Offset(0, 10))],
+          color: cardBg, // Dinámico
+          boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 10))],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
+              // IMAGEN
               Positioned.fill(
                 child: concert.imageUrl.isNotEmpty
                     ? Image.network(
                         concert.imageUrl,
                         fit: BoxFit.cover,
                         cacheWidth: 500, 
-                        errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFF2A2A2A)),
+                        // Colores de fallback dinámicos
+                        errorBuilder: (context, error, stackTrace) => Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
                       )
-                    : Container(color: const Color(0xFF2A2A2A)),
+                    // Colores de fallback dinámicos
+                    : Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
               ),
-              Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.95)], stops: const [0.4, 0.6, 1.0]))),
+              // GRADIENTE INFERIOR
+              Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, isDarkMode ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.1), isDarkMode ? Colors.black.withOpacity(0.95) : Colors.black.withOpacity(0.8)], stops: const [0.4, 0.6, 1.0]))),
               
+              // FECHA
               Positioned(top: 16, left: 16, child: Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(monthName, style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w900, height: 1)), Text(dayNum, style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1))]))),
               
-              Positioned(top: 16, right: 16, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white24)), child: Text(priceLabel, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)))),
+              // PRECIO
+              Positioned(top: 16, right: 16, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: isDarkMode ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.8), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDarkMode ? Colors.white24 : Colors.grey.shade400)), child: Text(priceLabel, style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 12)))),
 
+              // BOTONES DE ACCIÓN
               Positioned(
                 bottom: 20, right: 20,
                 child: Row(
                   children: [
-                    _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert)),
+                    // Estos botones usan iconos blancos/accent sobre un fondo semi-transparente negro, lo dejamos fijo para que destaque sobre la foto.
+                    _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
                     const SizedBox(width: 8),
-                    _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concertId)),
+                    _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concertId), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
                     const SizedBox(width: 8),
-                    _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: Colors.greenAccent, fillColorSelected: Colors.greenAccent.withOpacity(0.2), onTap: () => _toggleSave(concertId)),
+                    _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: accentColor, fillColorSelected: accentColor.withOpacity(0.2), onTap: () => _toggleSave(concertId), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
                   ],
                 ),
               ),
 
-              Positioned(bottom: 20, left: 20, right: 150, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), const SizedBox(height: 6), Row(children: [const Icon(Icons.location_on, color: Colors.greenAccent, size: 14), const SizedBox(width: 4), Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis))])])),
+              // TÍTULO Y UBICACIÓN
+              Positioned(
+                bottom: 20, left: 20, right: 150, 
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, 
+                  children: [
+                    Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), // Fijo a blanco
+                    const SizedBox(height: 6), 
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: accentColor, size: 14), // Accent
+                        const SizedBox(width: 4), 
+                        Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)) // Fijo a white70
+                      ]
+                    )
+                  ]
+                )
+              ),
             ],
           ),
         ),
@@ -566,24 +621,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // --- TARJETA PARA BÚSQUEDA (HORIZONTAL Y COMPACTA) ---
-  Widget _buildListCard(ConcertDetail concert) {
+  Widget _buildListCard(ConcertDetail concert, Color primaryText, Color secondaryText, Color cardBg) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final day = DateFormat('d MMM').format(concert.date).toUpperCase();
+    final Color accentColor = Colors.greenAccent;
     
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert))),
       child: Container(
         height: 100,
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
+          color: cardBg, // Dinámico
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05))
+          border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.shade300)
         ),
         child: Row(
           children: [
+            // IMAGEN
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
-              child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200, errorBuilder: (c,e,s) => Container(width: 100, color: Colors.grey[900])),
+              child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200, errorBuilder: (c,e,s) => Container(width: 100, color: isDarkMode ? Colors.grey[900] : Colors.grey[300])),
             ),
+            // TEXTOS
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
@@ -591,16 +650,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 16)), // Dinámico
                     const SizedBox(height: 4),
-                    Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white54, fontSize: 13)),
+                    Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 13)), // Dinámico
                     const SizedBox(height: 6),
-                    Text(day, style: const TextStyle(color: Colors.greenAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(day, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)), // Accent
                   ],
                 ),
               ),
             ),
-            const Padding(padding: EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 16))
+            // ICONO
+            Padding(padding: const EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 16)) // Dinámico
           ],
         ),
       ),
@@ -608,9 +668,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // --- DRAWER ACTUALIZADO CON TUS PEDIDOS ---
-  Widget _buildDrawer(BuildContext context) {
+  Widget _buildDrawer(BuildContext context, Color primaryText, Color accentColor, Color scaffoldBg, Color dividerColor) {
     return Drawer(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: scaffoldBg, // Dinámico
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -621,31 +681,31 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
-                  Text(widget.displayName, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), 
+                  Text(widget.displayName, style: TextStyle(color: primaryText, fontSize: 24, fontWeight: FontWeight.bold)), // Dinámico
                   const SizedBox(height: 8), 
                   GestureDetector(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), 
-                    child: const Text("Editar perfil", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w500))
+                    child: Text("Editar perfil", style: TextStyle(color: accentColor, fontWeight: FontWeight.w500)) // Accent
                   )
                 ]
               )
             ),
-            const Divider(color: Colors.white12),
+            Divider(color: dividerColor), // Dinámico
             
             // --- NUEVO: CUENTA ---
-            _menuItem(context, "Cuenta", Icons.person_outline, const AccountScreen()),
+            _menuItem(context, "Cuenta", Icons.person_outline, const AccountScreen(), primaryText),
 
             // MIS GUARDADOS
-            _menuItem(context, "Mis Guardados", Icons.bookmark, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())),
+            _menuItem(context, "Mis Guardados", Icons.bookmark, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList()), primaryText),
             
             // --- ACTUALIZADO: MÉTODOS DE PAGO ---
-            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen()),
+            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen(), primaryText),
             
             // CONFIGURACIÓN
-            _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
+            _menuItem(context, "Configuración", Icons.settings, const SettingsScreen(), primaryText),
             
             // --- NUEVO: AYUDA ---
-            _menuItem(context, "Ayuda", Icons.help_outline, const AyudaScreen()),
+            _menuItem(context, "Ayuda", Icons.help_outline, const AyudaScreen(), primaryText),
             
             const Spacer(),
             
@@ -665,10 +725,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {
+  Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen, Color primaryText) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white70), 
-      title: Text(title, style: const TextStyle(color: Colors.white)), 
+      leading: Icon(icon, color: primaryText.withOpacity(0.7)), // Dinámico
+      title: Text(title, style: TextStyle(color: primaryText)), // Dinámico
       onTap: () { 
         Navigator.of(context).pop(); 
         Navigator.push(context, MaterialPageRoute(builder: (_) => screen)); 
@@ -685,8 +745,9 @@ class _AnimatedIconButton extends StatefulWidget {
   final Color colorSelected;
   final VoidCallback onTap;
   final Color? fillColorSelected;
+  final Color? fillColor; // Nuevo para el color del fondo cuando NO está seleccionado
 
-  const _AnimatedIconButton({required this.isSelected, required this.iconSelected, required this.iconUnselected, required this.colorSelected, required this.onTap, this.fillColorSelected});
+  const _AnimatedIconButton({required this.isSelected, required this.iconSelected, required this.iconUnselected, required this.colorSelected, required this.onTap, this.fillColorSelected, this.fillColor});
 
   @override
   State<_AnimatedIconButton> createState() => _AnimatedIconButtonState();
@@ -712,9 +773,12 @@ class _AnimatedIconButtonState extends State<_AnimatedIconButton> with SingleTic
   @override
   Widget build(BuildContext context) {
     final Color currentColor = widget.isSelected ? widget.colorSelected : Colors.white;
+    
+    // Si está seleccionado, usamos el color de relleno seleccionado (e.g., RedAccent.withOpacity(0.2))
+    // Si no está seleccionado, usamos el color de relleno opcional (negro o blanco semitransparente)
     final Color currentFill = widget.isSelected 
         ? (widget.fillColorSelected ?? widget.colorSelected.withOpacity(0.2))
-        : Colors.white.withOpacity(0.15);
+        : (widget.fillColor ?? Colors.white.withOpacity(0.15));
 
     return GestureDetector(
       onTap: () {
@@ -729,6 +793,7 @@ class _AnimatedIconButtonState extends State<_AnimatedIconButton> with SingleTic
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: currentFill,
+            // El borde es más opaco si está seleccionado. Usamos el color del icono.
             border: Border.all(color: currentColor.withOpacity(widget.isSelected ? 1.0 : 0.5), width: 1),
           ),
           child: Icon(widget.isSelected ? widget.iconSelected : widget.iconUnselected, color: currentColor, size: 18),

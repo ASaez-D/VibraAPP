@@ -1,16 +1,115 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
+// ¡IMPORTACIÓN NECESARIA!
+import 'package:permission_handler/permission_handler.dart'; 
 // Asegúrate de que esta importación apunte correctamente a main.dart
 import '../main.dart'; 
 
 // -----------------------------------------------------------------
-// Definición de la pantalla principal de Configuración
+// Definición de la pantalla principal de Configuración (Ahora Stateful)
 // -----------------------------------------------------------------
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   final Color accentColor = const Color(0xFF54FF78);
 
-  const SettingsScreen({super.key});
+  // 1. Variables de estado para las notificaciones
+  bool _generalNotifications = true; // Valor inicial
+  bool _eventReminders = true; // Valor inicial
+  bool _ticketReleases = false; // Valor inicial
+
+  @override
+  void initState() {
+    super.initState();
+    // OPTIMIZACIÓN: Verificar el estado actual de los permisos al iniciar la pantalla
+    _checkInitialNotificationStatus();
+  }
+
+  // Función para verificar y sincronizar el estado del switch con el permiso real del OS
+  Future<void> _checkInitialNotificationStatus() async {
+    final status = await Permission.notification.status;
+    if (mounted) {
+      setState(() {
+        _generalNotifications = status.isGranted;
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // NUEVA FUNCIÓN CLAVE: Solicita o abre ajustes del sistema
+  // -----------------------------------------------------------------
+  Future<void> _toggleGeneralNotifications(bool newValue) async {
+    if (newValue) {
+      // 1. Intentar solicitar el permiso
+      final status = await Permission.notification.request();
+
+      if (status.isGranted) {
+        // Permiso concedido
+        setState(() {
+          _generalNotifications = true;
+        });
+      } else if (status.isPermanentlyDenied || status.isDenied) {
+        // Permiso denegado permanentemente o primera vez negado (necesita ir a ajustes)
+        final bool shouldOpenSettings = await _showPermissionDialog();
+
+        if (shouldOpenSettings) {
+          // Abre la configuración de la aplicación para que el usuario pueda activarlo
+          await openAppSettings();
+        }
+        
+        // Revisar el estado después de intentar abrir los ajustes (puede que no haya cambiado aún)
+        final updatedStatus = await Permission.notification.status;
+        setState(() {
+          _generalNotifications = updatedStatus.isGranted;
+        });
+        
+      } else {
+        // En cualquier otro caso (como restringido), lo dejamos apagado
+        setState(() {
+          _generalNotifications = false;
+        });
+      }
+    } else {
+      // Si el usuario desactiva el switch, simplemente actualizamos el estado local
+      setState(() {
+        _generalNotifications = false;
+      });
+      // NOTA: Desactivar el switch *local* no revoca automáticamente el permiso del OS. 
+      // Si se desea eso, se debería abrir openAppSettings.
+    }
+  }
+
+  // Diálogo para informar al usuario que debe ir a ajustes
+  Future<bool> _showPermissionDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Permiso de Notificación Necesario'),
+          content: const Text(
+            'Para recibir notificaciones de eventos, necesitamos que actives los permisos en la configuración del sistema.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar', style: TextStyle(color: accentColor)),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text('Ir a Ajustes', style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+  // -----------------------------------------------------------------
 
   // Función para obtener el valor actual del interruptor de texto grande
   // Es TRUE si la escala es mayor a 1.0 (es decir, está activo)
@@ -21,7 +120,7 @@ class SettingsScreen extends StatelessWidget {
   // Función para cambiar el estado de la escala de texto global
   void _toggleLargeText(bool newValue) {
     // 1.3 es un buen factor de escalado para "grande"
-    textScaleNotifier.value = newValue ? 1.3 : 1.0; 
+    textScaleNotifier.value = newValue ? 1.3 : 1.0;
   }
 
   @override
@@ -38,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       // USAMOS EL COLOR DEL TEMA (Blanco o Negro definido en main.dart)
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -65,13 +164,42 @@ class SettingsScreen extends StatelessWidget {
           _buildHeader("Notificaciones", isDark), // Pasamos isDark
           _buildCard(
             children: [
-              // Los switches de Notificaciones tienen un valor fijo (simulado) y onChanged vacío,
-              // pero ahora usan la versión refactorizada de _switchTile
-              _switchTile(Icons.notifications, "Notificaciones generales", isDark, accentColor, value: true, onChanged: (_){}),
+              // ESTE ES EL SWITCH QUE ACTIVA LA SOLICITUD DE PERMISOS
+              _switchTile(
+                Icons.notifications,
+                "Notificaciones generales",
+                isDark,
+                accentColor,
+                value: _generalNotifications,
+                onChanged: _toggleGeneralNotifications, // USAMOS LA FUNCIÓN DE PERMISOS
+              ),
               _divider(isDark),
-              _switchTile(Icons.event_available, "Recordatorios de eventos", isDark, accentColor, value: true, onChanged: (_){}),
+              // Los switches de abajo simplemente cambian el estado local
+              _switchTile(
+                Icons.event_available,
+                "Recordatorios de eventos",
+                isDark,
+                accentColor,
+                value: _eventReminders,
+                onChanged: (newValue) {
+                  setState(() {
+                    _eventReminders = newValue;
+                  });
+                },
+              ),
               _divider(isDark),
-              _switchTile(Icons.new_releases, "Lanzamiento de entradas", isDark, accentColor, value: false, onChanged: (_){}),
+              _switchTile(
+                Icons.new_releases,
+                "Lanzamiento de entradas",
+                isDark,
+                accentColor,
+                value: _ticketReleases,
+                onChanged: (newValue) {
+                  setState(() {
+                    _ticketReleases = newValue;
+                  });
+                },
+              ),
             ],
             cardColor: cardColor, // Pasamos el color de tarjeta dinámico
           ),
@@ -106,9 +234,9 @@ class SettingsScreen extends StatelessWidget {
                   _divider(isDark),
                   // SWITCH DE TEXTO GRANDE (AHORA CON FUNCIONALIDAD)
                   _switchTile(
-                    Icons.text_fields, 
-                    "Texto grande", 
-                    isDark, 
+                    Icons.text_fields,
+                    "Texto grande",
+                    isDark,
                     accentColor,
                     value: _isLargeTextActive(), // Usa la función de estado
                     onChanged: _toggleLargeText, // Usa la función de cambio
@@ -133,7 +261,7 @@ class SettingsScreen extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (context, mode, child) {
         final bool isCurrentlyDark = mode == ThemeMode.dark || (mode == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark);
-        
+
         return InkWell(
           onTap: () {
             // Cambiamos el tema al opuesto al actual
@@ -143,8 +271,8 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             child: Row(
               children: [
-                Icon(isCurrentlyDark ? Icons.dark_mode : Icons.light_mode, 
-                    color: isCurrentlyDark ? Colors.white.withOpacity(0.95) : Colors.black87, 
+                Icon(isCurrentlyDark ? Icons.dark_mode : Icons.light_mode,
+                    color: isCurrentlyDark ? Colors.white.withOpacity(0.95) : Colors.black87,
                     size: 22),
                 const SizedBox(width: 16),
                 Expanded(
@@ -157,11 +285,11 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                 // Usamos un Switch real para mejor UX
+                   // Usamos un Switch real para mejor UX
                 Transform.scale(
                   scale: 0.85,
                   child: Switch(
-                    value: isCurrentlyDark, 
+                    value: isCurrentlyDark,
                     onChanged: (newValue) {
                       themeNotifier.value = newValue ? ThemeMode.dark : ThemeMode.light;
                     },
@@ -286,15 +414,15 @@ class SettingsScreen extends StatelessWidget {
   // Tile con switch (REFECTORIZADO para recibir 'value' y 'onChanged')
   // ------------------------------------------------------------
   Widget _switchTile(
-    IconData icon, 
-    String text, 
-    bool isDark, 
-    Color accentColor,
-    {
-      // NUEVOS PARÁMETROS REQUERIDOS
-      required bool value, 
-      required ValueChanged<bool> onChanged
-    }) {
+      IconData icon,
+      String text,
+      bool isDark,
+      Color accentColor,
+      {
+        // NUEVOS PARÁMETROS REQUERIDOS
+        required bool value,
+        required ValueChanged<bool> onChanged
+      }) {
     final contentColor = isDark ? Colors.white : Colors.black;
 
     return Padding(
