@@ -17,7 +17,7 @@ import 'saved_events_screen.dart';
 
 // --- NUEVOS IMPORTS ---
 import 'account_screen.dart';
-import 'ayuda_screen.dart';
+import 'help_screen.dart';
 
 // SERVICIOS Y MODELOS
 import '../services/ticketmaster_service.dart';
@@ -705,7 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _menuItem(context, "Configuración", Icons.settings, const SettingsScreen(), primaryText),
             
             // --- NUEVO: AYUDA ---
-            _menuItem(context, "Ayuda", Icons.help_outline, const AyudaScreen(), primaryText),
+            _menuItem(context, "Ayuda", Icons.help_outline, const HelpScreen(), primaryText),
             
             const Spacer(),
             
