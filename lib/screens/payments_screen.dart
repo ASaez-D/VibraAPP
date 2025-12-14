@@ -5,15 +5,27 @@ class PaymentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Obtener el estado del tema y los colores dinámicos
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Colores base dinámicos
+    final mainTextColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final actionColor = Colors.redAccent; // Se mantiene, ya que es un color funcional
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      // ELIMINADO: backgroundColor: const Color(0xFF0E0E0E)
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        // ELIMINADO: Colors.transparent
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Pagos",
           style: TextStyle(
-            color: Colors.white,
+            // ELIMINADO: Colors.white
+            color: mainTextColor,
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
           ),
@@ -25,16 +37,18 @@ class PaymentsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Gestiona tus métodos de pago",
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              // ELIMINADO: Colors.white70
+              style: TextStyle(color: secondaryTextColor, fontSize: 14),
             ),
             const SizedBox(height: 20),
 
-            _buildPaymentOption("Tarjeta de crédito", Icons.credit_card),
-            _buildPaymentOption("PayPal", Icons.account_balance_wallet),
-            _buildPaymentOption("Apple Pay", Icons.phone_iphone),
-            _buildPaymentOption("Google Pay", Icons.android),
+            // Pasamos 'isDark' a la función auxiliar
+            _buildPaymentOption("Tarjeta de crédito", Icons.credit_card, isDark),
+            _buildPaymentOption("PayPal", Icons.account_balance_wallet, isDark),
+            _buildPaymentOption("Apple Pay", Icons.phone_iphone, isDark),
+            _buildPaymentOption("Google Pay", Icons.android, isDark),
 
             const SizedBox(height: 40),
             Center(
@@ -42,10 +56,10 @@ class PaymentsScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text(
+                child: Text(
                   "Volver",
                   style: TextStyle(
-                      color: Colors.redAccent,
+                      color: actionColor, // Rojo funcional se mantiene
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
@@ -57,24 +71,36 @@ class PaymentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentOption(String title, IconData icon) {
+  // Se añade 'isDark' como argumento
+  Widget _buildPaymentOption(String title, IconData icon, bool isDark) {
+    
+    // Colores del Tile (tarjeta) dinámicos
+    final tileColor = isDark ? const Color(0xFF1B1A1A) : Colors.grey[100]; // Gris oscuro vs Gris claro
+    final tileIconColor = isDark ? Colors.white70 : Colors.black54;
+    final tileTextColor = isDark ? Colors.white : Colors.black;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1B1A1A),
+          // ELIMINADO: const Color(0xFF1B1A1A)
+          color: tileColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white70, size: 28),
+            // ELIMINADO: Colors.white70
+            Icon(icon, color: tileIconColor, size: 28),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    // ELIMINADO: Colors.white
+                    color: tileTextColor, 
+                    fontWeight: FontWeight.w500
+                ),
               ),
             ),
           ],

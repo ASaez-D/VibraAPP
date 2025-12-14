@@ -7,8 +7,6 @@ import 'package:share_plus/share_plus.dart';
 import 'login_screen.dart';
 import 'settings_screen.dart';
 import 'payments_screen.dart';
-import 'privacity_screen.dart';
-import 'notifications_screen.dart';
 import 'customizeProfile_screen.dart';
 import 'calendar_screen.dart';
 import 'ticket_screen.dart';
@@ -16,6 +14,10 @@ import 'social_screen.dart';
 import 'concert_detail_screen.dart';
 import 'filtered_events_screen.dart';
 import 'saved_events_screen.dart';
+
+// --- NUEVOS IMPORTS ---
+import 'account_screen.dart';
+import 'ayuda_screen.dart';
 
 // SERVICIOS Y MODELOS
 import '../services/ticketmaster_service.dart';
@@ -605,6 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // --- DRAWER ACTUALIZADO CON TUS PEDIDOS ---
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: const Color(0xFF0E0E0E),
@@ -612,15 +615,49 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(widget.displayName, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), const SizedBox(height: 8), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), child: const Text("Editar perfil", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w500)))])),
+            // Cabecera del Drawer
+            Padding(
+              padding: const EdgeInsets.all(20), 
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, 
+                children: [
+                  Text(widget.displayName, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), 
+                  const SizedBox(height: 8), 
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), 
+                    child: const Text("Editar perfil", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w500))
+                  )
+                ]
+              )
+            ),
             const Divider(color: Colors.white12),
+            
+            // --- NUEVO: CUENTA ---
+            _menuItem(context, "Cuenta", Icons.person_outline, const AccountScreen()),
+
+            // MIS GUARDADOS
             _menuItem(context, "Mis Guardados", Icons.bookmark, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())),
-            _menuItem(context, "Pagos", Icons.payment, const PaymentsScreen()),
-            _menuItem(context, "Notificaciones", Icons.notifications, const NotificationsScreen()),
-            _menuItem(context, "Privacidad", Icons.vpn_key, const PrivacityScreen()),
+            
+            // --- ACTUALIZADO: MÉTODOS DE PAGO ---
+            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen()),
+            
+            // CONFIGURACIÓN
             _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
+            
+            // --- NUEVO: AYUDA ---
+            _menuItem(context, "Ayuda", Icons.help_outline, const AyudaScreen()),
+            
             const Spacer(),
-            ListTile(leading: const Icon(Icons.logout, color: Colors.redAccent), title: const Text("Cerrar sesión", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), onTap: () { Navigator.of(context).pop(); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }),
+            
+            // CERRAR SESIÓN
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent), 
+              title: const Text("Cerrar sesión", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), 
+              onTap: () { 
+                Navigator.of(context).pop(); 
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); 
+              }
+            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -629,7 +666,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {
-    return ListTile(leading: Icon(icon, color: Colors.white70), title: Text(title, style: const TextStyle(color: Colors.white)), onTap: () { Navigator.of(context).pop(); Navigator.push(context, MaterialPageRoute(builder: (_) => screen)); });
+    return ListTile(
+      leading: Icon(icon, color: Colors.white70), 
+      title: Text(title, style: const TextStyle(color: Colors.white)), 
+      onTap: () { 
+        Navigator.of(context).pop(); 
+        Navigator.push(context, MaterialPageRoute(builder: (_) => screen)); 
+      }
+    );
   }
 }
 
