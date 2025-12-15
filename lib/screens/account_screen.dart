@@ -1,71 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  // Acepta el perfil completo y la fuente de autenticación
+  final Map<String, dynamic> userProfile;
+  final String authSource;
+
+  const AccountScreen({
+    super.key,
+    required this.userProfile,
+    required this.authSource,
+  });
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  String? spotifyName;
-  String? spotifyEmail;
-  String? spotifyImageUrl;
-  String? spotifyProfileUrl; // URL al perfil de Spotify
+  String? displayName;
+  String? email;
+  String? imageUrl;
+  String? profileUrl; // URL al perfil externo (Spotify/Google)
 
   @override
   void initState() {
     super.initState();
-    _loadSpotifyProfile();
+    _loadProfileData(); // Carga los datos directamente desde los argumentos
   }
 
-  Future<void> _loadSpotifyProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('spotify_token');
-
-    if (token != null) {
-      final response = await http.get(
-        Uri.parse('https://api.spotify.com/v1/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        final profile = json.decode(response.body);
-        setState(() {
-          spotifyName = profile['display_name'];
-          spotifyEmail = profile['email'];
-          spotifyProfileUrl = profile['external_urls']?['spotify']; // link al perfil
-          spotifyImageUrl = (profile['images'] as List).isNotEmpty
-              ? profile['images'][0]['url']
-              : null;
-        });
-      }
-    }
+  // Lógica de carga modificada para usar los datos pasados en el constructor
+  void _loadProfileData() {
+    final profile = widget.userProfile;
+    setState(() {
+      // Extraemos los campos comunes
+      displayName = profile['displayName'];
+      email = profile['email'];
+      imageUrl = profile['photoURL'];
+      
+      // El campo 'profileUrl' (link externo) solo lo usa Spotify
+      profileUrl = profile['profileUrl']; 
+    });
   }
-
-  // Función para abrir URL de Spotify
-  Future<void> _launchSpotify() async {
-    if (spotifyProfileUrl != null) {
-      final uri = Uri.parse(spotifyProfileUrl!);
+  
+  // Función para abrir URL de Spotify o Google
+  Future<void> _launchProfileUrl() async {
+    if (profileUrl != null && profileUrl!.isNotEmpty) {
+      final uri = Uri.parse(profileUrl!);
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        print("No se pudo abrir Spotify");
+        // En un entorno de producción, aquí podrías mostrar un SnackBar al usuario
+        print("No se pudo abrir el perfil externo: $profileUrl");
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryTextColor = Theme.of(context).colorScheme.onBackground;
-    final secondaryTextColor =
-        Theme.of(context).colorScheme.onBackground.withOpacity(0.7);
+    final primaryTextColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = primaryTextColor.withOpacity(0.7);
 
     final avatarBgColor = isDark ? Colors.white10 : Colors.black12;
     final avatarIconColor = isDark ? Colors.white54 : Colors.black54;
+
+    // Texto y colores dinámicos para la vinculación
+    final String serviceName = widget.authSource == 'spotify' ? 'Spotify' : 'Google';
+    final Color serviceColor = widget.authSource == 'spotify' ? const Color(0xFF1DB954) : const Color(0xFF4285F4);
+    final IconData serviceIcon = widget.authSource == 'spotify' ? Icons.music_note : Icons.link;
+
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -103,9 +105,9 @@ class _AccountScreenState extends State<AccountScreen> {
                 width: 100,
                 height: 100,
                 color: avatarBgColor,
-                child: spotifyImageUrl != null
+                child: imageUrl != null && imageUrl!.isNotEmpty
                     ? Image.network(
-                        spotifyImageUrl!,
+                        imageUrl!,
                         fit: BoxFit.cover,
                       )
                     : Icon(Icons.account_circle,
@@ -116,14 +118,14 @@ class _AccountScreenState extends State<AccountScreen> {
 
           const SizedBox(height: 20),
 
-          // INFORMACIÓN DE SPOTIFY
+          // INFORMACIÓN DE CUENTA
           Text(
-            spotifyName != null ? "Nombre: $spotifyName" : "Cargando...",
+            displayName != null ? "Nombre: $displayName" : "Cargando...",
             style: TextStyle(color: secondaryTextColor, fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
-            spotifyEmail != null ? "Correo: $spotifyEmail" : "",
+            email != null ? "Correo: $email" : "",
             style: TextStyle(color: secondaryTextColor, fontSize: 16),
           ),
           const SizedBox(height: 20),
@@ -134,22 +136,22 @@ class _AccountScreenState extends State<AccountScreen> {
           // ESTADO DE VINCULACIÓN
           Row(
             children: [
-              Icon(Icons.music_note, color: secondaryTextColor),
+              Icon(serviceIcon, color: serviceColor),
               const SizedBox(width: 10),
               Text(
-                "Vinculado a Spotify",
+                "Vinculado a $serviceName",
                 style: TextStyle(color: secondaryTextColor, fontSize: 16),
               ),
             ],
           ),
           const SizedBox(height: 10),
 
-          // LINK A SPOTIFY
-          if (spotifyProfileUrl != null)
+          // LINK AL PERFIL EXTERNO
+          if (profileUrl != null && profileUrl!.isNotEmpty)
             TextButton.icon(
-              onPressed: _launchSpotify,
-              icon: const Icon(Icons.open_in_new),
-              label: const Text("Abrir perfil en Spotify"),
+              onPressed: _launchProfileUrl,
+              icon: Icon(Icons.open_in_new, color: serviceColor),
+              label: Text("Abrir perfil en $serviceName", style: TextStyle(color: serviceColor)),
             ),
         ],
       ),

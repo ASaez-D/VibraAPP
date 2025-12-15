@@ -66,18 +66,33 @@ class _LoginScreenState extends State<LoginScreen> {
                           final profile = await spotify.login();
                           if (profile == null) throw 'No se obtuvo perfil';
 
-                          final displayName =
-                              profile['display_name'] ?? 'Usuario';
+                          // --- CAMBIO: Extraer datos y foto de Spotify ---
+                          String? photoUrl;
+                          final images = profile['images'];
+                          if (images is List && images.isNotEmpty) {
+                            photoUrl = images[0]['url'] as String?;
+                          }
+
+                          // Creamos el mapa de perfil unificado
+                          final Map<String, dynamic> userProfile = {
+                            'displayName': profile['display_name'] ?? 'Usuario',
+                            'email': profile['email'],
+                            'photoURL': photoUrl,
+                            'profileUrl': profile['external_urls']?['spotify'], // Link al perfil
+                          };
 
                           if (!mounted) return;
 
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  HomeScreen(displayName: displayName),
+                              builder: (_) => HomeScreen(
+                                userProfile: userProfile, // Pasamos el perfil
+                                authSource: 'spotify',    // Indicamos la fuente
+                              ),
                             ),
                           );
+                          // ---------------------------------------------
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -141,18 +156,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           if (profile == null) throw 'No se pudo iniciar sesión';
 
-                          final displayName =
-                              profile['displayName'] ?? 'Usuario';
+                          // --- CAMBIO: Extraer datos de Google ---
+                          // El perfil de Google ya viene con las claves correctas de tu servicio
+                          final Map<String, dynamic> userProfile = {
+                            'displayName': profile['displayName'] ?? 'Usuario',
+                            'email': profile['email'],
+                            'photoURL': profile['photoURL'],
+                            'uid': profile['uid'],
+                          };
 
                           if (!mounted) return;
 
+                          // Navegamos a MusicPreferencesScreen pasando los nuevos datos
+                          // Asegúrate de actualizar MusicPreferencesScreen para aceptar estos parámetros también
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  MusicPreferencesScreen(displayName: displayName),
+                              builder: (_) => MusicPreferencesScreen(
+                                userProfile: userProfile, // Pasamos el perfil
+                                authSource: 'google',     // Indicamos la fuente
+                              ),
                             ),
                           );
+                          // ---------------------------------------
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

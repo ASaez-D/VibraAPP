@@ -24,10 +24,19 @@ import '../services/ticketmaster_service.dart';
 import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
 
-class HomeScreen extends StatefulWidget {
-  final String displayName;
 
-  const HomeScreen({super.key, required this.displayName});
+// -------------------------------------------------------------------------------------
+// CAMBIO CLAVE 1: Actualizar la clase para recibir el perfil y la fuente de auth
+// -------------------------------------------------------------------------------------
+class HomeScreen extends StatefulWidget {
+  final Map<String, dynamic> userProfile; // Recibirá el perfil completo
+  final String authSource; // 'spotify' o 'google'
+
+  const HomeScreen({
+    super.key, 
+    required this.userProfile, 
+    required this.authSource
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -50,8 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   
   // CACHE Y BÚSQUEDA
   List<ConcertDetail> _cachedConcerts = []; // Todos los conciertos descargados
-  List<ConcertDetail> _searchResults = [];  // Resultados de búsqueda
-  bool _isSearching = false;                // ¿Está buscando el usuario?
+  List<ConcertDetail> _searchResults = []; // Resultados de búsqueda
+  bool _isSearching = false; // ¿Está buscando el usuario?
   final TextEditingController _searchController = TextEditingController();
 
   // Artistas para Spotify
@@ -117,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Filtramos la lista cacheada por Nombre o por Venue
         _searchResults = _cachedConcerts.where((concert) {
           return concert.name.toLowerCase().contains(query) || 
-                      concert.venue.toLowerCase().contains(query);
+                         concert.venue.toLowerCase().contains(query);
         }).toList();
       }
     });
@@ -186,6 +195,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color hintText = isDarkMode ? Colors.white.withOpacity(0.4) : Colors.grey.shade400;
     final Color searchBarBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.grey.shade200;
     final Color dividerColor = isDarkMode ? Colors.white12 : Colors.grey.shade300;
+    
+    // -------------------------------------------------------------------------------------
+    // LÓGICA DINÁMICA DEL PERFIL (NUEVA)
+    // -------------------------------------------------------------------------------------
+    final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
+    final String photoUrl = widget.userProfile['photoURL'] ?? '';
+    final bool isLinked = photoUrl.isNotEmpty;
+    final bool isSpotify = widget.authSource == 'spotify';
+    // Color de servicio: Verde para Spotify, Azul para Google.
+    final Color serviceColor = isSpotify ? const Color(0xFF1DB954) : const Color(0xFF4285F4); 
+    final IconData fallbackIcon = isSpotify ? Icons.music_note : Icons.account_circle;
+    // -------------------------------------------------------------------------------------
 
 
     return Scaffold(
@@ -248,7 +269,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: CircleAvatar(
                           radius: 22,
                           backgroundColor: cardBg, // Dinámico
-                          child: Icon(Icons.person, color: primaryText, size: 24), // Dinámico
+                          // Utilizamos el ícono de persona, el borde ya es el accent color
+                          child: Icon(Icons.person, color: primaryText, size: 24), // Dinámico 
                         ),
                       ),
                     );
@@ -263,7 +285,10 @@ class _HomeScreenState extends State<HomeScreen> {
       // --- BODY CON LÓGICA DE BÚSQUEDA ---
       body: _isSearching 
         ? _buildSearchResults(primaryText, secondaryText, cardBg) // Pasamos colores
-        : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg), // Pasamos colores
+        // -------------------------------------------------------------------------------------
+        // CAMBIO 3: Pasar displayName
+        // -------------------------------------------------------------------------------------
+        : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg, displayName), 
       
       // BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
@@ -283,7 +308,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      endDrawer: _buildDrawer(context, primaryText, accentColor, scaffoldBg, dividerColor), // Pasamos colores
+      // -------------------------------------------------------------------------------------
+      // CAMBIO 4: Pasar los datos de perfil al Drawer
+      // -------------------------------------------------------------------------------------
+      endDrawer: _buildDrawer(
+        context, 
+        primaryText, 
+        accentColor, 
+        scaffoldBg, 
+        dividerColor,
+        displayName,
+        photoUrl,
+        isLinked,
+        serviceColor,
+        fallbackIcon,
+      ), 
     );
   }
 
@@ -297,6 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(Icons.search_off, size: 60, color: secondaryText.withOpacity(0.5)), // Dinámico
             const SizedBox(height: 16),
             Text("No hemos encontrado nada", style: TextStyle(color: secondaryText, fontSize: 16)), // Dinámico
+            TextButton(onPressed: _clearSearch, child: Text("Borrar búsqueda", style: TextStyle(color: Colors.blueAccent))),
           ],
         ),
       );
@@ -314,7 +354,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // --- VISTA NORMAL DE HOME ---
-  Widget _buildHomeContent(Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
+  // CAMBIO 3.1: Actualizar la firma para recibir displayName
+  Widget _buildHomeContent(Color primaryText, Color secondaryText, Color accentColor, Color cardBg, String displayName) {
     return FutureBuilder<List<ConcertDetail>>(
       future: _concertsFuture,
       builder: (context, snapshot) {
@@ -345,7 +386,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hola, ${widget.displayName}', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)), // Dinámico
+                    // CAMBIO 3.2: Usar el nuevo displayName
+                    Text('Hola, $displayName', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)), // Dinámico
                     Text('Descubre lo mejor', style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)), // Dinámico
                   ],
                 ),
@@ -667,8 +709,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- DRAWER ACTUALIZADO CON TUS PEDIDOS ---
-  Widget _buildDrawer(BuildContext context, Color primaryText, Color accentColor, Color scaffoldBg, Color dividerColor) {
+  // -------------------------------------------------------------------------------------
+  // CAMBIO 5: Actualizar _buildDrawer con la lógica de perfil dinámica
+  // -------------------------------------------------------------------------------------
+  Widget _buildDrawer(
+      BuildContext context, 
+      Color primaryText, 
+      Color accentColor, 
+      Color scaffoldBg, 
+      Color dividerColor,
+      String displayName, // Nuevo: Nombre de usuario
+      String photoUrl,    // Nuevo: URL de la foto de perfil
+      bool isLinked,      // Nuevo: Hay foto?
+      Color serviceColor, // Nuevo: Color del servicio (Spotify/Google)
+      IconData fallbackIcon, // Nuevo: Icono de reserva
+    ) {
     return Drawer(
       backgroundColor: scaffoldBg, // Dinámico
       child: SafeArea(
@@ -677,126 +732,155 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Cabecera del Drawer
             Padding(
-              padding: const EdgeInsets.all(20), 
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, 
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.displayName, style: TextStyle(color: primaryText, fontSize: 24, fontWeight: FontWeight.bold)), // Dinámico
-                  const SizedBox(height: 8), 
+                  // --- ZONA DE FOTO DE PERFIL Y NOMBRE DE USUARIO (DINÁMICA) ---
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: serviceColor, // Color del servicio (Spotify/Google)
+                          // Muestra la imagen si existe
+                          backgroundImage: isLinked 
+                            ? NetworkImage(photoUrl) 
+                            : null,
+                          // Muestra el icono de reserva si no hay imagen
+                          child: !isLinked
+                            ? Icon(
+                                fallbackIcon, // Icono dinámico (Música o Persona)
+                                color: primaryText, // Color de texto principal
+                                size: 20
+                              )
+                            : null,
+                        ),
+                      ),
+                      Text(
+                        displayName,
+                        style: TextStyle(
+                            color: primaryText,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  // --- FIN ZONA DE FOTO DE PERFIL Y NOMBRE DE USUARIO ---
+                  const SizedBox(height: 4),
                   GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), 
-                    child: Text("Editar perfil", style: TextStyle(color: accentColor, fontWeight: FontWeight.w500)) // Accent
-                  )
-                ]
-              )
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const CustomizeProfileScreen()),
+                      );
+                    },
+                    child: Text(
+                      "Editar perfil",
+                      style: TextStyle(
+                          color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Divider(color: dividerColor), // Dinámico
-            
-            // --- NUEVO: CUENTA ---
-            _menuItem(context, "Cuenta", Icons.person_outline, const AccountScreen(), primaryText),
+            const Divider(color: Colors.white24),
 
-            // MIS GUARDADOS
-            _menuItem(context, "Mis Guardados", Icons.bookmark, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList()), primaryText),
-            
-            // --- ACTUALIZADO: MÉTODOS DE PAGO ---
-            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen(), primaryText),
-            
-            // CONFIGURACIÓN
-            _menuItem(context, "Configuración", Icons.settings, const SettingsScreen(), primaryText),
-            
-            // --- NUEVO: AYUDA ---
-            _menuItem(context, "Ayuda", Icons.help_outline, const HelpScreen(), primaryText),
-            
-            const Spacer(),
-            
-            // CERRAR SESIÓN
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent), 
-              title: const Text("Cerrar sesión", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), 
-              onTap: () { 
-                Navigator.of(context).pop(); 
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); 
-              }
+            // --- MENÚ LATERAL ---
+            _menuItem(
+              context, 
+              "Cuenta", 
+              Icons.account_circle, 
+              // CAMBIO 5.1: Pasar el perfil y la fuente a AccountScreen
+              AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)
             ),
-            const SizedBox(height: 20),
+            
+            _menuItem(context,"Eventos guardados",Icons.bookmark_outline,SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),),),
+            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen()),
+            _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
+            _menuItem(context, "Ayuda", Icons.help_outline, const HelpScreen()),
+
+            const Spacer(),
+            Divider(color: dividerColor), // Dinámico
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text(
+                "Cerrar sesión",
+                style: TextStyle(
+                    color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen, Color primaryText) {
+  // --- WIDGET AUXILIAR MENU ITEM ---
+  Widget _menuItem(
+      BuildContext context, String title, IconData icon, Widget screen) {
+    // Usamos los colores del tema localizados en build() o por defecto si no están pasados
+    final primaryText = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black;
+    
     return ListTile(
-      leading: Icon(icon, color: primaryText.withOpacity(0.7)), // Dinámico
-      title: Text(title, style: TextStyle(color: primaryText)), // Dinámico
-      onTap: () { 
-        Navigator.of(context).pop(); 
-        Navigator.push(context, MaterialPageRoute(builder: (_) => screen)); 
-      }
+      leading: Icon(icon, color: primaryText.withOpacity(0.8)),
+      title: Text(title, style: TextStyle(color: primaryText)),
+      onTap: () {
+        Navigator.of(context).pop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+      },
     );
   }
 }
 
-// --- WIDGET ANIMADO INTERNO ---
-class _AnimatedIconButton extends StatefulWidget {
+// Clase auxiliar necesaria
+class _AnimatedIconButton extends StatelessWidget {
   final bool isSelected;
   final IconData iconSelected;
   final IconData iconUnselected;
   final Color colorSelected;
-  final VoidCallback onTap;
   final Color? fillColorSelected;
-  final Color? fillColor; // Nuevo para el color del fondo cuando NO está seleccionado
+  final VoidCallback onTap;
+  final Color? fillColor;
 
-  const _AnimatedIconButton({required this.isSelected, required this.iconSelected, required this.iconUnselected, required this.colorSelected, required this.onTap, this.fillColorSelected, this.fillColor});
-
-  @override
-  State<_AnimatedIconButton> createState() => _AnimatedIconButtonState();
-}
-
-class _AnimatedIconButtonState extends State<_AnimatedIconButton> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _AnimatedIconButton({
+    required this.isSelected,
+    required this.iconSelected,
+    required this.iconUnselected,
+    required this.colorSelected,
+    required this.onTap,
+    this.fillColorSelected,
+    this.fillColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final Color currentColor = widget.isSelected ? widget.colorSelected : Colors.white;
-    
-    // Si está seleccionado, usamos el color de relleno seleccionado (e.g., RedAccent.withOpacity(0.2))
-    // Si no está seleccionado, usamos el color de relleno opcional (negro o blanco semitransparente)
-    final Color currentFill = widget.isSelected 
-        ? (widget.fillColorSelected ?? widget.colorSelected.withOpacity(0.2))
-        : (widget.fillColor ?? Colors.white.withOpacity(0.15));
-
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        widget.onTap();
-        _controller.forward().then((_) => _controller.reverse());
-      },
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Container(
-          width: 36, height: 36,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: currentFill,
-            // El borde es más opaco si está seleccionado. Usamos el color del icono.
-            border: Border.all(color: currentColor.withOpacity(widget.isSelected ? 1.0 : 0.5), width: 1),
-          ),
-          child: Icon(widget.isSelected ? widget.iconSelected : widget.iconUnselected, color: currentColor, size: 18),
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isSelected ? (fillColorSelected ?? colorSelected.withOpacity(0.2)) : (fillColor ?? Colors.black.withOpacity(0.4)),
+          shape: BoxShape.circle,
+          border: Border.all(color: isSelected ? colorSelected : Colors.white.withOpacity(0.1), width: 1.5),
+        ),
+        child: Icon(
+          isSelected ? iconSelected : iconUnselected,
+          color: isSelected ? colorSelected : Colors.white,
+          size: 20,
         ),
       ),
     );

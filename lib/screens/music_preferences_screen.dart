@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/spotify_api_service.dart';
-import '../screens/home_screen.dart';
-
+import 'home_screen.dart'; // Asegúrate de que el import apunte a tu home_screen.dart
 
 class MusicPreferencesScreen extends StatefulWidget {
-  final String displayName;
+  // CAMBIO 1: Recibir el perfil completo y la fuente de autenticación
+  final Map<String, dynamic> userProfile;
+  final String authSource;
 
-  const MusicPreferencesScreen({super.key, required this.displayName});
+  const MusicPreferencesScreen({
+    super.key, 
+    required this.userProfile,
+    required this.authSource,
+  });
 
   @override
   State<MusicPreferencesScreen> createState() => _MusicPreferencesScreenState();
@@ -64,6 +69,9 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // CAMBIO 2: Extraer el nombre del perfil
+    final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
+
     final selectedGenreList =
         genres.where((g) => selectedGenres.contains(g)).toList();
     final unselectedGenres =
@@ -79,7 +87,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
             children: [
               // HEADER
               Text(
-                '¡Hola, ${widget.displayName}! 🎧',
+                '¡Hola, $displayName! 🎧', // Usamos la variable extraída
                 style: GoogleFonts.montserrat(
                   color: Colors.white,
                   fontSize: 28,
@@ -334,12 +342,16 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                     onPressed: selectedArtists.isNotEmpty ||
                             selectedGenres.isNotEmpty
                         ? () {
-                           Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(displayName: widget.displayName),
-                            ),
-                          );
+                            // CAMBIO 3: Pasar el perfil y la fuente a HomeScreen
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(
+                                  userProfile: widget.userProfile,
+                                  authSource: widget.authSource,
+                                ),
+                              ),
+                            );
                           }
                         : null,
                     child: const Text(
