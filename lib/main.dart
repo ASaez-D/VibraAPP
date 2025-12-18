@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vibra_project/screens/calendar_screen.dart'; // Asegúrate de que esto sea correcto
 import 'screens/login_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 // ¡IMPORTACIÓN NECESARIA!

@@ -6,7 +6,6 @@ import 'package:share_plus/share_plus.dart';
 // IMPORTS DE PANTALLAS
 import 'login_screen.dart';
 import 'settings_screen.dart';
-import 'payments_screen.dart';
 import 'customizeProfile_screen.dart';
 import 'calendar_screen.dart';
 import 'ticket_screen.dart';
@@ -14,8 +13,6 @@ import 'social_screen.dart';
 import 'concert_detail_screen.dart';
 import 'filtered_events_screen.dart';
 import 'saved_events_screen.dart';
-
-// --- NUEVOS IMPORTS ---
 import 'account_screen.dart';
 import 'help_screen.dart';
 
@@ -24,10 +21,7 @@ import '../services/ticketmaster_service.dart';
 import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
 
-
-// -------------------------------------------------------------------------------------
 // CAMBIO CLAVE 1: Actualizar la clase para recibir el perfil y la fuente de auth
-// -------------------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile; // Recibirá el perfil completo
   final String authSource; // 'spotify' o 'google'
@@ -196,9 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color searchBarBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.grey.shade200;
     final Color dividerColor = isDarkMode ? Colors.white12 : Colors.grey.shade300;
     
-    // -------------------------------------------------------------------------------------
-    // LÓGICA DINÁMICA DEL PERFIL (NUEVA)
-    // -------------------------------------------------------------------------------------
+    // LÓGICA DINÁMICA DEL PERFIL 
     final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
     final String photoUrl = widget.userProfile['photoURL'] ?? '';
     final bool isLinked = photoUrl.isNotEmpty;
@@ -206,13 +198,11 @@ class _HomeScreenState extends State<HomeScreen> {
     // Color de servicio: Verde para Spotify, Azul para Google.
     final Color serviceColor = isSpotify ? const Color(0xFF1DB954) : const Color(0xFF4285F4); 
     final IconData fallbackIcon = isSpotify ? Icons.music_note : Icons.account_circle;
-    // -------------------------------------------------------------------------------------
-
 
     return Scaffold(
       backgroundColor: scaffoldBg, // Dinámico
       
-      // --- APP BAR PREMIUM ---
+      // --- APP BAR 
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
@@ -220,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Row(
               children: [
-                // 1. BUSCADOR PREMIUM
+                // 1. BUSCADOR 
                 Expanded(
                   child: Container(
                     height: 50,
@@ -255,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 const SizedBox(width: 16),
                 
-                // 2. AVATAR PREMIUM (GLOW + BORDE)
+                // 2. AVATAR  GLOW + BORDE)
                 Builder(
                   builder: (context) {
                     return GestureDetector(
@@ -285,9 +275,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // --- BODY CON LÓGICA DE BÚSQUEDA ---
       body: _isSearching 
         ? _buildSearchResults(primaryText, secondaryText, cardBg) // Pasamos colores
-        // -------------------------------------------------------------------------------------
+
         // CAMBIO 3: Pasar displayName
-        // -------------------------------------------------------------------------------------
         : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg, displayName), 
       
       // BOTTOM NAV
@@ -308,9 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // -------------------------------------------------------------------------------------
       // CAMBIO 4: Pasar los datos de perfil al Drawer
-      // -------------------------------------------------------------------------------------
       endDrawer: _buildDrawer(
         context, 
         primaryText, 
@@ -326,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- VISTA DE RESULTADOS DE BÚSQUEDA ---
+  //  VISTA DE RESULTADOS DE BÚSQUEDA 
   Widget _buildSearchResults(Color primaryText, Color secondaryText, Color cardBg) {
     if (_searchResults.isEmpty) {
       return Center(
@@ -418,10 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ==========================================
   // WIDGETS AUXILIARES
-  // ==========================================
-
   Widget _buildSectionHeader({required String title, required String subtitle, required Color primaryText, required Color secondaryText, required Color accentColor, required Color cardBg, VoidCallback? onMoreTap}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 16),
@@ -558,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- TARJETA PRINCIPAL (HOME) ---
+  // --- TARJETA PRINCIPAL ---
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -662,7 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- TARJETA PARA BÚSQUEDA (HORIZONTAL Y COMPACTA) ---
+  // --- TARJETA PARA BÚSQUEDA ---
   Widget _buildListCard(ConcertDetail concert, Color primaryText, Color secondaryText, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final day = DateFormat('d MMM').format(concert.date).toUpperCase();
@@ -709,9 +693,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // -------------------------------------------------------------------------------------
-  // CAMBIO 5: Actualizar _buildDrawer con la lógica de perfil dinámica
-  // -------------------------------------------------------------------------------------
+  // Actualizar _buildDrawer con la lógica de perfil dinámica
   Widget _buildDrawer(
       BuildContext context, 
       Color primaryText, 
@@ -798,7 +780,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             
             _menuItem(context,"Eventos guardados",Icons.bookmark_outline,SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),),),
-            _menuItem(context, "Métodos de pago", Icons.payment, const PaymentsScreen()),
             _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
             _menuItem(context, "Ayuda", Icons.help_outline, const HelpScreen()),
 
