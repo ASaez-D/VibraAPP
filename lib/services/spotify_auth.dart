@@ -9,38 +9,44 @@ class SpotifyAuth {
   final String redirectUri = 'vibraapp://callback'; 
   final String scopes = 'user-read-private user-read-email user-top-read';
 
-  /// Devuelve null si no se pudo iniciar sesión
+  /// Devuelve un Mapa con los datos del perfil Y el access_token
   Future<Map<String, dynamic>?> login() async {
     try {
-      // Limpiar token previo antes de iniciar login
+      // Limpiar token previo
       await logout();
       print('🧹 Token anterior eliminado.');
 
-      // URL de login con Authorization Code Flow
-      final url =
-          'https://accounts.spotify.com/authorize?response_type=code&client_id=$clientId&redirect_uri=$redirectUri&scope=$scopes&show_dialog=true';
+      // 1. URL OFICIAL DE LOGIN (Authorize)
+      // Generamos la URL con los parámetros necesarios
+      final url = Uri.https('accounts.spotify.com', '/authorize', {
+        'response_type': 'code',
+        'client_id': clientId,
+        'redirect_uri': redirectUri,
+        'scope': scopes,
+      }).toString();
+      
       print('URL para login Spotify: $url');
 
-      // Abrir navegador para autenticación
-      print('🕒 Abriendo navegador para autenticación...');
+      // 2. Abrir navegador
+      print('🕒 Abriendo navegador...');
       final result = await FlutterWebAuth2.authenticate(
         url: url,
         callbackUrlScheme: 'vibraapp',
       );
-      print('📥 Resultado recibido del login: $result');
+      print('📥 Resultado recibido: $result');
 
-      // Obtener el código de autorización
+      // 3. Obtener el código
       final uri = Uri.parse(result);
       final code = uri.queryParameters['code'];
 
       if (code == null) {
-        print('No se recibió el código de autorización o usuario canceló login');
+        print('Error: No se recibió código de autorización');
         return null;
       }
 
-      print('✅ Código de autorización recibido: $code');
+      print('✅ Código recibido: $code');
 
-      // Intercambiar el código por access_token
+      // 4. Intercambiar código por Token (URL OFICIAL)
       final tokenResponse = await http.post(
         Uri.parse('https://accounts.spotify.com/api/token'),
         headers: {
@@ -56,51 +62,53 @@ class SpotifyAuth {
       );
 
       if (tokenResponse.statusCode != 200) {
-        print(
-            'Error al obtener access token: ${tokenResponse.statusCode} - ${tokenResponse.body}');
+        print('Error Token: ${tokenResponse.statusCode} - ${tokenResponse.body}');
         return null;
       }
 
       final tokenData = json.decode(tokenResponse.body);
       final accessToken = tokenData['access_token'];
-      print('✅ Access token recibido: $accessToken');
+      print('✅ Access Token obtenido');
 
       // Guardar token localmente
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('spotify_token', accessToken);
 
-      // Llamar a la API de Spotify para obtener perfil
+      // 5. Obtener Perfil de Usuario (URL OFICIAL)
       final response = await http.get(
         Uri.parse('https://api.spotify.com/v1/me'),
         headers: {'Authorization': 'Bearer $accessToken'},
       );
 
       if (response.statusCode != 200) {
-        print(
-            'Error al obtener perfil de Spotify: ${response.statusCode} - ${response.body}');
+        print('Error Perfil: ${response.statusCode} - ${response.body}');
         return null;
       }
 
-      final profile = json.decode(response.body);
-      print('Perfil Spotify: $profile');
+      // Decodificamos el perfil
+      final Map<String, dynamic> profile = json.decode(response.body);
+      
+      // --- CAMBIO CLAVE ---
+      // Inyectamos el token dentro del mapa del perfil para que LoginScreen pueda leerlo
+      // y pasárselo a la HomeScreen.
+      profile['access_token'] = accessToken; 
 
+      print('Perfil obtenido correctamente: ${profile['display_name']}');
       return profile;
+
     } catch (e) {
-      print('🚨 Error en login de Spotify: $e');
+      print('🚨 Excepción en Spotify Auth: $e');
       return null;
     }
   }
 
-  /// Recupera token guardado
   static Future<String?> getSavedToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('spotify_token');
   }
 
-  /// Elimina token guardado
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('spotify_token');
-    print('🧹 Token anterior eliminado.');
   }
 }

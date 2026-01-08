@@ -63,10 +63,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         final spotify = SpotifyAuth();
 
                         try {
+                          // Obtenemos el perfil completo (incluyendo el token)
                           final profile = await spotify.login();
+                          
                           if (profile == null) throw 'No se obtuvo perfil';
 
-                          // --- CAMBIO: Extraer datos y foto de Spotify ---
+                          // --- CAMBIO IMPORTANTE: Obtener el accessToken ---
+                          // Asumiendo que tu servicio SpotifyAuth devuelve el token dentro del mapa 'profile'
+                          // Si tu servicio no lo devuelve, tendrás que modificarlo para que lo haga.
+                          // Por ahora, asumimos que 'access_token' viene en la respuesta del login.
+                          final String? accessToken = profile['access_token']; 
+
                           String? photoUrl;
                           final images = profile['images'];
                           if (images is List && images.isNotEmpty) {
@@ -78,26 +85,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             'displayName': profile['display_name'] ?? 'Usuario',
                             'email': profile['email'],
                             'photoURL': photoUrl,
-                            'profileUrl': profile['external_urls']?['spotify'], // Link al perfil
+                            'profileUrl': profile['external_urls']?['spotify'],
                           };
 
                           if (!mounted) return;
 
+                          // Navegamos pasando el token
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => HomeScreen(
-                                userProfile: userProfile, // Pasamos el perfil
-                                authSource: 'spotify',    // Indicamos la fuente
+                                userProfile: userProfile,
+                                authSource: 'spotify',
+                                spotifyAccessToken: accessToken, // <--- AQUÍ PASAMOS EL TOKEN
                               ),
                             ),
                           );
-                          // ---------------------------------------------
+                          
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                  'Error al iniciar sesión con Spotify: $e'),
+                              content: Text('Error al iniciar sesión con Spotify: $e'),
                             ),
                           );
                         } finally {
@@ -156,8 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           if (profile == null) throw 'No se pudo iniciar sesión';
 
-                          // --- CAMBIO: Extraer datos de Google ---
-                          // El perfil de Google ya viene con las claves correctas de tu servicio
                           final Map<String, dynamic> userProfile = {
                             'displayName': profile['displayName'] ?? 'Usuario',
                             'email': profile['email'],
@@ -167,23 +173,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           if (!mounted) return;
 
-                          // Navegamos a MusicPreferencesScreen pasando los nuevos datos
-                          // Asegúrate de actualizar MusicPreferencesScreen para aceptar estos parámetros también
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => MusicPreferencesScreen(
-                                userProfile: userProfile, // Pasamos el perfil
-                                authSource: 'google',     // Indicamos la fuente
+                                userProfile: userProfile,
+                                authSource: 'google',
                               ),
                             ),
                           );
-                          // ---------------------------------------
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                                  Text('Error al iniciar sesión con Google: $e'),
+                              content: Text('Error al iniciar sesión con Google: $e'),
                             ),
                           );
                         } finally {
@@ -242,7 +244,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ICONO
             Container(
               width: 26,
               height: 26,
@@ -260,10 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
             const SizedBox(width: 12),
-
-            // TEXTO
             Text(
               text,
               style: TextStyle(

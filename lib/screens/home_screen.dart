@@ -1,3 +1,4 @@
+import 'dart:ui'; // NECESARIO PARA DETECTAR EL PAÍS
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Para HapticFeedback
 import 'package:intl/intl.dart';
@@ -21,15 +22,16 @@ import '../services/ticketmaster_service.dart';
 import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
 
-// CAMBIO CLAVE 1: Actualizar la clase para recibir el perfil y la fuente de auth
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile; // Recibirá el perfil completo
   final String authSource; // 'spotify' o 'google'
+  final String? spotifyAccessToken; // Token para la magia de recomendaciones
 
   const HomeScreen({
     super.key, 
     required this.userProfile, 
-    required this.authSource
+    required this.authSource,
+    this.spotifyAccessToken,
   });
 
   @override
@@ -52,12 +54,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final Set<String> _savedIds = {};
   
   // CACHE Y BÚSQUEDA
-  List<ConcertDetail> _cachedConcerts = []; // Todos los conciertos descargados
-  List<ConcertDetail> _searchResults = []; // Resultados de búsqueda
-  bool _isSearching = false; // ¿Está buscando el usuario?
+  List<ConcertDetail> _cachedConcerts = []; 
+  List<ConcertDetail> _searchResults = []; 
+  bool _isSearching = false; 
   final TextEditingController _searchController = TextEditingController();
 
-  // Artistas para Spotify
+  // UBICACIÓN (PAÍS DETECTADO)
+  String _userCountryCode = 'ES'; // Por defecto España
+
+  // --- VARIABLES DE INTELIGENCIA VIBRA ---
+  String _currentVibe = "lo mejor"; // Título dinámico (ej: "tu rollo Urbano")
+  List<ConcertDetail> _recommendedConcerts = []; // Lista horizontal "Solo para ti"
+  String _topArtistName = ""; // Nombre del artista para el título "Porque escuchas a..."
+  bool _isLoadingRecommendations = false;
+
+  // Artistas para Spotify (Carrusel genérico por defecto)
   final List<String> _targetArtists = ["Bad Bunny", "Rosalía", "Quevedo", "Aitana", "Feid", "C. Tangana"];
 
   // Tickets ejemplo
@@ -69,58 +80,163 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
     
-    // Listener para la búsqueda en tiempo real
+    // 1. INICIAR EL CEREBRO DE LA APP
+    _detectUserCountryAndTaste();
+    
     _searchController.addListener(_onSearchChanged);
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  // --- LÓGICA MAESTRA: PAÍS + GUSTOS MUSICALES ---
+  void _detectUserCountryAndTaste() {
+    // 1. Detectar País
+    final locale = PlatformDispatcher.instance.locale;
+    setState(() {
+      _userCountryCode = locale.countryCode ?? 'ES';
+    });
+    debugPrint("📍 País detectado: $_userCountryCode");
+
+    // 2. Decidir qué cargar según la fuente de Login
+    if (widget.authSource == 'spotify' && widget.spotifyAccessToken != null) {
+      // Si es Spotify, analizamos gustos
+      _analyzeUserTasteAndLoad();
+    } else {
+      // Si es Google, cargamos genérico
+      _loadData(keyword: null); 
+      // Cargamos fotos de artistas genéricos para el carrusel
+      _loadGenericArtistsImages();
+    }
   }
 
-  void _loadData() {
-    setState(() {
-      // 1. Cargar Conciertos (60 días)
-      _concertsFuture = _ticketmasterService.getConcerts(
-        DateTime.now(),
-        DateTime.now().add(const Duration(days: 60)),
-      ).then((events) {
-        _cachedConcerts = events; // Guardamos referencia para el buscador
-        return events;
-      });
+  // Analiza los géneros de Spotify y configura la Home
+  Future<void> _analyzeUserTasteAndLoad() async {
+    setState(() => _isLoadingRecommendations = true);
+    
+    try {
+      // A. Obtenemos artistas y sus géneros
+      final topArtistsData = await _spotifyService.getUserTopArtistsWithGenres(widget.spotifyAccessToken!);
+      
+      String? dominantKeyword;
+      
+      if (topArtistsData.isNotEmpty) {
+        // B. Algoritmo de "Vibra": Busca palabras clave en los géneros
+        final allGenres = topArtistsData.expand((e) => e['genres'] as List).join(" ").toLowerCase();
+        
+        if (allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("trap") || allGenres.contains("latino")) {
+          dominantKeyword = "Latino"; 
+          _currentVibe = "tu rollo Urbano";
+        } else if (allGenres.contains("rock") || allGenres.contains("metal") || allGenres.contains("punk")) {
+          dominantKeyword = "Rock";
+          _currentVibe = "tu lado Rocker";
+        } else if (allGenres.contains("indie") || allGenres.contains("alternative")) {
+          dominantKeyword = "Indie";
+          _currentVibe = "tu vibe Indie";
+        } else if (allGenres.contains("pop")) {
+          dominantKeyword = "Pop";
+          _currentVibe = "tus hits Pop";
+        } else if (allGenres.contains("electronic") || allGenres.contains("house") || allGenres.contains("techno") || allGenres.contains("dance")) {
+          dominantKeyword = "Electronic";
+          _currentVibe = "fiesta Electrónica";
+        }
 
-      // 2. Cargar Fotos Artistas
-      _artistsFuture = Future.wait(
+        // C. Cargar sección "Solo para ti" (Artistas específicos)
+        _loadSpecificRecommendations(topArtistsData.map((e) => e['name'] as String).toList());
+      }
+
+      // D. Cargar FEED PRINCIPAL filtrado por la Vibra dominante
+      debugPrint("🎵 Vibra detectada: $dominantKeyword");
+      _loadData(keyword: dominantKeyword);
+
+    } catch (e) {
+      debugPrint("Error analizando gustos: $e");
+      _loadData(keyword: null); // Fallback a general
+    }
+  }
+
+  // Carga eventos específicos de los artistas Top
+  Future<void> _loadSpecificRecommendations(List<String> artistNames) async {
+    if (artistNames.isEmpty) return;
+    _topArtistName = artistNames.first; // Para el título
+
+    List<ConcertDetail> foundEvents = [];
+    
+    // Buscamos conciertos de los top 3 artistas
+    final results = await Future.wait(
+      artistNames.take(3).map((artist) => 
+        _ticketmasterService.searchEventsByKeyword(artist, _userCountryCode)
+      )
+    );
+
+    for (var list in results) foundEvents.addAll(list);
+
+    // Quitamos duplicados
+    final uniqueEvents = <String, ConcertDetail>{};
+    for (var event in foundEvents) uniqueEvents[event.name] = event;
+
+    if (mounted) {
+      setState(() {
+        _recommendedConcerts = uniqueEvents.values.toList();
+        _isLoadingRecommendations = false;
+        
+        // También usamos estos artistas para las fotos del carrusel pequeño
+        _artistsFuture = Future.value(artistNames.map((name) => {"name": name, "image": ""}).toList());
+        // Y luego cargamos sus fotos reales en segundo plano (simplificado aquí)
+        _loadArtistsImages(artistNames);
+      });
+    }
+  }
+
+  void _loadArtistsImages(List<String> names) {
+     _artistsFuture = Future.wait(
+        names.map((name) async {
+          try {
+            final results = await _spotifyService.searchArtists(name);
+            if (results.isNotEmpty) return results.first;
+          } catch (e) {}
+          return {"name": name, "image": "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"};
+        })
+      );
+  }
+
+  void _loadGenericArtistsImages() {
+    _artistsFuture = Future.wait(
         _targetArtists.map((name) async {
           try {
             final results = await _spotifyService.searchArtists(name);
             if (results.isNotEmpty) return results.first;
-          } catch (e) {
-            debugPrint("Error Spotify para $name: $e");
-          }
+          } catch (e) {}
           return {"name": name, "image": ""};
         })
       ).then((list) => list.where((item) => item["image"] != "").toList());
+  }
+
+  // CARGA EL FEED PRINCIPAL
+  void _loadData({String? keyword}) {
+    setState(() {
+      _concertsFuture = _ticketmasterService.getConcerts(
+        DateTime.now(),
+        DateTime.now().add(const Duration(days: 90)), // 3 Meses
+        countryCode: _userCountryCode, 
+        keyword: keyword, // <--- FILTRO INTELIGENTE
+      ).then((events) {
+        _cachedConcerts = events; 
+        return events;
+      });
     });
   }
 
   // --- LÓGICA DE BÚSQUEDA ---
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
-    
     setState(() {
       if (query.isEmpty) {
         _isSearching = false;
         _searchResults = [];
       } else {
         _isSearching = true;
-        // Filtramos la lista cacheada por Nombre o por Venue
         _searchResults = _cachedConcerts.where((concert) {
           return concert.name.toLowerCase().contains(query) || 
-                         concert.venue.toLowerCase().contains(query);
+                 concert.venue.toLowerCase().contains(query);
         }).toList();
       }
     });
@@ -128,11 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _clearSearch() {
     _searchController.clear();
-    FocusScope.of(context).unfocus(); // Ocultar teclado
+    FocusScope.of(context).unfocus(); 
   }
 
   void _onTabTapped(int index) {
-    // Solo navegamos a las pantallas si no es la Home (índice 0)
     if (index != 0) {
       switch (index) {
         case 1: Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen())); break;
@@ -140,7 +255,6 @@ class _HomeScreenState extends State<HomeScreen> {
         case 3: Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen())); break;
       }
     }
-    // Si es la Home, solo cambiamos el índice
     setState(() => _currentIndex = index);
   }
 
@@ -153,11 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _toggleLike(String id) {
     HapticFeedback.lightImpact();
     setState(() {
-      if (_likedIds.contains(id)) {
-        _likedIds.remove(id);
-      } else {
-        _likedIds.add(id);
-      }
+      if (_likedIds.contains(id)) _likedIds.remove(id); else _likedIds.add(id);
     });
   }
 
@@ -169,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eliminado de guardados"), duration: Duration(seconds: 1)));
       } else {
         _savedIds.add(id);
-        // Usamos Colors.greenAccent que tiene buen contraste en ambos modos
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Guardado en tu lista"), backgroundColor: Colors.greenAccent, duration: Duration(seconds: 1)));
       }
     });
@@ -177,11 +286,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Detección del tema y Colores Dinámicos
+    // ESTILOS DINÁMICOS
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color accentColor = Colors.greenAccent; 
-    
-    // Colores base dinámicos
     final Color scaffoldBg = isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
     final Color cardBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
     final Color primaryText = isDarkMode ? Colors.white : const Color(0xFF222222);
@@ -190,19 +297,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color searchBarBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.grey.shade200;
     final Color dividerColor = isDarkMode ? Colors.white12 : Colors.grey.shade300;
     
-    // LÓGICA DINÁMICA DEL PERFIL 
     final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
     final String photoUrl = widget.userProfile['photoURL'] ?? '';
     final bool isLinked = photoUrl.isNotEmpty;
     final bool isSpotify = widget.authSource == 'spotify';
-    // Color de servicio: Verde para Spotify, Azul para Google.
     final Color serviceColor = isSpotify ? const Color(0xFF1DB954) : const Color(0xFF4285F4); 
     final IconData fallbackIcon = isSpotify ? Icons.music_note : Icons.account_circle;
 
     return Scaffold(
-      backgroundColor: scaffoldBg, // Dinámico
+      backgroundColor: scaffoldBg,
       
-      // --- APP BAR 
+      // --- APP BAR ---
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
@@ -210,57 +315,43 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Row(
               children: [
-                // 1. BUSCADOR 
                 Expanded(
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: searchBarBg, // Dinámico
+                      color: searchBarBg,
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.shade300, width: 1), // Borde sutil
-                      boxShadow: [
-                        BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.2) : Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
-                      ]
+                      border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.shade300, width: 1),
+                      boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.2) : Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))]
                     ),
                     child: TextField(
                       controller: _searchController,
-                      style: TextStyle(color: primaryText, fontSize: 15), // Dinámico
+                      style: TextStyle(color: primaryText, fontSize: 15),
                       cursorColor: accentColor,
                       decoration: InputDecoration(
-                        hintText: 'Buscar artistas, salas...',
-                        hintStyle: TextStyle(color: hintText, fontSize: 14), // Dinámico
-                        prefixIcon: Icon(Icons.search, color: hintText, size: 22), // Dinámico
+                        hintText: 'Buscar en $_userCountryCode...',
+                        hintStyle: TextStyle(color: hintText, fontSize: 14),
+                        prefixIcon: Icon(Icons.search, color: hintText, size: 22),
                         suffixIcon: _searchController.text.isNotEmpty 
-                          ? IconButton(
-                              icon: Icon(Icons.close, color: secondaryText, size: 20), // Dinámico
-                              onPressed: _clearSearch,
-                            )
-                          : null,
+                          ? IconButton(icon: Icon(Icons.close, color: secondaryText, size: 20), onPressed: _clearSearch) : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
                 ),
-                
                 const SizedBox(width: 16),
-                
-                // 2. AVATAR  GLOW + BORDE)
                 Builder(
                   builder: (context) {
                     return GestureDetector(
                       onTap: () => Scaffold.of(context).openEndDrawer(),
                       child: Container(
-                        padding: const EdgeInsets.all(2), // Espacio para el borde
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: accentColor, width: 1.5), // Borde Neón (Accent)
-                        ),
+                        padding: const EdgeInsets.all(2), 
+                        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: accentColor, width: 1.5)),
                         child: CircleAvatar(
                           radius: 22,
-                          backgroundColor: cardBg, // Dinámico
-                          // Utilizamos el ícono de persona, el borde ya es el accent color
-                          child: Icon(Icons.person, color: primaryText, size: 24), // Dinámico 
+                          backgroundColor: cardBg,
+                          child: Icon(Icons.person, color: primaryText, size: 24),
                         ),
                       ),
                     );
@@ -272,18 +363,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // --- BODY CON LÓGICA DE BÚSQUEDA ---
+      // --- BODY ---
       body: _isSearching 
-        ? _buildSearchResults(primaryText, secondaryText, cardBg) // Pasamos colores
-
-        // CAMBIO 3: Pasar displayName
+        ? _buildSearchResults(primaryText, secondaryText, cardBg)
         : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg, displayName), 
       
       // BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: scaffoldBg, // Dinámico
+        backgroundColor: scaffoldBg,
         selectedItemColor: accentColor,
-        unselectedItemColor: secondaryText, // Dinámico
+        unselectedItemColor: secondaryText,
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -297,66 +386,68 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // CAMBIO 4: Pasar los datos de perfil al Drawer
+      // DRAWER
       endDrawer: _buildDrawer(
-        context, 
-        primaryText, 
-        accentColor, 
-        scaffoldBg, 
-        dividerColor,
-        displayName,
-        photoUrl,
-        isLinked,
-        serviceColor,
-        fallbackIcon,
+        context, primaryText, accentColor, scaffoldBg, dividerColor,
+        displayName, photoUrl, isLinked, serviceColor, fallbackIcon,
       ), 
     );
   }
 
-  //  VISTA DE RESULTADOS DE BÚSQUEDA 
   Widget _buildSearchResults(Color primaryText, Color secondaryText, Color cardBg) {
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 60, color: secondaryText.withOpacity(0.5)), // Dinámico
+            Icon(Icons.search_off, size: 60, color: secondaryText.withOpacity(0.5)),
             const SizedBox(height: 16),
-            Text("No hemos encontrado nada", style: TextStyle(color: secondaryText, fontSize: 16)), // Dinámico
-            TextButton(onPressed: _clearSearch, child: Text("Borrar búsqueda", style: TextStyle(color: Colors.blueAccent))),
+            Text("No hemos encontrado nada", style: TextStyle(color: secondaryText, fontSize: 16)),
+            TextButton(onPressed: _clearSearch, child: const Text("Borrar búsqueda", style: TextStyle(color: Colors.blueAccent))),
           ],
         ),
       );
     }
-
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: _searchResults.length,
       separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (context, index) {
-        // Reutilizamos la tarjeta de lista filtrada para los resultados
-        return _buildListCard(_searchResults[index], primaryText, secondaryText, cardBg); // Pasamos colores
+        return _buildListCard(_searchResults[index], primaryText, secondaryText, cardBg);
       },
     );
   }
 
-  // --- VISTA NORMAL DE HOME ---
-  // CAMBIO 3.1: Actualizar la firma para recibir displayName
+  // --- VISTA PRINCIPAL CON INTELIGENCIA ---
   Widget _buildHomeContent(Color primaryText, Color secondaryText, Color accentColor, Color cardBg, String displayName) {
     return FutureBuilder<List<ConcertDetail>>(
       future: _concertsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: accentColor)); // Accent
+          return Center(child: CircularProgressIndicator(color: accentColor));
         } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.event_busy, color: secondaryText.withOpacity(0.5), size: 50), // Dinámico
+                Icon(Icons.location_off_rounded, color: secondaryText.withOpacity(0.5), size: 50),
                 const SizedBox(height: 10),
-                Text("No hay eventos disponibles", style: TextStyle(color: secondaryText)), // Dinámico
-                TextButton(onPressed: _loadData, child: Text("Reintentar", style: TextStyle(color: accentColor))) // Accent
+                Text("No hay eventos en $_userCountryCode", style: TextStyle(color: secondaryText, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text("Intenta cambiar de región", style: TextStyle(color: secondaryText.withOpacity(0.7), fontSize: 12)),
+                const SizedBox(height: 15),
+                TextButton(
+                  onPressed: () {
+                    // Fallback manual
+                    setState(() { _userCountryCode = 'ES'; _loadData(); });
+                  }, 
+                  style: TextButton.styleFrom(
+                    backgroundColor: accentColor.withOpacity(0.1),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+                  ),
+                  child: Text("Ver eventos en España", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold))
+                )
               ],
             ),
           );
@@ -373,9 +464,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // CAMBIO 3.2: Usar el nuevo displayName
-                    Text('Hola, $displayName', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)), // Dinámico
-                    Text('Descubre lo mejor', style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)), // Dinámico
+                    Text('Hola, $displayName', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)),
+                    // TÍTULO DINÁMICO SEGÚN TUS GUSTOS
+                    Text('Explora $_currentVibe', style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
                   ],
                 ),
               ),
@@ -384,17 +475,54 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg); // Pasamos colores
-                  if (index == 6) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor); // Pasamos colores
+                  // 1. Carrusel Artistas (Posición 2)
+                  if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg);
                   
+                  // 2. SECCIÓN RECOMENDADA PERSONALIZADA (Posición 4)
+                  if (index == 4 && _recommendedConcerts.isNotEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(
+                          title: "SOLO PARA TI", 
+                          subtitle: "Porque escuchas a $_topArtistName...", 
+                          primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg
+                        ),
+                        SizedBox(
+                          height: 280, 
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(left: 16),
+                            itemCount: _recommendedConcerts.length,
+                            itemBuilder: (ctx, i) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: SizedBox(
+                                  width: 220, 
+                                  child: _buildDiceCard(context, _recommendedConcerts[i], primaryText, secondaryText, accentColor, cardBg),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    );
+                  }
+
+                  // 3. Carrusel Categorías (Posición 6)
+                  if (index == 6) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor);
+                  
+                  // 4. Lista Principal (Filtrada por tu Vibra si hay Spotify)
                   if (index >= concerts.length) return null;
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: _buildDiceCard(context, concerts[index], primaryText, secondaryText, accentColor, cardBg), // Pasamos colores
+                    child: _buildDiceCard(context, concerts[index], primaryText, secondaryText, accentColor, cardBg),
                   );
                 },
-                childCount: concerts.length,
+                childCount: concerts.length, // Ojo: Aumentar +items falsos si quieres scroll infinito
               ),
             ),
             
@@ -416,11 +544,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: primaryText, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5, height: 1.1)), // Dinámico
+              Text(title, style: TextStyle(color: primaryText, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5, height: 1.1)),
               const SizedBox(height: 4),
-              Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))), // Accent
+              Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 6),
-              Text(subtitle, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500)), // Dinámico
+              Text(subtitle, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500)),
             ],
           ),
           if (onMoreTap != null)
@@ -428,8 +556,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: onMoreTap,
               child: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12)), // Dinámico
-                child: Icon(Icons.arrow_forward, color: primaryText, size: 18), // Dinámico
+                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.arrow_forward, color: primaryText, size: 18),
               ),
             ),
         ],
@@ -441,17 +569,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(title: "ARTISTAS TOP", subtitle: "Lo más escuchado ahora", primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg),
+        _buildSectionHeader(title: "TUS ARTISTAS", subtitle: "Basado en lo que más escuchas", primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg),
         SizedBox(
           height: 110,
           child: FutureBuilder<List<Map<String, String>>>(
             future: _artistsFuture,
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator(color: accentColor)); // Accent
-              }
-              if (!snapshot.hasData) return const SizedBox.shrink(); // No mostramos nada si no hay datos
-              
+              if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator(color: accentColor));
+              if (!snapshot.hasData) return const SizedBox.shrink();
               final artists = snapshot.data!;
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -464,16 +589,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(3),
-                          // Dejamos el gradiente fijo para un look 'Premium'
                           decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [Colors.greenAccent, Colors.blueAccent])),
                           child: CircleAvatar(
                             radius: 32,
-                            backgroundColor: cardBg, // Dinámico
-                            backgroundImage: ResizeImage(NetworkImage(artists[index]['image']!), width: 150),
+                            backgroundColor: cardBg,
+                            backgroundImage: (artists[index]['image'] != null && artists[index]['image']!.isNotEmpty) 
+                              ? ResizeImage(NetworkImage(artists[index]['image']!), width: 150)
+                              : null,
+                            child: (artists[index]['image'] == null || artists[index]['image']!.isEmpty)
+                              ? Icon(Icons.music_note, color: secondaryText) : null,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(artists[index]['name']!, style: TextStyle(color: secondaryText, fontSize: 12)), // Dinámico
+                        SizedBox(
+                          width: 80,
+                          child: Text(artists[index]['name']!, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 12))
+                        ),
                       ],
                     ),
                   );
@@ -496,7 +627,6 @@ class _HomeScreenState extends State<HomeScreen> {
       {"name": "Pop & Hits", "id": "KnvZfZ7vAev", "color": Colors.pinkAccent, "img": "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=400&auto=format&fit=crop"},
       {"name": "Jazz & Blues", "id": "KnvZfZ7vAvE", "color": Colors.amber, "img": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?q=80&w=400&auto=format&fit=crop"},
     ];
-
     final Color cardBg = Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1C1E) : Colors.white;
 
     return Column(
@@ -523,9 +653,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Dejamos la imagen con oscurecimiento fijo para el efecto
                         Image.network(col["img"] as String, fit: BoxFit.cover, cacheWidth: 400, color: Colors.black.withOpacity(0.3), colorBlendMode: BlendMode.darken, errorBuilder: (c,e,s) => Container(color: color.withOpacity(0.3))),
-                        // Dejamos el gradiente fijo para el efecto
                         Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color.withOpacity(0.9), color.withOpacity(0.2), Colors.black.withOpacity(0.8)], stops: const [0.0, 0.5, 1.0]))),
                         Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.6), width: 1.5))),
                         Positioned(bottom: 12, left: 14, child: Row(children: [Container(height: 20, width: 4, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2))), const SizedBox(width: 8), Text(col["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5))])),
@@ -545,11 +673,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // --- TARJETA PRINCIPAL ---
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     final String dayNum = DateFormat('d').format(concert.date);
     final String monthName = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase().replaceAll('.', '');
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
     
+    // Tag único para evitar conflictos Hero
+    String uniqueHeroTag = "${concert.name}_${concert.date}_home_${DateTime.now().millisecondsSinceEpoch}";
     String concertId = concert.name; 
     bool isLiked = _likedIds.contains(concertId);
     bool isSaved = _savedIds.contains(concertId);
@@ -563,6 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
               concert: concert,
               initialIsLiked: isLiked,
               initialIsSaved: isSaved,
+              heroTag: uniqueHeroTag, 
               onStateChanged: (liked, saved) {
                 setState(() {
                   if (liked) _likedIds.add(concertId); else _likedIds.remove(concertId);
@@ -577,41 +707,36 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 320,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: cardBg, // Dinámico
+          color: cardBg,
           boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 10))],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
-              // IMAGEN
               Positioned.fill(
-                child: concert.imageUrl.isNotEmpty
-                    ? Image.network(
-                        concert.imageUrl,
-                        fit: BoxFit.cover,
-                        cacheWidth: 500, 
-                        // Colores de fallback dinámicos
-                        errorBuilder: (context, error, stackTrace) => Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
-                      )
-                    // Colores de fallback dinámicos
-                    : Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
+                child: Hero(
+                  tag: uniqueHeroTag, 
+                  child: concert.imageUrl.isNotEmpty
+                      ? Image.network(
+                          concert.imageUrl,
+                          fit: BoxFit.cover,
+                          cacheWidth: 500, 
+                          errorBuilder: (context, error, stackTrace) => Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
+                        )
+                      : Container(color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300),
+                ),
               ),
-              // GRADIENTE INFERIOR
               Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, isDarkMode ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.1), isDarkMode ? Colors.black.withOpacity(0.95) : Colors.black.withOpacity(0.8)], stops: const [0.4, 0.6, 1.0]))),
               
-              // FECHA
               Positioned(top: 16, left: 16, child: Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(monthName, style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w900, height: 1)), Text(dayNum, style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1))]))),
               
-              // PRECIO
               Positioned(top: 16, right: 16, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: isDarkMode ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.8), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDarkMode ? Colors.white24 : Colors.grey.shade400)), child: Text(priceLabel, style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 12)))),
 
-              // BOTONES DE ACCIÓN
               Positioned(
                 bottom: 20, right: 20,
                 child: Row(
                   children: [
-                    // Estos botones usan iconos blancos/accent sobre un fondo semi-transparente negro, lo dejamos fijo para que destaque sobre la foto.
                     _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
                     const SizedBox(width: 8),
                     _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concertId), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
@@ -621,24 +746,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // TÍTULO Y UBICACIÓN
-              Positioned(
-                bottom: 20, left: 20, right: 150, 
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, 
-                  children: [
-                    Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), // Fijo a blanco
-                    const SizedBox(height: 6), 
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: accentColor, size: 14), // Accent
-                        const SizedBox(width: 4), 
-                        Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)) // Fijo a white70
-                      ]
-                    )
-                  ]
-                )
-              ),
+              Positioned(bottom: 20, left: 20, right: 150, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), const SizedBox(height: 6), Row(children: [Icon(Icons.location_on, color: accentColor, size: 14), const SizedBox(width: 4), Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis))])])),
             ],
           ),
         ),
@@ -656,177 +764,46 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert))),
       child: Container(
         height: 100,
-        decoration: BoxDecoration(
-          color: cardBg, // Dinámico
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.shade300)
-        ),
+        decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.shade300)),
         child: Row(
           children: [
-            // IMAGEN
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
-              child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200, errorBuilder: (c,e,s) => Container(width: 100, color: isDarkMode ? Colors.grey[900] : Colors.grey[300])),
-            ),
-            // TEXTOS
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 16)), // Dinámico
-                    const SizedBox(height: 4),
-                    Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 13)), // Dinámico
-                    const SizedBox(height: 6),
-                    Text(day, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)), // Accent
-                  ],
-                ),
-              ),
-            ),
-            // ICONO
-            Padding(padding: const EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 16)) // Dinámico
+            ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)), child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200, errorBuilder: (c,e,s) => Container(width: 100, color: isDarkMode ? Colors.grey[900] : Colors.grey[300]))),
+            Expanded(child: Padding(padding: const EdgeInsets.all(12.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 13)), const SizedBox(height: 6), Text(day, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold))]))),
+            Padding(padding: const EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 16))
           ],
         ),
       ),
     );
   }
 
-  // Actualizar _buildDrawer con la lógica de perfil dinámica
-  Widget _buildDrawer(
-      BuildContext context, 
-      Color primaryText, 
-      Color accentColor, 
-      Color scaffoldBg, 
-      Color dividerColor,
-      String displayName, // Nuevo: Nombre de usuario
-      String photoUrl,    // Nuevo: URL de la foto de perfil
-      bool isLinked,      // Nuevo: Hay foto?
-      Color serviceColor, // Nuevo: Color del servicio (Spotify/Google)
-      IconData fallbackIcon, // Nuevo: Icono de reserva
-    ) {
+  Widget _buildDrawer(BuildContext context, Color primaryText, Color accentColor, Color scaffoldBg, Color dividerColor, String displayName, String photoUrl, bool isLinked, Color serviceColor, IconData fallbackIcon) {
     return Drawer(
-      backgroundColor: scaffoldBg, // Dinámico
+      backgroundColor: scaffoldBg,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cabecera del Drawer
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- ZONA DE FOTO DE PERFIL Y NOMBRE DE USUARIO (DINÁMICA) ---
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: serviceColor, // Color del servicio (Spotify/Google)
-                          // Muestra la imagen si existe
-                          backgroundImage: isLinked 
-                            ? NetworkImage(photoUrl) 
-                            : null,
-                          // Muestra el icono de reserva si no hay imagen
-                          child: !isLinked
-                            ? Icon(
-                                fallbackIcon, // Icono dinámico (Música o Persona)
-                                color: primaryText, // Color de texto principal
-                                size: 20
-                              )
-                            : null,
-                        ),
-                      ),
-                      Text(
-                        displayName,
-                        style: TextStyle(
-                            color: primaryText,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  // --- FIN ZONA DE FOTO DE PERFIL Y NOMBRE DE USUARIO ---
-                  const SizedBox(height: 4),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const CustomizeProfileScreen()),
-                      );
-                    },
-                    child: Text(
-                      "Editar perfil",
-                      style: TextStyle(
-                          color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Padding(padding: const EdgeInsets.only(right: 10), child: CircleAvatar(radius: 18, backgroundColor: serviceColor, backgroundImage: isLinked ? NetworkImage(photoUrl) : null, child: !isLinked ? Icon(fallbackIcon, color: primaryText, size: 20) : null)), Text(displayName, style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.bold))]), const SizedBox(height: 4), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), child: Text("Editar perfil", style: TextStyle(color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500)))]),),
             const Divider(color: Colors.white24),
-
-            // --- MENÚ LATERAL ---
-            _menuItem(
-              context, 
-              "Cuenta", 
-              Icons.account_circle, 
-              // CAMBIO 5.1: Pasar el perfil y la fuente a AccountScreen
-              AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)
-            ),
-            
-            _menuItem(context,"Eventos guardados",Icons.bookmark_outline,SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),),),
+            _menuItem(context, "Cuenta", Icons.account_circle, AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)),
+            _menuItem(context, "Eventos guardados", Icons.bookmark_outline, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())),
             _menuItem(context, "Configuración", Icons.settings, const SettingsScreen()),
             _menuItem(context, "Ayuda", Icons.help_outline, const HelpScreen()),
-
             const Spacer(),
-            Divider(color: dividerColor), // Dinámico
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text(
-                "Cerrar sesión",
-                style: TextStyle(
-                    color: Colors.redAccent, fontWeight: FontWeight.bold),
-              ),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
-              },
-            ),
+            Divider(color: dividerColor),
+            ListTile(leading: const Icon(Icons.logout, color: Colors.redAccent), title: const Text("Cerrar sesión", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), onTap: () { Navigator.of(context).pop(); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }),
           ],
         ),
       ),
     );
   }
 
-  // --- WIDGET AUXILIAR MENU ITEM ---
-  Widget _menuItem(
-      BuildContext context, String title, IconData icon, Widget screen) {
-    // Usamos los colores del tema localizados en build() o por defecto si no están pasados
+  Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {
     final primaryText = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black;
-    
-    return ListTile(
-      leading: Icon(icon, color: primaryText.withOpacity(0.8)),
-      title: Text(title, style: TextStyle(color: primaryText)),
-      onTap: () {
-        Navigator.of(context).pop();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => screen),
-        );
-      },
-    );
+    return ListTile(leading: Icon(icon, color: primaryText.withOpacity(0.8)), title: Text(title, style: TextStyle(color: primaryText)), onTap: () { Navigator.of(context).pop(); Navigator.push(context, MaterialPageRoute(builder: (_) => screen)); });
   }
 }
 
-// Clase auxiliar necesaria
 class _AnimatedIconButton extends StatelessWidget {
   final bool isSelected;
   final IconData iconSelected;
@@ -836,34 +813,10 @@ class _AnimatedIconButton extends StatelessWidget {
   final VoidCallback onTap;
   final Color? fillColor;
 
-  const _AnimatedIconButton({
-    required this.isSelected,
-    required this.iconSelected,
-    required this.iconUnselected,
-    required this.colorSelected,
-    required this.onTap,
-    this.fillColorSelected,
-    this.fillColor,
-  });
+  const _AnimatedIconButton({required this.isSelected, required this.iconSelected, required this.iconUnselected, required this.colorSelected, required this.onTap, this.fillColorSelected, this.fillColor});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: isSelected ? (fillColorSelected ?? colorSelected.withOpacity(0.2)) : (fillColor ?? Colors.black.withOpacity(0.4)),
-          shape: BoxShape.circle,
-          border: Border.all(color: isSelected ? colorSelected : Colors.white.withOpacity(0.1), width: 1.5),
-        ),
-        child: Icon(
-          isSelected ? iconSelected : iconUnselected,
-          color: isSelected ? colorSelected : Colors.white,
-          size: 20,
-        ),
-      ),
-    );
+    return GestureDetector(onTap: onTap, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: isSelected ? (fillColorSelected ?? colorSelected.withOpacity(0.2)) : (fillColor ?? Colors.black.withOpacity(0.4)), shape: BoxShape.circle, border: Border.all(color: isSelected ? colorSelected : Colors.white.withOpacity(0.1), width: 1.5)), child: Icon(isSelected ? iconSelected : iconUnselected, color: isSelected ? colorSelected : Colors.white, size: 20)));
   }
 }

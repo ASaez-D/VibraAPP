@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/concert_detail.dart';
 
 class TicketmasterService {
+  // ⚠️ RECUERDA: Pon tu API Key real de Ticketmaster aquí
   final String apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6';
 
   String _formatDate(DateTime date) {
@@ -11,29 +12,48 @@ class TicketmasterService {
     return "${isoString.split('.')[0]}Z";
   }
 
-  // AHORA ACEPTA UN PARÁMETRO OPCIONAL classificationId
-  Future<List<ConcertDetail>> getConcerts(DateTime start, DateTime end, {String? classificationId}) async {
+  // --- 1. OBTENER CONCIERTOS (FEED PRINCIPAL) ---
+  // Ahora acepta 'keyword' para filtrar por tu "Vibra" (ej: Rock, Latino)
+  Future<List<ConcertDetail>> getConcerts(
+    DateTime start, 
+    DateTime end, {
+    String? classificationId,
+    String countryCode = 'ES', // País detectado automáticamente
+    String? keyword,           // Filtro inteligente (Tu Vibra)
+  }) async {
     final startStr = _formatDate(start);
     final endStr = _formatDate(end);
 
-    // Construimos la URL base
-    String baseUrl = 'https://app.ticketmaster.com/discovery/v2/events.json?apikey=$apiKey&startDateTime=$startStr&endDateTime=$endStr&sort=date,asc';
+    // URL Base
+    String baseUrl = 'https://app.ticketmaster.com/discovery/v2/events.json?'
+        'apikey=$apiKey'
+        '&startDateTime=$startStr'
+        '&endDateTime=$endStr'
+        '&countryCode=$countryCode'
+        '&size=50'
+        '&sort=date,asc';
     
-    // Si nos pasan una clasificación (Género, Segmento...), la añadimos, si no, por defecto música
-    if (classificationId != null && classificationId.isNotEmpty) {
+    // Lógica de Filtros
+    if (keyword != null && keyword.isNotEmpty) {
+      // Si sabemos tu gusto (Vibra), filtramos por esa palabra clave
+      baseUrl += '&keyword=${Uri.encodeComponent(keyword)}';
+    } else if (classificationId != null && classificationId.isNotEmpty) {
+      // Si pulsaste una categoría manual
       baseUrl += '&classificationId=$classificationId';
     } else {
-      baseUrl += '&classificationName=music';
+      // Por defecto, música general
+      baseUrl += '&segmentName=Music';
     }
 
     final url = Uri.parse(baseUrl);
-    // print("Llamando a API: $url"); // Debug
+    // print("Fetching: $url"); // Descomentar para debug
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        // Usamos utf8.decode para acentos y ñ
+        final data = json.decode(utf8.decode(response.bodyBytes));
 
         if (data['_embedded'] != null && data['_embedded']['events'] != null) {
           final events = data['_embedded']['events'] as List<dynamic>;
@@ -43,11 +63,40 @@ class TicketmasterService {
         }
       } else {
         print("Error Ticketmaster: ${response.statusCode} - ${response.body}");
-        throw Exception('Error al cargar conciertos');
+        return [];
       }
     } catch (e) {
-      print("Excepción en servicio: $e");
-      return []; // Retornamos lista vacía en vez de explotar
+      print("Excepción en servicio TM: $e");
+      return []; 
+    }
+  }
+
+  // --- 2. BUSCAR EVENTOS ESPECÍFICOS (Para "Solo para ti") ---
+  // Busca un artista concreto en un país concreto
+  Future<List<ConcertDetail>> searchEventsByKeyword(String artistName, String countryCode) async {
+    final url = Uri.parse(
+        'https://app.ticketmaster.com/discovery/v2/events.json?'
+        'apikey=$apiKey'
+        '&keyword=${Uri.encodeComponent(artistName)}'
+        '&segmentName=Music'
+        '&countryCode=$countryCode'
+        '&size=5' // Pocos resultados, solo los más relevantes
+        '&sort=date,asc');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+
+        if (data['_embedded'] != null && data['_embedded']['events'] != null) {
+          final events = data['_embedded']['events'] as List<dynamic>;
+          return events.map((e) => ConcertDetail.fromJson(e)).toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
 }
