@@ -63,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String _userCountryCode = 'ES'; // Por defecto España
 
   // --- VARIABLES DE INTELIGENCIA VIBRA ---
-  String _currentVibe = "lo mejor"; // Título dinámico (ej: "tu rollo Urbano")
+  String _currentVibe = "lo mejor"; // Título dinámico
   List<ConcertDetail> _recommendedConcerts = []; // Lista horizontal "Solo para ti"
-  String _topArtistName = ""; // Nombre del artista para el título "Porque escuchas a..."
+  String _topArtistName = ""; // Nombre del artista para el título
   bool _isLoadingRecommendations = false;
 
   // Artistas para Spotify (Carrusel genérico por defecto)
@@ -80,46 +80,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    
-    // 1. INICIAR EL CEREBRO DE LA APP
     _detectUserCountryAndTaste();
-    
     _searchController.addListener(_onSearchChanged);
   }
 
-  // --- LÓGICA MAESTRA: PAÍS + GUSTOS MUSICALES ---
   void _detectUserCountryAndTaste() {
-    // 1. Detectar País
     final locale = PlatformDispatcher.instance.locale;
     setState(() {
       _userCountryCode = locale.countryCode ?? 'ES';
     });
-    debugPrint("📍 País detectado: $_userCountryCode");
 
-    // 2. Decidir qué cargar según la fuente de Login
     if (widget.authSource == 'spotify' && widget.spotifyAccessToken != null) {
-      // Si es Spotify, analizamos gustos
       _analyzeUserTasteAndLoad();
     } else {
-      // Si es Google, cargamos genérico
       _loadData(keyword: null); 
-      // Cargamos fotos de artistas genéricos para el carrusel
       _loadGenericArtistsImages();
     }
   }
 
-  // Analiza los géneros de Spotify y configura la Home
   Future<void> _analyzeUserTasteAndLoad() async {
     setState(() => _isLoadingRecommendations = true);
     
     try {
-      // A. Obtenemos artistas y sus géneros
       final topArtistsData = await _spotifyService.getUserTopArtistsWithGenres(widget.spotifyAccessToken!);
-      
       String? dominantKeyword;
       
       if (topArtistsData.isNotEmpty) {
-        // B. Algoritmo de "Vibra": Busca palabras clave en los géneros
         final allGenres = topArtistsData.expand((e) => e['genres'] as List).join(" ").toLowerCase();
         
         if (allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("trap") || allGenres.contains("latino")) {
@@ -139,28 +125,20 @@ class _HomeScreenState extends State<HomeScreen> {
           _currentVibe = "fiesta Electrónica";
         }
 
-        // C. Cargar sección "Solo para ti" (Artistas específicos)
         _loadSpecificRecommendations(topArtistsData.map((e) => e['name'] as String).toList());
       }
-
-      // D. Cargar FEED PRINCIPAL filtrado por la Vibra dominante
-      debugPrint("🎵 Vibra detectada: $dominantKeyword");
       _loadData(keyword: dominantKeyword);
 
     } catch (e) {
-      debugPrint("Error analizando gustos: $e");
-      _loadData(keyword: null); // Fallback a general
+      _loadData(keyword: null); 
     }
   }
 
-  // Carga eventos específicos de los artistas Top
   Future<void> _loadSpecificRecommendations(List<String> artistNames) async {
     if (artistNames.isEmpty) return;
-    _topArtistName = artistNames.first; // Para el título
+    _topArtistName = artistNames.first; 
 
     List<ConcertDetail> foundEvents = [];
-    
-    // Buscamos conciertos de los top 3 artistas
     final results = await Future.wait(
       artistNames.take(3).map((artist) => 
         _ticketmasterService.searchEventsByKeyword(artist, _userCountryCode)
@@ -169,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (var list in results) foundEvents.addAll(list);
 
-    // Quitamos duplicados
+    // FILTRO ANTI-DUPLICADOS (Por nombre)
     final uniqueEvents = <String, ConcertDetail>{};
     for (var event in foundEvents) uniqueEvents[event.name] = event;
 
@@ -177,10 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _recommendedConcerts = uniqueEvents.values.toList();
         _isLoadingRecommendations = false;
-        
-        // También usamos estos artistas para las fotos del carrusel pequeño
         _artistsFuture = Future.value(artistNames.map((name) => {"name": name, "image": ""}).toList());
-        // Y luego cargamos sus fotos reales en segundo plano (simplificado aquí)
         _loadArtistsImages(artistNames);
       });
     }
@@ -210,22 +185,29 @@ class _HomeScreenState extends State<HomeScreen> {
       ).then((list) => list.where((item) => item["image"] != "").toList());
   }
 
-  // CARGA EL FEED PRINCIPAL
   void _loadData({String? keyword}) {
     setState(() {
       _concertsFuture = _ticketmasterService.getConcerts(
         DateTime.now(),
-        DateTime.now().add(const Duration(days: 90)), // 3 Meses
+        DateTime.now().add(const Duration(days: 90)),
         countryCode: _userCountryCode, 
-        keyword: keyword, // <--- FILTRO INTELIGENTE
+        keyword: keyword, 
       ).then((events) {
-        _cachedConcerts = events; 
-        return events;
+        // FILTRO ANTI-DUPLICADOS PARA LA LISTA PRINCIPAL
+        final seenNames = <String>{};
+        final uniqueEvents = events.where((event) {
+          final cleanName = event.name.trim().toLowerCase();
+          if (seenNames.contains(cleanName)) return false;
+          seenNames.add(cleanName);
+          return true; 
+        }).toList();
+
+        _cachedConcerts = uniqueEvents; 
+        return uniqueEvents;
       });
     });
   }
 
-  // --- LÓGICA DE BÚSQUEDA ---
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -258,7 +240,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _currentIndex = index);
   }
 
-  // --- LÓGICA DE INTERACCIÓN ---
   void _shareConcert(ConcertDetail concert) {
     final dateStr = DateFormat('d MMM yyyy').format(concert.date);
     Share.share('¡Mira este planazo en Vibra! 🎸\n${concert.name}\n📅 $dateStr\n📍 ${concert.venue}\n${concert.ticketUrl}');
@@ -286,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ESTILOS DINÁMICOS
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color accentColor = Colors.greenAccent; 
     final Color scaffoldBg = isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
@@ -307,7 +287,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: scaffoldBg,
       
-      // --- APP BAR ---
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
@@ -363,12 +342,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // --- BODY ---
       body: _isSearching 
         ? _buildSearchResults(primaryText, secondaryText, cardBg)
         : _buildHomeContent(primaryText, secondaryText, accentColor, cardBg, displayName), 
       
-      // BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: scaffoldBg,
         selectedItemColor: accentColor,
@@ -386,7 +363,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // DRAWER
       endDrawer: _buildDrawer(
         context, primaryText, accentColor, scaffoldBg, dividerColor,
         displayName, photoUrl, isLinked, serviceColor, fallbackIcon,
@@ -418,7 +394,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- VISTA PRINCIPAL CON INTELIGENCIA ---
   Widget _buildHomeContent(Color primaryText, Color secondaryText, Color accentColor, Color cardBg, String displayName) {
     return FutureBuilder<List<ConcertDetail>>(
       future: _concertsFuture,
@@ -438,7 +413,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Fallback manual
                     setState(() { _userCountryCode = 'ES'; _loadData(); });
                   }, 
                   style: TextButton.styleFrom(
@@ -465,7 +439,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Hola, $displayName', style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)),
-                    // TÍTULO DINÁMICO SEGÚN TUS GUSTOS
                     Text('Explora $_currentVibe', style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
                   ],
                 ),
@@ -475,10 +448,8 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  // 1. Carrusel Artistas (Posición 2)
                   if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg);
                   
-                  // 2. SECCIÓN RECOMENDADA PERSONALIZADA (Posición 4)
                   if (index == 4 && _recommendedConcerts.isNotEmpty) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,10 +482,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }
 
-                  // 3. Carrusel Categorías (Posición 6)
                   if (index == 6) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor);
                   
-                  // 4. Lista Principal (Filtrada por tu Vibra si hay Spotify)
                   if (index >= concerts.length) return null;
 
                   return Padding(
@@ -522,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildDiceCard(context, concerts[index], primaryText, secondaryText, accentColor, cardBg),
                   );
                 },
-                childCount: concerts.length, // Ojo: Aumentar +items falsos si quieres scroll infinito
+                childCount: concerts.length,
               ),
             ),
             
@@ -533,7 +502,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // WIDGETS AUXILIARES
   Widget _buildSectionHeader({required String title, required String subtitle, required Color primaryText, required Color secondaryText, required Color accentColor, required Color cardBg, VoidCallback? onMoreTap}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 16),
@@ -670,15 +638,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- TARJETA PRINCIPAL ---
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final String dayNum = DateFormat('d').format(concert.date);
     final String monthName = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase().replaceAll('.', '');
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
     
-    // Tag único para evitar conflictos Hero
-    String uniqueHeroTag = "${concert.name}_${concert.date}_home_${DateTime.now().millisecondsSinceEpoch}";
+    // Generar un Hero Tag único para esta instancia
+    String uniqueHeroTag = "${concert.name}_${concert.date}_home_${DateTime.now().millisecondsSinceEpoch}_${concert.hashCode}";
+    
     String concertId = concert.name; 
     bool isLiked = _likedIds.contains(concertId);
     bool isSaved = _savedIds.contains(concertId);
@@ -692,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
               concert: concert,
               initialIsLiked: isLiked,
               initialIsSaved: isSaved,
-              heroTag: uniqueHeroTag, 
+              heroTag: uniqueHeroTag, // Pasamos el tag único
               onStateChanged: (liked, saved) {
                 setState(() {
                   if (liked) _likedIds.add(concertId); else _likedIds.remove(concertId);
@@ -716,7 +684,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Positioned.fill(
                 child: Hero(
-                  tag: uniqueHeroTag, 
+                  tag: uniqueHeroTag,
                   child: concert.imageUrl.isNotEmpty
                       ? Image.network(
                           concert.imageUrl,
@@ -754,7 +722,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- TARJETA PARA BÚSQUEDA ---
   Widget _buildListCard(ConcertDetail concert, Color primaryText, Color secondaryText, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final day = DateFormat('d MMM').format(concert.date).toUpperCase();

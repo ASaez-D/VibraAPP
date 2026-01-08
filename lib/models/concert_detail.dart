@@ -8,7 +8,7 @@ class ConcertDetail {
   final String imageUrl;
   final String ticketUrl;
   final String genre;
-  final String priceRange;
+  final String priceRange; // El texto ya formateado (ej: "Desde 30€")
   final double? latitude;
   final double? longitude;
 
@@ -22,13 +22,13 @@ class ConcertDetail {
     required this.imageUrl,
     this.ticketUrl = '',
     this.genre = '',
-    this.priceRange = 'Ver precios', // Valor por defecto 
+    this.priceRange = 'Ver precios', // Valor por defecto si la API falla
     this.latitude,
     this.longitude,
   });
 
   factory ConcertDetail.fromJson(Map<String, dynamic> json) {
-    // 1. VENUE
+    // 1. VENUE (Ubicación)
     String venueName = "Desconocido";
     String venueAddress = "";
     String venueCity = "";
@@ -50,21 +50,25 @@ class ConcertDetail {
           lng = double.tryParse(v["location"]["longitude"] ?? "");
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // Si falla el venue, seguimos adelante
+    }
 
-    // 2. IMAGEN
+    // 2. IMAGEN (Buscamos la de mejor calidad > 600px de ancho)
     String finalImageUrl = "";
     try {
       final images = json["images"];
       if (images is List && images.isNotEmpty) {
-        // Buscamos calidad > 600px
+        // Intentamos encontrar una imagen grande (apaisada)
         final highQualityImg = images.firstWhere(
           (img) => (img["width"] ?? 0) > 600, 
-          orElse: () => images[0]
+          orElse: () => images[0] // Si no, cogemos la primera
         );
         finalImageUrl = highQualityImg["url"] ?? "";
       }
-    } catch (e) {}
+    } catch (e) {
+      // Sin imagen
+    }
 
     // 3. GÉNERO
     String finalGenre = "";
@@ -75,8 +79,8 @@ class ConcertDetail {
       }
     } catch (e) {}
 
-    // 4. PRECIO PREMIUM 
-    String finalPrice = "Ver precios"; 
+    // 4. PRECIO INTELIGENTE
+    String finalPrice = "Ver precios"; // Texto por defecto elegante
     
     try {
       final prices = json["priceRanges"];
@@ -86,7 +90,7 @@ class ConcertDetail {
         final double? max = priceData["max"]?.toDouble();
         String currency = priceData["currency"] ?? "EUR";
 
-        // Símbolos de moneda
+        // Convertimos códigos de moneda a símbolos
         if (currency == "EUR") currency = "€";
         else if (currency == "USD") currency = "\$";
         else if (currency == "GBP") currency = "£";
@@ -95,19 +99,21 @@ class ConcertDetail {
           if (min == 0) {
             finalPrice = "GRATIS";
           } else {
-            // Quitamos decimales si es redondo (ej: 30.0 -> 30)
+            // Quitamos decimales si es número entero (ej: 30.0 -> 30)
             String priceStr = min.toStringAsFixed(min.truncateToDouble() == min ? 0 : 2);
             
-            // Si hay rango, ponemos "Desde"
+            // Si hay un rango (el mínimo es distinto al máximo), ponemos "Desde"
             if (max != null && max > min) {
-              finalPrice = "Desde $priceStr$currency";
+              finalPrice = "Desde $priceStr $currency";
             } else {
-              finalPrice = "$priceStr$currency";
+              finalPrice = "$priceStr $currency";
             }
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // Si falla la lectura del precio, se queda en "Ver precios"
+    }
 
     // 5. FECHA
     DateTime parsedDate;
@@ -120,7 +126,7 @@ class ConcertDetail {
     }
 
     return ConcertDetail(
-      name: json["name"] ?? "Sin nombre",
+      name: json["name"] ?? "Evento sin nombre",
       venue: venueName,
       address: venueAddress,
       city: venueCity,

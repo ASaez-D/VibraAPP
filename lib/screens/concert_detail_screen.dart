@@ -6,12 +6,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/concert_detail.dart';
+import '../services/ticketmaster_service.dart'; // Necesario para buscar más fechas
 
 class ConcertDetailScreen extends StatefulWidget {
   final ConcertDetail concert;
   
+  // Tag único para evitar choques de animaciones Hero
   final String? heroTag;
-
+  
+  // Parámetros para sincronizar estado con la Home
   final bool initialIsLiked;
   final bool initialIsSaved;
   final Function(bool isLiked, bool isSaved)? onStateChanged;
@@ -30,8 +33,10 @@ class ConcertDetailScreen extends StatefulWidget {
 }
 
 class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerProviderStateMixin {
-  // Mantener solo el accentColor fijo o moverlo al Theme global si es posible
-  final Color accentColor = Colors.greenAccent; 
+  final Color accentColor = Colors.greenAccent;
+  
+  // Servicio para buscar gira/otras fechas
+  final TicketmasterService _ticketmasterService = TicketmasterService();
 
   late bool isLiked;
   late bool isSaved;
@@ -40,6 +45,10 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
   late Animation<double> _likeAnimation;
   late AnimationController _saveController;
   late Animation<double> _saveAnimation;
+
+  // Variables para "Otras fechas"
+  List<ConcertDetail> _relatedConcerts = [];
+  bool _isLoadingRelated = true;
 
   @override
   void initState() {
@@ -52,6 +61,25 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
     _saveController = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
     _saveAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(parent: _saveController, curve: Curves.easeOutBack));
+
+    // Cargar otras fechas del mismo artista
+    _loadMoreDates();
+  }
+
+  void _loadMoreDates() async {
+    // Buscamos eventos usando el nombre del artista actual como palabra clave
+    final results = await _ticketmasterService.searchEventsByKeyword(
+      widget.concert.name, 
+      'ES' // Por defecto buscamos en España o usa widget.concert.country si lo tienes mapeado a código
+    );
+
+    if (mounted) {
+      setState(() {
+        // Filtramos para no mostrar el evento que ya estamos viendo
+        _relatedConcerts = results.where((c) => c.date != widget.concert.date && c.venue != widget.concert.venue).toList();
+        _isLoadingRelated = false;
+      });
+    }
   }
 
   @override
@@ -61,7 +89,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     super.dispose();
   }
 
-  // --- FUNCIONES (Sin cambios de lógica) ---
+  // --- FUNCIONES ---
 
   void _launchURL(String url) async {
     if (url.isEmpty) return;
@@ -76,8 +104,8 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     if (widget.concert.latitude != null && widget.concert.longitude != null) {
       googleMapsUrl = Uri.parse("geo:${widget.concert.latitude},${widget.concert.longitude}?q=${widget.concert.latitude},${widget.concert.longitude}(${Uri.encodeComponent(widget.concert.venue)})");
     } else {
-      // Corregida la URL de Maps para búsqueda por texto
-      googleMapsUrl = Uri.parse("http://maps.google.com/?q=${Uri.encodeComponent('${widget.concert.venue}, ${widget.concert.city}')}");
+      // URL corregida: Abre búsqueda de Google Maps
+      googleMapsUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${widget.concert.venue}, ${widget.concert.city}')}");
     }
     _launchURL(googleMapsUrl.toString());
   }
@@ -103,7 +131,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
       isSaved = !isSaved;
     });
     if (isSaved) {
-      // Usar Theme.of(context).textTheme.bodyMedium?.color para el texto del SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Guardado", style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)),
@@ -121,12 +148,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     }
   }
 
-  // WIDGETS AUXILIARES con soporte de tema
-  
-  // Función auxiliar para obtener colores dinámicos
+  // Helper de Colores Dinámicos (Tema Claro/Oscuro)
   Map<String, Color> _getThemedColors(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
     return {
       'scaffoldBg': isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
       'cardBg': isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
@@ -138,58 +162,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     };
   }
 
-  Widget _buildSectionTitle(String title, Color color) {
-    return Text(title, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800));
-  }
-
-  Widget _buildInfoRow(IconData icon, String text, Color iconColor, Color textColor) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: iconColor, size: 22),
-        const SizedBox(width: 14),
-        Expanded(child: Text(text, style: TextStyle(color: textColor, fontSize: 15, height: 1.3))),
-      ],
-    );
-  }
-
-  Widget _buildAnimatedActionButton({
-    required IconData icon, 
-    required String label, 
-    required VoidCallback onTap, 
-    required Color iconColor, 
-    required Color textColor, 
-    required Color buttonBg,
-    required Color borderColor,
-    Animation<double>? animation
-  }) {
-    Widget content = Column(
-      children: [
-        Container(
-          width: 60, height: 60,
-          decoration: BoxDecoration(
-            color: buttonBg, // Usar el color de fondo dinámico
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: borderColor, width: 1.5),
-          ),
-          child: Icon(icon, color: iconColor, size: 26),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
-      ],
-    );
-
-    return GestureDetector(
-      onTap: onTap,
-      child: animation != null 
-        ? ScaleTransition(scale: animation, child: content)
-        : content,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // 1. Obtener colores basados en el tema
+    // 1. Colores
     final colors = _getThemedColors(context);
     final scaffoldBg = colors['scaffoldBg']!;
     final cardBg = colors['cardBg']!;
@@ -199,13 +174,14 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     final borderColor = colors['borderColor']!;
     final shadowColor = colors['shadowColor']!;
     
-    // 2. Data Formatting
+    // 2. Datos
     final String formattedDate = DateFormat('EEE d MMM, HH:mm', 'es_ES').format(widget.concert.date);
-    String mainPrice = widget.concert.priceRange.isNotEmpty ? widget.concert.priceRange.split('-')[0].trim() : "Info";
+    
+    // IMPORTANTE: Usamos el precio completo del modelo (ej: "Desde 30€")
+    String mainPrice = widget.concert.priceRange; 
     
     final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
-    
-    // 3. Renderizado de la pantalla
+
     return Scaffold(
       backgroundColor: scaffoldBg,
       appBar: AppBar(
@@ -220,12 +196,11 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         actions: [
           IconButton(
             icon: Icon(Icons.more_horiz_rounded, color: primaryText, size: 24),
-            onPressed: () {},
+            onPressed: () {}, // Opcional: Menú extra
           ),
         ],
       ),
 
-      // CONTENIDO PRINCIPAL 
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -235,7 +210,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
             children: [
               const SizedBox(height: 10),
               
-              // 1. IMAGEN DEL CONCIERTO 
+              // 1. IMAGEN HERO
               Hero(
                 tag: heroTagToUse,
                 child: AspectRatio(
@@ -243,7 +218,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: iconBg, // Usar color dinámico
+                      color: iconBg,
                       boxShadow: [
                         BoxShadow(color: shadowColor, blurRadius: 20, offset: const Offset(0,10))
                       ],
@@ -251,7 +226,11 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: widget.concert.imageUrl.isNotEmpty
-                          ? Image.network(widget.concert.imageUrl, fit: BoxFit.cover)
+                          ? Image.network(
+                              widget.concert.imageUrl, 
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.broken_image, size: 50, color: secondaryText)),
+                            )
                           : Center(child: Icon(Icons.music_note, size: 50, color: secondaryText.withOpacity(0.5))),
                     ),
                   ),
@@ -260,7 +239,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
               const SizedBox(height: 24),
 
-              // 2. DATOS PRINCIPALES
+              // 2. TÍTULO Y FECHA
               Text(
                 widget.concert.name,
                 style: TextStyle(color: primaryText, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1, letterSpacing: -0.5),
@@ -278,11 +257,10 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
               const SizedBox(height: 32),
 
-              // 3. BOTONES DE ACCIÓN ANIMADOS
+              // 3. ACCIONES (Guardar, Compartir, Like)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // Botón Guardar
                   _buildAnimatedActionButton(
                     icon: isSaved ? Icons.bookmark : Icons.bookmark_border_rounded, 
                     label: isSaved ? "Guardado" : "Guardar",
@@ -293,7 +271,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                     onTap: _toggleSave,
                     animation: _saveAnimation,
                   ),
-                  // Botón Compartir
                   _buildAnimatedActionButton(
                     icon: Icons.ios_share_rounded, 
                     label: "Compartir",
@@ -303,7 +280,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                     borderColor: borderColor,
                     onTap: _shareEvent,
                   ),
-                  // Botón Me gusta
                   _buildAnimatedActionButton(
                     icon: isLiked ? Icons.favorite : Icons.thumb_up_off_alt_rounded, 
                     label: "Me gusta",
@@ -369,7 +345,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(10),
-                                // Usar un color de fondo dinámico para el icono
                                 decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(10)),
                                 child: Icon(Icons.storefront_rounded, color: primaryText, size: 24),
                               ),
@@ -390,7 +365,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       ),
                     ),
 
-                    // MAPA PREVIEW 
+                    // BOTÓN VER MAPA
                     GestureDetector(
                       onTap: () => _openMap(context),
                       child: Container(
@@ -409,14 +384,11 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                             children: [
                               Positioned.fill(
                                 child: Image.network(
-                                  // Usar una imagen de mapa más neutral para ambos temas, o un placeholder gris.
-                                  // Mantener la imagen de Unsplash, pero aplicar un filtro/overlay dinámico.
                                   'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop',
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(color: iconBg), // Color dinámico en caso de error
+                                  errorBuilder: (context, error, stackTrace) => Container(color: iconBg),
                                 ),
                               ),
-                              // Overlay dinámico para contraste
                               Container(color: primaryText.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.6)),
                               Icon(Icons.location_on, color: accentColor, size: 48),
                               Positioned(
@@ -425,7 +397,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    // Fondo dinámico para el botón del mapa
                                     color: primaryText.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(color: borderColor)
@@ -449,13 +420,71 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 ),
               ),
 
+              const SizedBox(height: 32),
+
+              // --- 6. SECCIÓN: OTRAS FECHAS (Relacionados) ---
+              if (!_isLoadingRelated && _relatedConcerts.isNotEmpty) ...[
+                _buildSectionTitle("Otras fechas / Gira", primaryText),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 130, // Altura de las tarjetas relacionadas
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _relatedConcerts.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final related = _relatedConcerts[index];
+                      return GestureDetector(
+                        onTap: () {
+                          // Navegar al nuevo concierto
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: related)));
+                        },
+                        child: Container(
+                          width: 280,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(related.imageUrl, width: 80, height: 100, fit: BoxFit.cover, errorBuilder: (c,e,s) => Container(width: 80, color: iconBg)),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(DateFormat('d MMM yyyy', 'es_ES').format(related.date), style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                                    const SizedBox(height: 4),
+                                    Text(related.city, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(height: 4),
+                                    Text(related.venue, style: TextStyle(color: secondaryText, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  ],
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 14),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
+              ],
+
               const SizedBox(height: 40),
             ],
           ),
         ),
       ),
 
-      // --- 6. FOOTER DE COMPRA ---
+      // --- FOOTER DE COMPRA ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         decoration: BoxDecoration(
@@ -471,16 +500,16 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    mainPrice.isEmpty ? "Info" : mainPrice,
+                    mainPrice, 
                     style: TextStyle(
                       color: primaryText,
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  if (widget.concert.priceRange.isNotEmpty)
+                  if (mainPrice != "Ver precios" && mainPrice != "GRATIS")
                     Text(
-                      "Consulta en web.",
+                      "Consulta en web",
                       style: TextStyle(color: secondaryText, fontSize: 11),
                     )
                 ],
@@ -493,7 +522,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                     onPressed: widget.concert.ticketUrl.isNotEmpty ? () => _launchURL(widget.concert.ticketUrl) : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
-                      // El texto del botón principal SIEMPRE debe ser oscuro para contrastar con accentColor
                       foregroundColor: Colors.black, 
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
@@ -506,6 +534,57 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
           ),
         ),
       ),
+    );
+  }
+
+  // --- WIDGETS AUXILIARES ---
+
+  Widget _buildSectionTitle(String title, Color color) {
+    return Text(title, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800));
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, Color iconColor, Color textColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: iconColor, size: 22),
+        const SizedBox(width: 14),
+        Expanded(child: Text(text, style: TextStyle(color: textColor, fontSize: 15, height: 1.3))),
+      ],
+    );
+  }
+
+  Widget _buildAnimatedActionButton({
+    required IconData icon, 
+    required String label, 
+    required VoidCallback onTap, 
+    required Color iconColor, 
+    required Color textColor, 
+    required Color buttonBg,
+    required Color borderColor,
+    Animation<double>? animation
+  }) {
+    Widget content = Column(
+      children: [
+        Container(
+          width: 60, height: 60,
+          decoration: BoxDecoration(
+            color: buttonBg,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: borderColor, width: 1.5),
+          ),
+          child: Icon(icon, color: iconColor, size: 26),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
+      ],
+    );
+
+    return GestureDetector(
+      onTap: onTap,
+      child: animation != null 
+        ? ScaleTransition(scale: animation, child: content)
+        : content,
     );
   }
 }
