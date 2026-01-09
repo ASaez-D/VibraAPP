@@ -12,14 +12,15 @@ class TicketmasterService {
     return "${isoString.split('.')[0]}Z";
   }
 
-  // --- 1. OBTENER CONCIERTOS (FEED PRINCIPAL) ---
-  // Ahora acepta 'keyword' para filtrar por tu "Vibra" (ej: Rock, Latino)
+  // --- 1. OBTENER CONCIERTOS (FEED PRINCIPAL Y SECCIONES) ---
   Future<List<ConcertDetail>> getConcerts(
     DateTime start, 
     DateTime end, {
     String? classificationId,
-    String countryCode = 'ES', // País detectado automáticamente
-    String? keyword,           // Filtro inteligente (Tu Vibra)
+    String countryCode = 'ES', 
+    String? keyword,           
+    int page = 0,              
+    int size = 50, // <--- AÑADIDO: Ahora aceptamos el tamaño de página (por defecto 50)
   }) async {
     final startStr = _formatDate(start);
     final endStr = _formatDate(end);
@@ -30,29 +31,25 @@ class TicketmasterService {
         '&startDateTime=$startStr'
         '&endDateTime=$endStr'
         '&countryCode=$countryCode'
-        '&size=50'
+        '&size=$size'     // <--- AÑADIDO: Usamos la variable size aquí
+        '&page=$page'     
         '&sort=date,asc';
     
     // Lógica de Filtros
     if (keyword != null && keyword.isNotEmpty) {
-      // Si sabemos tu gusto (Vibra), filtramos por esa palabra clave
       baseUrl += '&keyword=${Uri.encodeComponent(keyword)}';
     } else if (classificationId != null && classificationId.isNotEmpty) {
-      // Si pulsaste una categoría manual
       baseUrl += '&classificationId=$classificationId';
     } else {
-      // Por defecto, música general
       baseUrl += '&segmentName=Music';
     }
 
     final url = Uri.parse(baseUrl);
-    // print("Fetching: $url"); // Descomentar para debug
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        // Usamos utf8.decode para acentos y ñ
         final data = json.decode(utf8.decode(response.bodyBytes));
 
         if (data['_embedded'] != null && data['_embedded']['events'] != null) {
@@ -72,7 +69,6 @@ class TicketmasterService {
   }
 
   // --- 2. BUSCAR EVENTOS ESPECÍFICOS (Para "Solo para ti") ---
-  // Busca un artista concreto en un país concreto
   Future<List<ConcertDetail>> searchEventsByKeyword(String artistName, String countryCode) async {
     final url = Uri.parse(
         'https://app.ticketmaster.com/discovery/v2/events.json?'
@@ -80,7 +76,7 @@ class TicketmasterService {
         '&keyword=${Uri.encodeComponent(artistName)}'
         '&segmentName=Music'
         '&countryCode=$countryCode'
-        '&size=5' // Pocos resultados, solo los más relevantes
+        '&size=5' 
         '&sort=date,asc');
 
     try {
