@@ -1,20 +1,17 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Para HapticFeedback
+import 'package:flutter/services.dart'; 
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/concert_detail.dart';
-import '../services/ticketmaster_service.dart'; // Necesario para buscar más fechas
+import '../services/ticketmaster_service.dart'; 
+import '../services/user_data_service.dart'; // <--- 1. IMPORTAR SERVICIO DB
 
 class ConcertDetailScreen extends StatefulWidget {
   final ConcertDetail concert;
-  
-  // Tag único para evitar choques de animaciones Hero
   final String? heroTag;
-  
-  // Parámetros para sincronizar estado con la Home
   final bool initialIsLiked;
   final bool initialIsSaved;
   final Function(bool isLiked, bool isSaved)? onStateChanged;
@@ -35,8 +32,8 @@ class ConcertDetailScreen extends StatefulWidget {
 class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerProviderStateMixin {
   final Color accentColor = Colors.greenAccent;
   
-  // Servicio para buscar gira/otras fechas
   final TicketmasterService _ticketmasterService = TicketmasterService();
+  final UserDataService _userDataService = UserDataService(); // <--- 2. INSTANCIAR SERVICIO DB
 
   late bool isLiked;
   late bool isSaved;
@@ -46,7 +43,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
   late AnimationController _saveController;
   late Animation<double> _saveAnimation;
 
-  // Variables para "Otras fechas"
   List<ConcertDetail> _relatedConcerts = [];
   bool _isLoadingRelated = true;
 
@@ -62,20 +58,17 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     _saveController = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
     _saveAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(parent: _saveController, curve: Curves.easeOutBack));
 
-    // Cargar otras fechas del mismo artista
     _loadMoreDates();
   }
 
   void _loadMoreDates() async {
-    // Buscamos eventos usando el nombre del artista actual como palabra clave
     final results = await _ticketmasterService.searchEventsByKeyword(
       widget.concert.name, 
-      'ES' // Por defecto buscamos en España o usa widget.concert.country si lo tienes mapeado a código
+      'ES' 
     );
 
     if (mounted) {
       setState(() {
-        // Filtramos para no mostrar el evento que ya estamos viendo
         _relatedConcerts = results.where((c) => c.date != widget.concert.date && c.venue != widget.concert.venue).toList();
         _isLoadingRelated = false;
       });
@@ -104,7 +97,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     if (widget.concert.latitude != null && widget.concert.longitude != null) {
       googleMapsUrl = Uri.parse("geo:${widget.concert.latitude},${widget.concert.longitude}?q=${widget.concert.latitude},${widget.concert.longitude}(${Uri.encodeComponent(widget.concert.venue)})");
     } else {
-      // URL corregida: Abre búsqueda de Google Maps
       googleMapsUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${widget.concert.venue}, ${widget.concert.city}')}");
     }
     _launchURL(googleMapsUrl.toString());
@@ -115,21 +107,43 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     Share.share('¡Mira este planazo en Vibra! 🎸\n${widget.concert.name}\n📅 $dateStr\n📍 ${widget.concert.venue}\n${widget.concert.ticketUrl}');
   }
 
+  // --- 3. CONECTAR BOTONES A FIREBASE ---
+
   void _toggleLike() {
     HapticFeedback.lightImpact();
     _likeController.forward().then((_) => _likeController.reverse());
+    
     setState(() {
       isLiked = !isLiked;
     });
+
+    // GUARDAR EN NUBE
+    _userDataService.toggleFavorite(widget.concert.name, {
+      'name': widget.concert.name,
+      'date': widget.concert.date.toIso8601String(),
+      'imageUrl': widget.concert.imageUrl,
+      'venue': widget.concert.venue,
+    });
+
     _notifyChanges();
   }
 
   void _toggleSave() {
     HapticFeedback.lightImpact();
     _saveController.forward().then((_) => _saveController.reverse());
+    
     setState(() {
       isSaved = !isSaved;
     });
+
+    // GUARDAR EN NUBE
+    _userDataService.toggleSaved(widget.concert.name, {
+      'name': widget.concert.name,
+      'date': widget.concert.date.toIso8601String(),
+      'imageUrl': widget.concert.imageUrl,
+      'venue': widget.concert.venue,
+    });
+
     if (isSaved) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -148,7 +162,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     }
   }
 
-  // Helper de Colores Dinámicos (Tema Claro/Oscuro)
   Map<String, Color> _getThemedColors(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return {
@@ -164,7 +177,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
   @override
   Widget build(BuildContext context) {
-    // 1. Colores
     final colors = _getThemedColors(context);
     final scaffoldBg = colors['scaffoldBg']!;
     final cardBg = colors['cardBg']!;
@@ -174,12 +186,8 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     final borderColor = colors['borderColor']!;
     final shadowColor = colors['shadowColor']!;
     
-    // 2. Datos
     final String formattedDate = DateFormat('EEE d MMM, HH:mm', 'es_ES').format(widget.concert.date);
-    
-    // IMPORTANTE: Usamos el precio completo del modelo (ej: "Desde 30€")
     String mainPrice = widget.concert.priceRange; 
-    
     final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
 
     return Scaffold(
@@ -196,7 +204,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         actions: [
           IconButton(
             icon: Icon(Icons.more_horiz_rounded, color: primaryText, size: 24),
-            onPressed: () {}, // Opcional: Menú extra
+            onPressed: () {}, 
           ),
         ],
       ),
@@ -210,7 +218,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
             children: [
               const SizedBox(height: 10),
               
-              // 1. IMAGEN HERO
               Hero(
                 tag: heroTagToUse,
                 child: AspectRatio(
@@ -239,7 +246,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
               const SizedBox(height: 24),
 
-              // 2. TÍTULO Y FECHA
               Text(
                 widget.concert.name,
                 style: TextStyle(color: primaryText, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1, letterSpacing: -0.5),
@@ -257,7 +263,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
               const SizedBox(height: 32),
 
-              // 3. ACCIONES (Guardar, Compartir, Like)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -297,7 +302,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               Divider(color: primaryText.withOpacity(0.1)),
               const SizedBox(height: 32),
 
-              // 4. INFORMACIÓN
               _buildSectionTitle("Información", primaryText),
               const SizedBox(height: 16),
               Container(
@@ -321,7 +325,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               
               const SizedBox(height: 32),
               
-              // 5. UBICACIÓN 
               _buildSectionTitle("Ubicación", primaryText),
               const SizedBox(height: 16),
               
@@ -365,7 +368,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       ),
                     ),
 
-                    // BOTÓN VER MAPA
                     GestureDetector(
                       onTap: () => _openMap(context),
                       child: Container(
@@ -422,12 +424,11 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
               const SizedBox(height: 32),
 
-              // --- 6. SECCIÓN: OTRAS FECHAS (Relacionados) ---
               if (!_isLoadingRelated && _relatedConcerts.isNotEmpty) ...[
                 _buildSectionTitle("Otras fechas / Gira", primaryText),
                 const SizedBox(height: 16),
                 SizedBox(
-                  height: 130, // Altura de las tarjetas relacionadas
+                  height: 130, 
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _relatedConcerts.length,
@@ -436,7 +437,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       final related = _relatedConcerts[index];
                       return GestureDetector(
                         onTap: () {
-                          // Navegar al nuevo concierto
                           Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: related)));
                         },
                         child: Container(
@@ -484,7 +484,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         ),
       ),
 
-      // --- FOOTER DE COMPRA ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         decoration: BoxDecoration(
@@ -537,8 +536,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     );
   }
 
-  // --- WIDGETS AUXILIARES ---
-
   Widget _buildSectionTitle(String title, Color color) {
     return Text(title, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800));
   }
@@ -560,7 +557,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     required VoidCallback onTap, 
     required Color iconColor, 
     required Color textColor, 
-    required Color buttonBg,
+    required Color buttonBg, 
     required Color borderColor,
     Animation<double>? animation
   }) {

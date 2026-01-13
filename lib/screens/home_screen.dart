@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; 
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart'; 
+import '../services/user_data_service.dart';       
 
 // IMPORTS PANTALLAS
 import 'login_screen.dart';
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   
   final TicketmasterService _ticketmasterService = TicketmasterService();
   final SpotifyAPIService _spotifyService = SpotifyAPIService();
+  final UserDataService _userDataService = UserDataService(); // <--- INSTANCIA DEL SERVICIO
 
   // DATOS
   Future<List<ConcertDetail>>? _concertsFuture; 
@@ -81,16 +84,44 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // --- AUTOGUARDADO Y CARGA DE DATOS ---
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // 1. Asegurar que el usuario existe en DB
+      _userDataService.saveUserProfile(user);
+      // 2. Cargar sus likes y guardados previos
+      _loadUserInteractions();
+    }
+    // ------------------------------------
+
     _detectUserCountryAndInit();
     _searchController.addListener(_onSearchChanged);
+  }
+
+  // Carga inicial de corazones y marcadores desde Firebase
+  Future<void> _loadUserInteractions() async {
+    try {
+      final likes = await _userDataService.getUserInteractions('favorites');
+      final saves = await _userDataService.getUserInteractions('saved_events');
+      if (mounted) {
+        setState(() {
+          _likedIds.addAll(likes);
+          _savedIds.addAll(saves);
+        });
+      }
+    } catch (e) {
+      print("Error cargando interacciones: $e");
+    }
   }
 
   void _detectUserCountryAndInit() {
     final locale = PlatformDispatcher.instance.locale;
     setState(() {
-      _userCountryCode = locale.countryCode ?? 'ES';
+      String detected = locale.countryCode ?? 'ES';
+      if (detected == 'US') detected = 'ES'; // Forzar ES si es emulador
+      _userCountryCode = detected;
     });
-    // Cargamos todo forzando el país detectado
     _reloadAllData();
   }
 
@@ -286,8 +317,51 @@ class _HomeScreenState extends State<HomeScreen> {
     final dateStr = DateFormat('d MMM yyyy').format(concert.date);
     Share.share('¡Mira este planazo en Vibra! 🎸\n${concert.name}\n📅 $dateStr\n📍 ${concert.venue}\n${concert.ticketUrl}');
   }
-  void _toggleLike(String id) { HapticFeedback.lightImpact(); setState(() { if (_likedIds.contains(id)) _likedIds.remove(id); else _likedIds.add(id); }); }
-  void _toggleSave(String id) { HapticFeedback.mediumImpact(); setState(() { if (_savedIds.contains(id)) { _savedIds.remove(id); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eliminado de guardados"), duration: Duration(seconds: 1))); } else { _savedIds.add(id); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Guardado en tu lista"), backgroundColor: Colors.greenAccent, duration: Duration(seconds: 1))); } }); }
+
+  // --- LOGICA DE FAVORITOS Y GUARDADOS (CONECTADA A FIREBASE) ---
+
+  void _toggleLike(ConcertDetail concert) {
+    HapticFeedback.lightImpact();
+    final id = concert.name; // Usamos nombre como ID simple
+
+    setState(() {
+      if (_likedIds.contains(id)) _likedIds.remove(id);
+      else _likedIds.add(id);
+    });
+
+    // Guardar en Firestore
+    _userDataService.toggleFavorite(id, {
+      'name': concert.name,
+      'date': concert.date.toIso8601String(),
+      'imageUrl': concert.imageUrl,
+      'venue': concert.venue,
+    });
+  }
+
+  void _toggleSave(ConcertDetail concert) {
+    HapticFeedback.mediumImpact();
+    final id = concert.name;
+
+    setState(() {
+      if (_savedIds.contains(id)) {
+        _savedIds.remove(id);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eliminado de guardados"), duration: Duration(seconds: 1)));
+      } else {
+        _savedIds.add(id);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Guardado en tu lista"), backgroundColor: Colors.greenAccent, duration: Duration(seconds: 1)));
+      }
+    });
+
+    // Guardar en Firestore
+    _userDataService.toggleSaved(id, {
+      'name': concert.name,
+      'date': concert.date.toIso8601String(),
+      'imageUrl': concert.imageUrl,
+      'venue': concert.venue,
+    });
+  }
+
+  // -------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -386,11 +460,11 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  // --- MAPPING DE SECCIONES (Ahora intercaladas al principio) ---
+                  // --- MAPPING DE SECCIONES (Intercaladas al principio) ---
                   // 2: Carrusel Artistas
                   if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg);
                   
-                  // 3: SOLO PARA TI (Pegado arriba)
+                  // 3: SOLO PARA TI
                   if (index == 3) {
                     final displayList = _recommendedConcerts.isNotEmpty ? _recommendedConcerts : concerts.take(8).toList();
                     final title = _recommendedConcerts.isNotEmpty ? "SOLO PARA TI" : "TENDENCIAS EN $_userCountryCode";
@@ -398,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, accentColor, cardBg) : const SizedBox.shrink();
                   }
 
-                  // 6: FINDE (Tras 2 conciertos)
+                  // 6: FINDE
                   if (index == 6) {
                     final displayList = _weekendConcerts.isNotEmpty ? _weekendConcerts : concerts.skip(5).take(8).toList();
                     final title = _weekendConcerts.isNotEmpty ? "¡YA ES FINDE!" : "DESTACADOS";
@@ -406,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.orangeAccent, cardBg) : const SizedBox.shrink();
                   }
 
-                  // 9: SECUNDARIO (Tras otros 2 conciertos)
+                  // 9: SECUNDARIO
                   if (index == 9) {
                     final displayList = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeConcerts : concerts.reversed.take(8).toList();
                     final title = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeTitle : "DESCUBRE MÁS";
@@ -418,7 +492,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (index == 12) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor);
 
                   // CÁLCULO DE ÍNDICE DE LISTA PRINCIPAL
-                  // Ajustamos para saltarnos las secciones insertadas
                   int concertIndex = index;
                   if (index > 2) concertIndex--; // - Artistas
                   if (index > 3) concertIndex--; // - Recs
@@ -433,7 +506,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildDiceCard(context, concerts[concertIndex], primaryText, secondaryText, accentColor, cardBg),
                   );
                 },
-                // Sumamos 5 secciones extra al total
                 childCount: concerts.length + 5, 
               ),
             ),
@@ -523,7 +595,15 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, isDarkMode ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.1), isDarkMode ? Colors.black.withOpacity(0.95) : Colors.black.withOpacity(0.8)], stops: const [0.4, 0.6, 1.0]))),
               Positioned(top: 16, left: 16, child: Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(monthName, style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w900, height: 1)), Text(dayNum, style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1))]))),
               Positioned(top: 16, right: 16, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: isDarkMode ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.8), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDarkMode ? Colors.white24 : Colors.grey.shade400)), child: Text(priceLabel, style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 12)))),
-              Positioned(bottom: 20, right: 20, child: Row(children: [_AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), const SizedBox(width: 8), _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concertId), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), const SizedBox(width: 8), _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: accentColor, fillColorSelected: accentColor.withOpacity(0.2), onTap: () => _toggleSave(concertId), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5))])),
+              Positioned(bottom: 20, right: 20, child: Row(children: [
+                _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
+                const SizedBox(width: 8), 
+                // LIKE CONECTADO A FIREBASE
+                _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
+                const SizedBox(width: 8), 
+                // GUARDAR CONECTADO A FIREBASE
+                _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: accentColor, fillColorSelected: accentColor.withOpacity(0.2), onTap: () => _toggleSave(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5))
+              ])),
               Positioned(bottom: 20, left: 20, right: 150, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), const SizedBox(height: 6), Row(children: [Icon(Icons.location_on, color: accentColor, size: 14), const SizedBox(width: 4), Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis))])]))
             ],
           ),
