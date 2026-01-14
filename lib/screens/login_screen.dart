@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
+import '../services/user_data_service.dart'; // Importante: Conexión con BD
 import 'home_screen.dart';
 import 'music_preferences_screen.dart';
 
@@ -18,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: const Color(0xFF0E0E0E), // Fondo negro fijo
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -47,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 50),
 
-              // LOGIN SPOTIFY
+              // --- BOTÓN SPOTIFY ---
               _buildLoginButton(
                 gradientColors: [
                   Colors.greenAccent.shade700,
@@ -63,55 +64,50 @@ class _LoginScreenState extends State<LoginScreen> {
                         final spotify = SpotifyAuth();
 
                         try {
-                          // Obtenemos el perfil completo (incluyendo el token)
+                          // 1. Login con Spotify
                           final profile = await spotify.login();
-                          
                           if (profile == null) throw 'No se obtuvo perfil';
 
-                          // --- CAMBIO IMPORTANTE: Obtener el accessToken ---
-                          // Asumiendo que tu servicio SpotifyAuth devuelve el token dentro del mapa 'profile'
-                          // Si tu servicio no lo devuelve, tendrás que modificarlo para que lo haga.
-                          // Por ahora, asumimos que 'access_token' viene en la respuesta del login.
+                          // 2. Extraer token y foto
                           final String? accessToken = profile['access_token']; 
-
                           String? photoUrl;
                           final images = profile['images'];
                           if (images is List && images.isNotEmpty) {
                             photoUrl = images[0]['url'] as String?;
                           }
 
-                          // Creamos el mapa de perfil unificado
+                          // 3. Preparar datos del usuario
                           final Map<String, dynamic> userProfile = {
+                            'id': profile['id'],
                             'displayName': profile['display_name'] ?? 'Usuario',
                             'email': profile['email'],
                             'photoURL': photoUrl,
                             'profileUrl': profile['external_urls']?['spotify'],
                           };
 
+                          // 4. GUARDAR EN FIREBASE
+                          await UserDataService().saveUserFromMap(userProfile);
+
                           if (!mounted) return;
 
-                          // Navegamos pasando el token
+                          // 5. Navegar a Home (Spotify no necesita preferencias manuales)
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => HomeScreen(
                                 userProfile: userProfile,
                                 authSource: 'spotify',
-                                spotifyAccessToken: accessToken, // <--- AQUÍ PASAMOS EL TOKEN
+                                spotifyAccessToken: accessToken,
                               ),
                             ),
                           );
                           
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error al iniciar sesión con Spotify: $e'),
-                            ),
+                            SnackBar(content: Text('Error Spotify: $e')),
                           );
                         } finally {
-                          if (mounted) {
-                            setState(() => _isLoadingSpotify = false);
-                          }
+                          if (mounted) setState(() => _isLoadingSpotify = false);
                         }
                       },
               ),
@@ -120,30 +116,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
               Row(
                 children: const [
-                  Expanded(
-                    child: Divider(
-                      color: Colors.white24,
-                      thickness: 1,
-                      endIndent: 10,
-                    ),
-                  ),
-                  Text(
-                    'o',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: Colors.white24,
-                      thickness: 1,
-                      indent: 10,
-                    ),
-                  ),
+                  Expanded(child: Divider(color: Colors.white24, thickness: 1, endIndent: 10)),
+                  Text('o', style: TextStyle(color: Colors.white54, fontSize: 14)),
+                  Expanded(child: Divider(color: Colors.white24, thickness: 1, indent: 10)),
                 ],
               ),
 
               const SizedBox(height: 25),
 
-              // LOGIN GOOGLE
+              // --- BOTÓN GOOGLE (INTELIGENTE) ---
               _buildLoginButton(
                 gradientColors: [
                   Colors.blueAccent.shade700,
@@ -159,11 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _isLoadingGoogle = true);
 
                         try {
+                          // 1. Login con Google
                           final googleAuth = GoogleAuth();
                           final profile = await googleAuth.login();
 
                           if (profile == null) throw 'No se pudo iniciar sesión';
 
+                          // 2. Preparar datos
                           final Map<String, dynamic> userProfile = {
                             'displayName': profile['displayName'] ?? 'Usuario',
                             'email': profile['email'],
@@ -171,27 +154,47 @@ class _LoginScreenState extends State<LoginScreen> {
                             'uid': profile['uid'],
                           };
 
+                          // 3. GUARDAR EN FIREBASE
+                          await UserDataService().saveUserFromMap(userProfile);
+
+                          // 4. 🧠 CEREBRO: ¿TIENE YA PREFERENCIAS?
+                          // Consultamos a la base de datos si ya configuró sus gustos
+                          final prefs = await UserDataService().getUserPreferences();
+                          final bool hasPreferences = prefs != null && prefs['preferencesSet'] == true;
+
                           if (!mounted) return;
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MusicPreferencesScreen(
-                                userProfile: userProfile,
-                                authSource: 'google',
+                          // 5. NAVEGACIÓN INTELIGENTE
+                          if (hasPreferences) {
+                            // A) YA TIENE GUSTOS -> A LA HOME DIRECTO
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => HomeScreen(
+                                  userProfile: userProfile,
+                                  authSource: 'google',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            // B) ES NUEVO -> A ELEGIR GUSTOS
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MusicPreferencesScreen(
+                                  userProfile: userProfile,
+                                  authSource: 'google',
+                                ),
+                              ),
+                            );
+                          }
+
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error al iniciar sesión con Google: $e'),
-                            ),
+                            SnackBar(content: Text('Error Google: $e')),
                           );
                         } finally {
-                          if (mounted) {
-                            setState(() => _isLoadingGoogle = false);
-                          }
+                          if (mounted) setState(() => _isLoadingGoogle = false);
                         }
                       },
               ),
@@ -200,11 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const Text(
                 'Al continuar, aceptas nuestros Términos y Política de privacidad.',
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 12,
-                  height: 1.4,
-                ),
+                style: TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -255,10 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   : null,
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Image.asset(
-                  iconPath,
-                  fit: BoxFit.contain,
-                ),
+                child: Image.asset(iconPath, fit: BoxFit.contain),
               ),
             ),
             const SizedBox(width: 12),

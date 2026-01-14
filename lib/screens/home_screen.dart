@@ -45,11 +45,11 @@ class _HomeScreenState extends State<HomeScreen> {
   
   final TicketmasterService _ticketmasterService = TicketmasterService();
   final SpotifyAPIService _spotifyService = SpotifyAPIService();
-  final UserDataService _userDataService = UserDataService(); // <--- INSTANCIA DEL SERVICIO
+  final UserDataService _userDataService = UserDataService(); 
 
   // DATOS
   Future<List<ConcertDetail>>? _concertsFuture; 
-  late Future<List<Map<String, String>>> _artistsFuture;
+  late Future<List<Map<String, String>>> _artistsFuture; 
   
   List<ConcertDetail> _recommendedConcerts = [];   
   List<ConcertDetail> _weekendConcerts = [];       
@@ -74,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasMore = true; 
   String? _currentKeyword; 
 
+  // Artistas por defecto si todo falla
   final List<String> _targetArtists = ["Bad Bunny", "Rosalía", "Quevedo", "Aitana", "Feid", "C. Tangana"];
 
   final List<Ticket> myTickets = [
@@ -84,22 +85,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Inicializamos vacío para evitar errores mientras carga Spotify
+    _artistsFuture = Future.value([]); 
     
-    // --- AUTOGUARDADO Y CARGA DE DATOS ---
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // 1. Asegurar que el usuario existe en DB
       _userDataService.saveUserProfile(user);
-      // 2. Cargar sus likes y guardados previos
       _loadUserInteractions();
     }
-    // ------------------------------------
 
     _detectUserCountryAndInit();
     _searchController.addListener(_onSearchChanged);
   }
 
-  // Carga inicial de corazones y marcadores desde Firebase
   Future<void> _loadUserInteractions() async {
     try {
       final likes = await _userDataService.getUserInteractions('favorites');
@@ -119,40 +117,75 @@ class _HomeScreenState extends State<HomeScreen> {
     final locale = PlatformDispatcher.instance.locale;
     setState(() {
       String detected = locale.countryCode ?? 'ES';
-      if (detected == 'US') detected = 'ES'; // Forzar ES si es emulador
+      if (detected == 'US') detected = 'ES'; 
       _userCountryCode = detected;
     });
     _reloadAllData();
   }
 
   void _reloadAllData() {
-    _loadData(keyword: null, refresh: true); 
+    // Aquí decidimos la estrategia de carga según el Login
     _loadWeekendPlans();
 
     if (widget.authSource == 'spotify' && widget.spotifyAccessToken != null) {
+      // Estrategia Spotify (Token)
       _analyzeUserTasteAndLoad();
     } else {
-      _loadGenericArtistsImages();
+      // Estrategia Google (Base de Datos)
+      _loadPreferencesFromDB();
     }
   }
 
-  // --- CARGAS DE DATOS ---
+  // --- 1. ESTRATEGIA GOOGLE: LEER BASE DE DATOS ---
+  Future<void> _loadPreferencesFromDB() async {
+    bool hasPreferences = false;
+    try {
+      final prefs = await _userDataService.getUserPreferences();
+      
+      if (prefs != null) {
+        final genres = List<String>.from(prefs['favoriteGenres'] ?? []);
+        final artists = List<String>.from(prefs['favoriteArtists'] ?? []);
 
-  void _loadWeekendPlans() {
-    DateTime now = DateTime.now();
-    int daysUntilFriday = (DateTime.friday - now.weekday + 7) % 7;
-    if (daysUntilFriday == 0) daysUntilFriday = 0; 
-    
-    DateTime nextFriday = now.add(Duration(days: daysUntilFriday));
-    DateTime nextSunday = nextFriday.add(const Duration(days: 2));
+        if (genres.isNotEmpty || artists.isNotEmpty) {
+          hasPreferences = true;
+          String? primaryGenre;
+          String? secondaryGenre;
 
-    _ticketmasterService.getConcerts(
-      nextFriday, nextSunday, countryCode: _userCountryCode, size: 10 
-    ).then((events) {
-      if (mounted) setState(() => _weekendConcerts = _filterDuplicates(events));
-    });
+          // Configurar Géneros
+          if (genres.isNotEmpty) {
+            primaryGenre = genres[0];
+            _currentVibe = "tu estilo $primaryGenre";
+            if (genres.length > 1) secondaryGenre = genres[1];
+          }
+
+          // Cargar Artistas Favoritos (Para el carrusel)
+          if (artists.isNotEmpty) {
+             _loadSpecificRecommendations(artists); 
+          } else {
+             _loadGenericArtistsImages();
+          }
+
+          // Cargar Feed Principal con el género
+          _loadData(keyword: primaryGenre, refresh: true);
+
+          // Cargar Vibe Secundaria
+          if (secondaryGenre != null) {
+            _loadSecondaryVibe(secondaryGenre);
+          }
+        }
+      }
+    } catch (e) {
+      print("Error leyendo DB: $e");
+    }
+
+    // Si no tenía preferencias guardadas, cargamos lo genérico
+    if (!hasPreferences) {
+      _loadGenericArtistsImages();
+      _loadData(keyword: null, refresh: true);
+    }
   }
 
+  // --- 2. ESTRATEGIA SPOTIFY: ANALIZAR TOKEN ---
   Future<void> _analyzeUserTasteAndLoad() async {
     try {
       final topArtistsData = await _spotifyService.getUserTopArtistsWithGenres(widget.spotifyAccessToken!);
@@ -163,35 +196,48 @@ class _HomeScreenState extends State<HomeScreen> {
       if (topArtistsData.isNotEmpty) {
         final allGenres = topArtistsData.expand((e) => e['genres'] as List).join(" ").toLowerCase();
         
-        bool hasLatino = allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("latino");
-        bool hasRock = allGenres.contains("rock") || allGenres.contains("metal") || allGenres.contains("punk");
-        bool hasIndie = allGenres.contains("indie") || allGenres.contains("alternative");
-        bool hasPop = allGenres.contains("pop");
-        bool hasElectronic = allGenres.contains("electronic") || allGenres.contains("house") || allGenres.contains("techno");
-
-        if (hasLatino) {
-          dominantKeyword = "Latino"; _currentVibe = "tu rollo Urbano";
-          if (hasRock) secondaryKeyword = "Rock"; else if (hasElectronic) secondaryKeyword = "Electronic";
-        } else if (hasRock) {
+        if (allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("latino")) {
+          dominantKeyword = "Urbano"; _currentVibe = "tu rollo Urbano";
+          secondaryKeyword = "Electronic";
+        } else if (allGenres.contains("rock") || allGenres.contains("metal") || allGenres.contains("punk")) {
           dominantKeyword = "Rock"; _currentVibe = "tu lado Rocker";
-          if (hasIndie) secondaryKeyword = "Indie"; else if (hasPop) secondaryKeyword = "Pop";
-        } else if (hasIndie) {
+          secondaryKeyword = "Pop";
+        } else if (allGenres.contains("indie") || allGenres.contains("alternative")) {
           dominantKeyword = "Indie"; _currentVibe = "tu vibe Indie";
-          if (hasRock) secondaryKeyword = "Rock";
-        } else if (hasElectronic) {
+          secondaryKeyword = "Rock";
+        } else if (allGenres.contains("electronic") || allGenres.contains("house") || allGenres.contains("techno")) {
           dominantKeyword = "Electronic"; _currentVibe = "fiesta Electrónica";
-          if (hasPop) secondaryKeyword = "Pop";
-        } else if (hasPop) {
+          secondaryKeyword = "Pop";
+        } else {
           dominantKeyword = "Pop"; _currentVibe = "tus hits Pop";
         }
 
         _loadSpecificRecommendations(topArtistsData.map((e) => e['name'] as String).toList());
         if (secondaryKeyword != null) _loadSecondaryVibe(secondaryKeyword);
+      } else {
+        _loadGenericArtistsImages();
       }
       _loadData(keyword: dominantKeyword, refresh: true);
     } catch (e) {
+      _loadGenericArtistsImages();
       _loadData(keyword: null, refresh: true); 
     }
+  }
+
+  // --- CARGAS COMUNES ---
+
+  void _loadWeekendPlans() {
+    DateTime now = DateTime.now();
+    int daysUntilFriday = (DateTime.friday - now.weekday + 7) % 7;
+    if (daysUntilFriday == 0) daysUntilFriday = 0; 
+    DateTime nextFriday = now.add(Duration(days: daysUntilFriday));
+    DateTime nextSunday = nextFriday.add(const Duration(days: 2));
+
+    _ticketmasterService.getConcerts(
+      nextFriday, nextSunday, countryCode: _userCountryCode, size: 10 
+    ).then((events) {
+      if (mounted) setState(() => _weekendConcerts = _filterDuplicates(events));
+    });
   }
 
   void _loadSecondaryVibe(String keyword) {
@@ -209,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // --- ⚠️ FUNCIÓN MODIFICADA CON "RED DE SEGURIDAD" ---
   void _loadData({String? keyword, bool refresh = false}) {
     if (refresh) {
       _currentPage = 0;
@@ -216,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _hasMore = true;
       _currentKeyword = keyword; 
     }
-    if (!_hasMore && !refresh) return;
+    if (!_hasMore && !refresh && keyword == _currentKeyword) return;
 
     setState(() {
       if (!refresh) _isLoadingMore = true;
@@ -225,10 +272,31 @@ class _HomeScreenState extends State<HomeScreen> {
         DateTime.now(), DateTime.now().add(const Duration(days: 90)),
         countryCode: _userCountryCode, keyword: _currentKeyword, page: _currentPage, size: 20
       ).then((events) {
+        
+        // --- 🛡️ RED DE SEGURIDAD 🛡️ ---
         if (events.isEmpty) {
+          // Si estamos filtrando (ej: Jazz) y no hay nada, volvemos al modo general
+          if (_currentKeyword != null && _currentPage == 0) {
+             print("⚠️ No se encontraron eventos de $_currentKeyword. Activando modo general...");
+             
+             Future.microtask(() {
+               if (mounted) {
+                 setState(() {
+                   _currentKeyword = null; 
+                   _currentVibe = "lo más popular"; 
+                 });
+                 _loadData(refresh: true); // Recargamos sin filtro
+               }
+             });
+             return []; // Devolvemos vacío temporal
+          }
+
+          // Si ya estábamos en modo general, es que no hay nada de nada
           setState(() { _hasMore = false; _isLoadingMore = false; });
           return _cachedConcerts;
         }
+        // --------------------------------
+
         final seenNames = _cachedConcerts.map((c) => c.name.trim().toLowerCase()).toSet();
         final newUnique = events.where((e) {
           final clean = e.name.trim().toLowerCase();
@@ -251,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (artistNames.isEmpty) return;
     _topArtistName = artistNames.first; 
     List<ConcertDetail> foundEvents = [];
+    
     final results = await Future.wait(artistNames.take(3).map((artist) => _ticketmasterService.searchEventsByKeyword(artist, _userCountryCode)));
     for (var list in results) foundEvents.addAll(list);
     
@@ -318,18 +387,17 @@ class _HomeScreenState extends State<HomeScreen> {
     Share.share('¡Mira este planazo en Vibra! 🎸\n${concert.name}\n📅 $dateStr\n📍 ${concert.venue}\n${concert.ticketUrl}');
   }
 
-  // --- LOGICA DE FAVORITOS Y GUARDADOS (CONECTADA A FIREBASE) ---
+  // --- LOGICA DE FAVORITOS Y GUARDADOS ---
 
   void _toggleLike(ConcertDetail concert) {
     HapticFeedback.lightImpact();
-    final id = concert.name; // Usamos nombre como ID simple
+    final id = concert.name; 
 
     setState(() {
       if (_likedIds.contains(id)) _likedIds.remove(id);
       else _likedIds.add(id);
     });
 
-    // Guardar en Firestore
     _userDataService.toggleFavorite(id, {
       'name': concert.name,
       'date': concert.date.toIso8601String(),
@@ -352,7 +420,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    // Guardar en Firestore
     _userDataService.toggleSaved(id, {
       'name': concert.name,
       'date': concert.date.toIso8601String(),
@@ -460,11 +527,8 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  // --- MAPPING DE SECCIONES (Intercaladas al principio) ---
-                  // 2: Carrusel Artistas
                   if (index == 2) return _buildArtistsCarousel(primaryText, secondaryText, accentColor, cardBg);
                   
-                  // 3: SOLO PARA TI
                   if (index == 3) {
                     final displayList = _recommendedConcerts.isNotEmpty ? _recommendedConcerts : concerts.take(8).toList();
                     final title = _recommendedConcerts.isNotEmpty ? "SOLO PARA TI" : "TENDENCIAS EN $_userCountryCode";
@@ -472,7 +536,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, accentColor, cardBg) : const SizedBox.shrink();
                   }
 
-                  // 6: FINDE
                   if (index == 6) {
                     final displayList = _weekendConcerts.isNotEmpty ? _weekendConcerts : concerts.skip(5).take(8).toList();
                     final title = _weekendConcerts.isNotEmpty ? "¡YA ES FINDE!" : "DESTACADOS";
@@ -480,7 +543,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.orangeAccent, cardBg) : const SizedBox.shrink();
                   }
 
-                  // 9: SECUNDARIO
                   if (index == 9) {
                     final displayList = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeConcerts : concerts.reversed.take(8).toList();
                     final title = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeTitle : "DESCUBRE MÁS";
@@ -488,16 +550,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.purpleAccent, cardBg) : const SizedBox.shrink();
                   }
 
-                  // 12: CATEGORÍAS
                   if (index == 12) return _buildCollectionsCarousel(primaryText, secondaryText, accentColor);
 
-                  // CÁLCULO DE ÍNDICE DE LISTA PRINCIPAL
                   int concertIndex = index;
-                  if (index > 2) concertIndex--; // - Artistas
-                  if (index > 3) concertIndex--; // - Recs
-                  if (index > 6) concertIndex--; // - Finde
-                  if (index > 9) concertIndex--; // - Sec
-                  if (index > 12) concertIndex--; // - Cats
+                  if (index > 2) concertIndex--;
+                  if (index > 3) concertIndex--; 
+                  if (index > 6) concertIndex--;
+                  if (index > 9) concertIndex--; 
+                  if (index > 12) concertIndex--;
 
                   if (concertIndex >= concerts.length) return null;
 
@@ -510,21 +570,49 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             
-            if (_hasMore)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 30),
-                  child: Center(
-                    child: _isLoadingMore
-                      ? CircularProgressIndicator(color: accentColor)
-                      : TextButton(
-                          onPressed: () => _loadData(keyword: _currentKeyword, refresh: false),
-                          style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), backgroundColor: cardBg, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: secondaryText.withOpacity(0.2)))),
-                          child: Text("Mostrar más eventos", style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
-                        ),
-                  ),
+            // --- BOTÓN INTELIGENTE "MOSTRAR MÁS" / "VER TODOS" ---
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 30),
+                child: Center(
+                  child: _hasMore
+                      ? _isLoadingMore
+                          ? CircularProgressIndicator(color: accentColor)
+                          : TextButton(
+                              onPressed: () => _loadData(keyword: _currentKeyword, refresh: false),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
+                                backgroundColor: cardBg, 
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: secondaryText.withOpacity(0.2)))
+                              ),
+                              child: Text("Mostrar más eventos", style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
+                            )
+                      : _currentKeyword != null 
+                          ? Column(
+                              children: [
+                                Text("No hay más eventos de $_currentKeyword", style: TextStyle(color: secondaryText)),
+                                const SizedBox(height: 10),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentKeyword = null; 
+                                      _currentVibe = "lo más popular";
+                                    });
+                                    _loadData(keyword: null, refresh: true);
+                                  },
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: accentColor.withOpacity(0.1),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+                                  ),
+                                  child: Text("Ver todos los eventos", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            )
+                          : Text("¡Has llegado al final!", style: TextStyle(color: secondaryText.withOpacity(0.5))),
                 ),
               ),
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: 80)),
           ],
         );
@@ -598,10 +686,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Positioned(bottom: 20, right: 20, child: Row(children: [
                 _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
                 const SizedBox(width: 8), 
-                // LIKE CONECTADO A FIREBASE
                 _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
                 const SizedBox(width: 8), 
-                // GUARDAR CONECTADO A FIREBASE
                 _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: accentColor, fillColorSelected: accentColor.withOpacity(0.2), onTap: () => _toggleSave(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5))
               ])),
               Positioned(bottom: 20, left: 20, right: 150, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), const SizedBox(height: 6), Row(children: [Icon(Icons.location_on, color: accentColor, size: 14), const SizedBox(width: 4), Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis))])]))

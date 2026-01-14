@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/spotify_api_service.dart';
-import 'home_screen.dart'; // Asegúrate de que el import apunte a tu home_screen.dart
+import '../services/user_data_service.dart';
+import 'home_screen.dart';
 
 class MusicPreferencesScreen extends StatefulWidget {
-  // CAMBIO 1: Recibir el perfil completo y la fuente de autenticación
   final Map<String, dynamic> userProfile;
   final String authSource;
 
   const MusicPreferencesScreen({
-    super.key, 
+    super.key,
     required this.userProfile,
     required this.authSource,
   });
@@ -22,30 +22,34 @@ class MusicPreferencesScreen extends StatefulWidget {
 class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
   final TextEditingController _searchController = TextEditingController();
   final SpotifyAPIService _spotifyService = SpotifyAPIService();
+  final UserDataService _userDataService = UserDataService();
 
   List<Map<String, String>> searchResults = [];
   final Set<Map<String, String>> selectedArtists = {};
-  final Set<String> selectedGenres = {};
+  
+  // Guardamos el "value" (lo que sirve para la API), no el emoji
+  final Set<String> selectedGenres = {}; 
 
   bool _isSearching = false;
+  bool _isSaving = false;
 
-  final List<String> genres = [
-    'Pop',
-    'Rock',
-    'Hip-Hop',
-    'Reggaeton',
-    'Electrónica',
-    'Indie',
-    'Jazz',
-    'R&B',
-    'Clásica',
-    'Trap',
-    'Soul',
-    'Country',
-    'K-Pop',
-    'Dancehall',
-    'Metal',
-    'Funk',
+  // --- LISTA MAESTRA DE GÉNEROS OPTIMIZADA PARA TICKETMASTER ---
+  // label: Lo que ve el usuario
+  // value: Lo que usamos para filtrar en la API
+  // color: Para darle vida visual
+  final List<Map<String, dynamic>> genreOptions = [
+    {'label': '🔥 Urbano & Reggaeton', 'value': 'Urbano', 'color': Colors.orangeAccent},
+    {'label': '🎸 Rock & Alternative', 'value': 'Rock', 'color': Colors.redAccent},
+    {'label': '🎤 Pop & Hits', 'value': 'Pop', 'color': Colors.pinkAccent},
+    {'label': '💃 Indie Español', 'value': 'Indie', 'color': Colors.tealAccent},
+    {'label': '🎧 Electrónica & House', 'value': 'Electronic', 'color': Colors.blueAccent},
+    {'label': '🎪 Festivales', 'value': 'Festival', 'color': Colors.amber},
+    {'label': '🎤 Hip-Hop / Rap', 'value': 'Hip-Hop', 'color': Colors.purpleAccent},
+    {'label': '🤘 Heavy Metal', 'value': 'Metal', 'color': Colors.grey},
+    {'label': '💃 Flamenco', 'value': 'Flamenco', 'color': Colors.deepOrange},
+    {'label': '🎹 Jazz & Blues', 'value': 'Jazz', 'color': Colors.indigoAccent},
+    {'label': '🎻 Clásica', 'value': 'Classical', 'color': Colors.brown},
+    {'label': '🌍 Latino', 'value': 'Latin', 'color': Colors.yellowAccent},
   ];
 
   Future<void> _searchArtists(String query) async {
@@ -53,29 +57,58 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
       setState(() => searchResults = []);
       return;
     }
-
     setState(() => _isSearching = true);
     try {
       final results = await _spotifyService.searchArtists(query);
       setState(() => searchResults = results);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error buscando artistas: $e')),
-      );
+      print("Error buscando: $e");
     } finally {
       setState(() => _isSearching = false);
     }
   }
 
+  Future<void> _saveAndContinue() async {
+    setState(() => _isSaving = true);
+
+    try {
+      final List<String> artistNames = selectedArtists.map((a) => a['name']!).toList();
+      final List<String> genreValues = selectedGenres.toList();
+
+      // Guardamos en Firebase las preferencias "limpias"
+      await _userDataService.saveUserPreferences(
+        widget.userProfile['uid'] ?? widget.userProfile['id'], 
+        {
+          'favoriteArtists': artistNames,
+          'favoriteGenres': genreValues, // Guardamos ej: ["Rock", "Urbano"]
+          'preferencesSet': true,
+        }
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            userProfile: widget.userProfile,
+            authSource: widget.authSource,
+          ),
+        ),
+      );
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error guardando: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // CAMBIO 2: Extraer el nombre del perfil
     final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
-
-    final selectedGenreList =
-        genres.where((g) => selectedGenres.contains(g)).toList();
-    final unselectedGenres =
-        genres.where((g) => !selectedGenres.contains(g)).toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -85,95 +118,55 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // HEADER
               Text(
-                '¡Hola, $displayName! 🎧', // Usamos la variable extraída
-                style: GoogleFonts.montserrat(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                '¡Hola, $displayName! 🎧',
+                style: GoogleFonts.montserrat(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-
               Text(
-                'Queremos saber más de ti. Cuéntanos qué música te gusta.',
-                style: GoogleFonts.montserrat(
-                  color: Colors.white70,
-                  fontSize: 15,
-                ),
+                'Personaliza tu feed. ¿Qué te mueve?',
+                style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 15),
               ),
               const SizedBox(height: 25),
 
-              // BUSCADOR
+              // --- BUSCADOR ARTISTAS ---
               TextField(
                 controller: _searchController,
                 onChanged: _searchArtists,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Busca tus artistas favoritos...',
+                  hintText: 'Buscar artista (ej: Bad Bunny)...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   prefixIcon: const Icon(Icons.search, color: Colors.white38),
                   filled: true,
                   fillColor: const Color(0xFF1A1A1A),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide.none,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
                 ),
               ),
-
-              const SizedBox(height: 10),
-
-              // RESULTADOS BÚSQUEDA
+              
+              // --- LISTA RESULTADOS BÚSQUEDA ---
               if (_isSearching)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: CircularProgressIndicator(color: Colors.greenAccent),
-                  ),
-                )
+                 const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(color: Colors.greenAccent)))
               else if (searchResults.isNotEmpty)
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 220),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                 Container(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  margin: const EdgeInsets.only(top: 10),
+                  decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white10)),
                   child: ListView.builder(
                     itemCount: searchResults.length,
                     itemBuilder: (context, index) {
                       final artist = searchResults[index];
-                      final isSelected = selectedArtists
-                          .any((a) => a['name'] == artist['name']);
-
+                      final isSelected = selectedArtists.any((a) => a['name'] == artist['name']);
                       return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(artist['image']!),
-                        ),
-                        title: Text(
-                          artist['name']!,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        trailing: Icon(
-                          isSelected
-                              ? Icons.check_circle
-                              : Icons.add_circle_outline,
-                          color: isSelected
-                              ? Colors.greenAccent
-                              : Colors.white38,
-                        ),
+                        leading: CircleAvatar(backgroundImage: NetworkImage(artist['image']!)),
+                        title: Text(artist['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        trailing: Icon(isSelected ? Icons.check_circle : Icons.add_circle_outline, color: isSelected ? Colors.greenAccent : Colors.white38),
                         onTap: () {
                           HapticFeedback.lightImpact();
                           setState(() {
-                            if (isSelected) {
-                              selectedArtists.removeWhere(
-                                  (a) => a['name'] == artist['name']);
-                            } else {
-                              selectedArtists.add(artist);
-                            }
+                            if (isSelected) selectedArtists.removeWhere((a) => a['name'] == artist['name']);
+                            else selectedArtists.add(artist);
                             _searchController.clear();
                             searchResults = [];
                           });
@@ -185,187 +178,110 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
               const SizedBox(height: 20),
 
-              // SCROLL
+              // --- ZONA SCROLLABLE ---
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ARTISTAS SELECCIONADOS
-                      if (selectedArtists.isNotEmpty)
+                      // CHIPS ARTISTAS SELECCIONADOS
+                      if (selectedArtists.isNotEmpty) ...[
+                        Text('Tus Artistas:', style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 10),
                         Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
+                          spacing: 10, runSpacing: 10,
                           children: selectedArtists.map((artist) {
                             return Chip(
-                              label: Text(
-                                artist['name']!,
-                                style: GoogleFonts.montserrat(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              avatar: CircleAvatar(
-                                backgroundImage: NetworkImage(artist['image']!),
-                              ),
-                              backgroundColor:
-                                  Colors.greenAccent.withOpacity(0.2),
-                              deleteIcon: const Icon(Icons.close,
-                                  color: Colors.white70),
-                              onDeleted: () {
-                                setState(() {
-                                  selectedArtists.removeWhere(
-                                      (a) => a['name'] == artist['name']);
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
+                              label: Text(artist['name']!, style: const TextStyle(color: Colors.white)),
+                              avatar: CircleAvatar(backgroundImage: NetworkImage(artist['image']!)),
+                              backgroundColor: Colors.greenAccent.withOpacity(0.15),
+                              deleteIcon: const Icon(Icons.close, size: 16, color: Colors.greenAccent),
+                              onDeleted: () => setState(() => selectedArtists.removeWhere((a) => a['name'] == artist['name'])),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: Colors.greenAccent.withOpacity(0.3))),
                             );
                           }).toList(),
                         ),
+                        const SizedBox(height: 25),
+                      ],
 
-                      if (selectedArtists.isNotEmpty)
-                        const SizedBox(height: 20),
-
-                      // TEXTO GÉNEROS
-                      Text(
-                        'Selecciona tus géneros favoritos:',
-                        style: GoogleFonts.montserrat(
-                          color: Colors.white70,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(color: Colors.white24),
-                      const SizedBox(height: 10),
-
-                      // GÉNEROS SELECCIONADOS
-                      if (selectedGenreList.isNotEmpty)
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: selectedGenreList.map((genre) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.greenAccent.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    genre,
-                                    style: GoogleFonts.montserrat(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedGenres.remove(genre);
-                                      });
-                                    },
-                                    child: const Icon(Icons.close,
-                                        color: Colors.white, size: 18),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-
-                      if (selectedGenreList.isNotEmpty)
-                        const SizedBox(height: 15),
-
-                      // GÉNEROS DISPONIBLES
-                      Text(
-                        'Géneros disponibles:',
-                        style: GoogleFonts.montserrat(
-                            color: Colors.white38, fontSize: 14),
-                      ),
-                      const SizedBox(height: 5),
-
+                      Text('Géneros y Estilos:', style: GoogleFonts.montserrat(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 15),
+                      
+                      // GRID DE GÉNEROS (Más visual)
                       Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: unselectedGenres.map((genre) {
-                          return ChoiceChip(
-                            label: Text(
-                              genre,
-                              style: GoogleFonts.montserrat(
-                                  color: Colors.white70),
+                        spacing: 10, runSpacing: 10,
+                        children: genreOptions.map((genre) {
+                          final isSelected = selectedGenres.contains(genre['value']);
+                          final color = genre['color'] as Color;
+                          return FilterChip(
+                            label: Text(genre['label']),
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
                             ),
-                            selected: false,
-                            backgroundColor: const Color(0xFF1F1F1F),
-                            selectedColor: Colors.greenAccent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            onSelected: (_) {
+                            selected: isSelected,
+                            onSelected: (bool selected) {
+                              HapticFeedback.selectionClick();
                               setState(() {
-                                selectedGenres.add(genre);
+                                if (selected) selectedGenres.add(genre['value']);
+                                else selectedGenres.remove(genre['value']);
                               });
                             },
+                            backgroundColor: const Color(0xFF1F1F1F),
+                            selectedColor: color, // Usa el color específico del género al seleccionarlo
+                            checkmarkColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: isSelected ? BorderSide.none : BorderSide(color: Colors.white.withOpacity(0.1)),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                           );
                         }).toList(),
                       ),
+                      const SizedBox(height: 100), 
                     ],
                   ),
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              // BOTÓN CONTINUAR
-              Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Colors.greenAccent, Colors.lightGreenAccent],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 80, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: selectedArtists.isNotEmpty ||
-                            selectedGenres.isNotEmpty
-                        ? () {
-                            // CAMBIO 3: Pasar el perfil y la fuente a HomeScreen
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(
-                                  userProfile: widget.userProfile,
-                                  authSource: widget.authSource,
-                                ),
-                              ),
-                            );
-                          }
-                        : null,
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             ],
+          ),
+        ),
+      ),
+      
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(24),
+        color: Colors.black,
+        child: Container(
+          width: double.infinity,
+          height: 55,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) 
+                ? [Colors.greenAccent, Colors.lightGreenAccent] 
+                : [Colors.grey.shade800, Colors.grey.shade700],
+            ),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            ),
+            onPressed: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) && !_isSaving
+                ? _saveAndContinue
+                : null,
+            child: _isSaving 
+              ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+              : Text(
+                  'Comenzar', 
+                  style: TextStyle(
+                    color: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) ? Colors.black : Colors.white38, 
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16
+                  )
+                ),
           ),
         ),
       ),
