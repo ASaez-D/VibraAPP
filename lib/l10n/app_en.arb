@@ -6,14 +6,57 @@
     "loginLoading": "Loading...",
     "loginTerms": "By continuing, you agree to our Terms and Privacy Policy.",
     "loginError": "Login error: {error}",
+    "@loginError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
     "homeSearchHint": "Search in {country}...",
+    "@homeSearchHint": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
     "homeGreeting": "Hello, {name}",
+    "@homeGreeting": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "homeVibeTitle": "Explore {vibe}",
+    "@homeVibeTitle": {
+        "placeholders": {
+            "vibe": {
+                "type": "String"
+            }
+        }
+    },
+    "vibeBest": "the best",
     "homeSectionArtists": "YOUR ARTISTS",
     "homeSectionArtistsSub": "Based on your listening history",
     "homeSectionForYou": "JUST FOR YOU",
     "homeSectionForYouSub": "Because you listen to {artist}...",
+    "@homeSectionForYouSub": {
+        "placeholders": {
+            "artist": {
+                "type": "String"
+            }
+        }
+    },
     "homeSectionTrends": "TRENDING IN {country}",
+    "@homeSectionTrends": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
     "homeSectionTrendsSub": "Most popular this week",
     "homeSectionWeekend": "IT'S WEEKEND!",
     "homeSectionWeekendSub": "Plans for this weekend",
@@ -24,8 +67,22 @@
     "homeBtnShowMore": "Show more events",
     "homeBtnViewAll": "View all events",
     "homeTextNoMore": "No more events for {keyword}",
+    "@homeTextNoMore": {
+        "placeholders": {
+            "keyword": {
+                "type": "String"
+            }
+        }
+    },
     "homeTextEnd": "You've reached the end!",
     "homeErrorNoEvents": "No events in {country}",
+    "@homeErrorNoEvents": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
     "homeBtnRetryCountry": "See events in Spain",
     "homeSearchNoResults": "We couldn't find anything",
     "homeSearchClear": "Clear search",
@@ -36,6 +93,13 @@
     "menuLogout": "Log Out",
     "menuEditProfile": "Edit Profile",
     "prefsTitle": "Hi, {name}! 🎧",
+    "@prefsTitle": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "prefsSubtitle": "Customize your feed. What moves you?",
     "prefsSearchHint": "Search artist (e.g. Bad Bunny)...",
     "prefsYourArtists": "Your Artists:",
@@ -45,6 +109,13 @@
     "accountConnection": "ACTIVE CONNECTION",
     "accountLinked": "Account linked successfully",
     "accountOpenProfile": "Open profile in {service}",
+    "@accountOpenProfile": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
     "calendarTitle": "When do you want to go out?",
     "calendarToday": "Today",
     "calendarTomorrow": "Tomorrow",
@@ -60,6 +131,13 @@
     "detailInfoTitle": "Information",
     "detailAgeRestricted": "18+ only (ID required).",
     "detailOrganizedBy": "Organized by {venue}",
+    "@detailOrganizedBy": {
+        "placeholders": {
+            "venue": {
+                "type": "String"
+            }
+        }
+    },
     "detailLocationTitle": "Location",
     "detailDoorsOpen": "Doors open",
     "detailViewMap": "View map",
@@ -96,6 +174,19 @@
     "savedEmptySub": "Tap the save icon on the Home screen!",
     "savedPriceInfo": "See more",
     "settingsLanguage": "Language",
+    "settingsHeaderNotifications": "Notifications",
+    "settingsGeneralNotifications": "General Notifications",
+    "settingsEventReminders": "Event Reminders",
+    "settingsTicketReleases": "Ticket Releases",
+    "settingsHeaderPrivacy": "Privacy",
+    "settingsLocationPermissions": "Location Permissions",
+    "settingsSharedData": "Shared Data",
+    "settingsDownloadData": "Download my data",
+    "settingsDeleteAccount": "Delete account",
+    "settingsHeaderPrefs": "Preferences",
+    "settingsThemeMode": "Dark mode",
+    "settingsLargeText": "Large text",
+    "settingsDialogAjustes": "Settings",
     "commonError": "An error occurred",
     "commonSuccess": "Saved successfully"
 }

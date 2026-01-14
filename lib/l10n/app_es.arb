@@ -37,6 +37,7 @@
             }
         }
     },
+    "vibeBest": "lo mejor",
     "homeSectionArtists": "TUS ARTISTAS",
     "homeSectionArtistsSub": "Basado en lo que más escuchas",
     "homeSectionForYou": "SOLO PARA TI",
@@ -173,6 +174,19 @@
     "savedEmptySub": "¡Dale al icono de guardar en la Home!",
     "savedPriceInfo": "Ver más",
     "settingsLanguage": "Idioma",
+    "settingsHeaderNotifications": "Notificaciones",
+    "settingsGeneralNotifications": "Notificaciones generales",
+    "settingsEventReminders": "Recordatorios de eventos",
+    "settingsTicketReleases": "Lanzamiento de entradas",
+    "settingsHeaderPrivacy": "Privacidad",
+    "settingsLocationPermissions": "Permisos de ubicación",
+    "settingsSharedData": "Datos compartidos",
+    "settingsDownloadData": "Descargar mis datos",
+    "settingsDeleteAccount": "Eliminar cuenta",
+    "settingsHeaderPrefs": "Preferencias",
+    "settingsThemeMode": "Modo oscuro",
+    "settingsLargeText": "Texto grande",
+    "settingsDialogAjustes": "Ajustes",
     "commonError": "Ha ocurrido un error",
     "commonSuccess": "Guardado con éxito"
 }

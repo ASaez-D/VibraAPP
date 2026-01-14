@@ -1,11 +1,15 @@
-import 'dart:ui'; 
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+// LOCALIZACIÓN E IMPORTS INTERNOS
 import '../l10n/app_localizations.dart';
-import '../services/user_data_service.dart';       
+import '../services/user_data_service.dart';
+import '../providers/language_provider.dart';
 
 // IMPORTS PANTALLAS
 import 'login_screen.dart';
@@ -26,13 +30,13 @@ import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
 
 class HomeScreen extends StatefulWidget {
-  final Map<String, dynamic> userProfile; 
-  final String authSource; 
-  final String? spotifyAccessToken; 
+  final Map<String, dynamic> userProfile;
+  final String authSource;
+  final String? spotifyAccessToken;
 
   const HomeScreen({
-    super.key, 
-    required this.userProfile, 
+    super.key,
+    required this.userProfile,
     required this.authSource,
     this.spotifyAccessToken,
   });
@@ -43,37 +47,35 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  
+
   final TicketmasterService _ticketmasterService = TicketmasterService();
   final SpotifyAPIService _spotifyService = SpotifyAPIService();
-  final UserDataService _userDataService = UserDataService(); 
+  final UserDataService _userDataService = UserDataService();
 
-  // DATOS
-  Future<List<ConcertDetail>>? _concertsFuture; 
-  late Future<List<Map<String, String>>> _artistsFuture; 
-  
-  List<ConcertDetail> _recommendedConcerts = [];   
-  List<ConcertDetail> _weekendConcerts = [];       
-  List<ConcertDetail> _secondaryVibeConcerts = []; 
-  List<ConcertDetail> _cachedConcerts = [];         
-  
+  Future<List<ConcertDetail>>? _concertsFuture;
+  late Future<List<Map<String, String>>> _artistsFuture;
+
+  List<ConcertDetail> _recommendedConcerts = [];
+  List<ConcertDetail> _weekendConcerts = [];
+  List<ConcertDetail> _secondaryVibeConcerts = [];
+  List<ConcertDetail> _cachedConcerts = [];
+
   final Set<String> _likedIds = {};
   final Set<String> _savedIds = {};
-  
-  List<ConcertDetail> _searchResults = []; 
-  bool _isSearching = false; 
+
+  List<ConcertDetail> _searchResults = [];
+  bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
 
-  String _userCountryCode = 'ES'; 
-  String _currentVibe = "lo mejor"; 
-  String _secondaryVibeTitle = "";  
-  String _topArtistName = ""; 
-  
-  // PAGINACIÓN
-  int _currentPage = 0; 
-  bool _isLoadingMore = false; 
-  bool _hasMore = true; 
-  String? _currentKeyword; 
+  String _userCountryCode = 'ES';
+  String _currentVibe = "lo mejor";
+  String _secondaryVibeTitle = "";
+  String _topArtistName = "";
+
+  int _currentPage = 0;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  String? _currentKeyword;
 
   final List<String> _targetArtists = ["Bad Bunny", "Rosalía", "Quevedo", "Aitana", "Feid", "C. Tangana"];
 
@@ -85,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _artistsFuture = Future.value([]); 
-    
+    _artistsFuture = Future.value([]);
+
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _userDataService.saveUserProfile(user);
@@ -108,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error cargando interacciones: $e");
+      debugPrint("Error cargando interacciones: $e");
     }
   }
 
@@ -116,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final locale = PlatformDispatcher.instance.locale;
     setState(() {
       String detected = locale.countryCode ?? 'ES';
-      if (detected == 'US') detected = 'ES'; 
+      if (detected == 'US') detected = 'ES';
       _userCountryCode = detected;
     });
     _reloadAllData();
@@ -146,20 +148,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
           if (genres.isNotEmpty) {
             primaryGenre = genres[0];
-            _currentVibe = primaryGenre; 
+            _currentVibe = primaryGenre;
             if (genres.length > 1) secondaryGenre = genres[1];
           }
 
           if (artists.isNotEmpty) {
-             _loadSpecificRecommendations(artists); 
+            _loadSpecificRecommendations(artists);
           } else {
-             _loadGenericArtistsImages();
+            _loadGenericArtistsImages();
           }
           _loadData(keyword: primaryGenre, refresh: true);
           if (secondaryGenre != null) _loadSecondaryVibe(secondaryGenre);
         }
       }
-    } catch (e) { print("Error DB: $e"); }
+    } catch (e) { debugPrint("Error DB: $e"); }
 
     if (!hasPreferences) {
       _loadGenericArtistsImages();
@@ -172,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final topArtistsData = await _spotifyService.getUserTopArtistsWithGenres(widget.spotifyAccessToken!);
       String? dominantKeyword;
       String? secondaryKeyword;
-      
+
       if (topArtistsData.isNotEmpty) {
         final allGenres = topArtistsData.expand((e) => e['genres'] as List).join(" ").toLowerCase();
         if (allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("latino")) {
@@ -193,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _loadData(keyword: dominantKeyword, refresh: true);
     } catch (e) {
       _loadGenericArtistsImages();
-      _loadData(keyword: null, refresh: true); 
+      _loadData(keyword: null, refresh: true);
     }
   }
 
@@ -220,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentPage = 0;
       _cachedConcerts = [];
       _hasMore = true;
-      _currentKeyword = keyword; 
+      _currentKeyword = keyword;
     }
     if (!_hasMore && !refresh && keyword == _currentKeyword) return;
 
@@ -245,12 +247,12 @@ class _HomeScreenState extends State<HomeScreen> {
           final clean = e.name.trim().toLowerCase();
           if (seenNames.contains(clean)) return false;
           seenNames.add(clean);
-          return true; 
+          return true;
         }).toList();
 
         setState(() {
           _cachedConcerts.addAll(newUnique);
-          _currentPage++; 
+          _currentPage++;
           _isLoadingMore = false;
         });
         return _cachedConcerts;
@@ -260,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadSpecificRecommendations(List<String> artistNames) async {
     if (artistNames.isEmpty) return;
-    _topArtistName = artistNames.first; 
+    _topArtistName = artistNames.first;
     List<ConcertDetail> foundEvents = [];
     final results = await Future.wait(artistNames.take(3).map((artist) => _ticketmasterService.searchEventsByKeyword(artist, _userCountryCode)));
     for (var list in results) foundEvents.addAll(list);
@@ -284,23 +286,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadArtistsImages(List<String> names) {
-     _artistsFuture = Future.wait(names.map((name) async {
-          try {
-            final results = await _spotifyService.searchArtists(name);
-            if (results.isNotEmpty) return results.first;
-          } catch (e) {}
-          return {"name": name, "image": ""};
-        }));
+    _artistsFuture = Future.wait(names.map((name) async {
+      try {
+        final results = await _spotifyService.searchArtists(name);
+        if (results.isNotEmpty) return results.first;
+      } catch (e) {}
+      return {"name": name, "image": ""};
+    }));
   }
 
   void _loadGenericArtistsImages() {
     _artistsFuture = Future.wait(_targetArtists.map((name) async {
-          try {
-            final results = await _spotifyService.searchArtists(name);
-            if (results.isNotEmpty) return results.first;
-          } catch (e) {}
-          return {"name": name, "image": ""};
-        })).then((list) => list.where((item) => item["image"] != "").toList());
+      try {
+        final results = await _spotifyService.searchArtists(name);
+        if (results.isNotEmpty) return results.first;
+      } catch (e) {}
+      return {"name": name, "image": ""};
+    })).then((list) => list.where((item) => item["image"] != "").toList());
   }
 
   void _onSearchChanged() {
@@ -312,7 +314,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
+
   void _clearSearch() { _searchController.clear(); FocusScope.of(context).unfocus(); }
+
   void _onTabTapped(int index) {
     if (index != 0) {
       switch (index) {
@@ -323,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     setState(() => _currentIndex = index);
   }
+
   void _shareConcert(ConcertDetail concert) {
     final dateStr = DateFormat('d MMM yyyy').format(concert.date);
     Share.share('¡Mira este planazo en Vibra! 🎸\n${concert.name}\n📅 $dateStr\n📍 ${concert.venue}\n${concert.ticketUrl}');
@@ -330,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _toggleLike(ConcertDetail concert) {
     HapticFeedback.lightImpact();
-    final id = concert.name; 
+    final id = concert.name;
     setState(() {
       if (_likedIds.contains(id)) _likedIds.remove(id);
       else _likedIds.add(id);
@@ -362,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color accentColor = Colors.greenAccent; 
+    final Color accentColor = Colors.greenAccent;
     final Color scaffoldBg = isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
     final Color cardBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
     final Color primaryText = isDarkMode ? Colors.white : const Color(0xFF222222);
@@ -374,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final String photoUrl = widget.userProfile['photoURL'] ?? '';
     final bool isLinked = photoUrl.isNotEmpty;
     final bool isSpotify = widget.authSource == 'spotify';
-    final Color serviceColor = isSpotify ? const Color(0xFF1DB954) : const Color(0xFF4285F4); 
+    final Color serviceColor = isSpotify ? const Color(0xFF1DB954) : const Color(0xFF4285F4);
     final IconData fallbackIcon = isSpotify ? Icons.music_note : Icons.account_circle;
 
     return Scaffold(
@@ -388,37 +393,44 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: Container(
-                    height: 50, decoration: BoxDecoration(color: searchBarBg, borderRadius: BorderRadius.circular(30), border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.shade300, width: 1), boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.2) : Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))]),
+                    height: 50,
+                    decoration: BoxDecoration(color: searchBarBg, borderRadius: BorderRadius.circular(30), border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.shade300, width: 1), boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.2) : Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))]),
                     child: TextField(
-                      controller: _searchController, style: TextStyle(color: primaryText, fontSize: 15), cursorColor: accentColor,
+                      controller: _searchController,
+                      style: TextStyle(color: primaryText, fontSize: 15),
+                      cursorColor: accentColor,
                       decoration: InputDecoration(
-                        hintText: l10n.homeSearchHint(_userCountryCode), // "Buscar en ES..."
-                        hintStyle: TextStyle(color: hintText, fontSize: 14), 
-                        prefixIcon: Icon(Icons.search, color: hintText, size: 22), 
-                        suffixIcon: _searchController.text.isNotEmpty ? IconButton(icon: Icon(Icons.close, color: secondaryText, size: 20), onPressed: _clearSearch) : null, border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 14)),
+                          hintText: l10n.homeSearchHint(_userCountryCode),
+                          hintStyle: TextStyle(color: hintText, fontSize: 14),
+                          prefixIcon: Icon(Icons.search, color: hintText, size: 22),
+                          suffixIcon: _searchController.text.isNotEmpty ? IconButton(icon: Icon(Icons.close, color: secondaryText, size: 20), onPressed: _clearSearch) : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 14)),
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Builder(builder: (context) {
-                    return GestureDetector(onTap: () => Scaffold.of(context).openEndDrawer(), child: Container(padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: accentColor, width: 1.5)), child: CircleAvatar(radius: 22, backgroundColor: cardBg, backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null, child: photoUrl.isEmpty ? Icon(Icons.person, color: primaryText, size: 24) : null)));
-                  }
-                ),
+                  return GestureDetector(onTap: () => Scaffold.of(context).openEndDrawer(), child: Container(padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: accentColor, width: 1.5)), child: CircleAvatar(radius: 22, backgroundColor: cardBg, backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null, child: photoUrl.isEmpty ? Icon(Icons.person, color: primaryText, size: 24) : null)));
+                }),
               ],
             ),
           ),
         ),
       ),
-
-      body: _isSearching 
-        ? _buildSearchResults(l10n, primaryText, secondaryText, cardBg)
-        : _buildHomeContent(l10n, primaryText, secondaryText, accentColor, cardBg, displayName), 
-      
+      body: _isSearching ? _buildSearchResults(l10n, primaryText, secondaryText, cardBg) : _buildHomeContent(l10n, primaryText, secondaryText, accentColor, cardBg, displayName),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: scaffoldBg, selectedItemColor: accentColor, unselectedItemColor: secondaryText, type: BottomNavigationBarType.fixed, currentIndex: _currentIndex, onTap: _onTabTapped, showSelectedLabels: false, showUnselectedLabels: false,
+        backgroundColor: scaffoldBg,
+        selectedItemColor: accentColor,
+        unselectedItemColor: secondaryText,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
         items: const [BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''), BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: ''), BottomNavigationBarItem(icon: Icon(Icons.confirmation_number_outlined), label: ''), BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: '')],
       ),
-      endDrawer: _buildDrawer(context, l10n, primaryText, accentColor, scaffoldBg, dividerColor, displayName, photoUrl, isLinked, serviceColor, fallbackIcon), 
+      endDrawer: _buildDrawer(context, l10n, primaryText, accentColor, scaffoldBg, dividerColor, displayName, photoUrl, isLinked, serviceColor, fallbackIcon),
     );
   }
 
@@ -436,10 +448,11 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snapshot.connectionState == ConnectionState.waiting && _cachedConcerts.isEmpty) {
           return Center(child: CircularProgressIndicator(color: accentColor));
         } else if (snapshot.hasError || (_cachedConcerts.isEmpty && (!snapshot.hasData || snapshot.data!.isEmpty))) {
-           return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.location_off_rounded, color: secondaryText.withOpacity(0.5), size: 50), const SizedBox(height: 10), Text(l10n.homeErrorNoEvents(_userCountryCode), style: TextStyle(color: secondaryText, fontWeight: FontWeight.bold)), const SizedBox(height: 15), TextButton(onPressed: () { setState(() { _userCountryCode = 'ES'; _reloadAllData(); }); }, style: TextButton.styleFrom(backgroundColor: accentColor.withOpacity(0.1), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))), child: Text(l10n.homeBtnRetryCountry, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)))]));
+          return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.location_off_rounded, color: secondaryText.withOpacity(0.5), size: 50), const SizedBox(height: 10), Text(l10n.homeErrorNoEvents(_userCountryCode), style: TextStyle(color: secondaryText, fontWeight: FontWeight.bold)), const SizedBox(height: 15), TextButton(onPressed: () { setState(() { _userCountryCode = 'ES'; _reloadAllData(); }); }, style: TextButton.styleFrom(backgroundColor: accentColor.withOpacity(0.1), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))), child: Text(l10n.homeBtnRetryCountry, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)))]));
         }
 
         final concerts = _cachedConcerts;
+        String displayVibe = _currentVibe == "lo mejor" ? l10n.vibeBest : _currentVibe;
 
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -451,17 +464,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(l10n.homeGreeting(displayName), style: TextStyle(color: secondaryText, fontSize: 16, fontWeight: FontWeight.w500)),
-                    Text(l10n.homeVibeTitle(_currentVibe), style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                    Text(l10n.homeVibeTitle(displayVibe), style: TextStyle(color: primaryText, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
                   ],
                 ),
               ),
             ),
-
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   if (index == 2) return _buildArtistsCarousel(l10n, primaryText, secondaryText, accentColor, cardBg);
-                  
+
                   if (index == 3) {
                     final displayList = _recommendedConcerts.isNotEmpty ? _recommendedConcerts : concerts.take(8).toList();
                     final title = _recommendedConcerts.isNotEmpty ? l10n.homeSectionForYou : l10n.homeSectionTrends(_userCountryCode);
@@ -487,9 +499,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   int concertIndex = index;
                   if (index > 2) concertIndex--;
-                  if (index > 3) concertIndex--; 
+                  if (index > 3) concertIndex--;
                   if (index > 6) concertIndex--;
-                  if (index > 9) concertIndex--; 
+                  if (index > 9) concertIndex--;
                   if (index > 12) concertIndex--;
                   if (concertIndex >= concerts.length) return null;
 
@@ -498,10 +510,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildDiceCard(context, concerts[concertIndex], primaryText, secondaryText, accentColor, cardBg),
                   );
                 },
-                childCount: concerts.length + 5, 
+                childCount: concerts.length + 5,
               ),
             ),
-            
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 30),
@@ -512,27 +523,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           : TextButton(
                               onPressed: () => _loadData(keyword: _currentKeyword, refresh: false),
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
-                                backgroundColor: cardBg, 
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: secondaryText.withOpacity(0.2)))
-                              ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  backgroundColor: cardBg,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      side: BorderSide(color: secondaryText.withOpacity(0.2)))), // FIX: 'border' cambiado por 'side'
                               child: Text(l10n.homeBtnShowMore, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
                             )
-                      : _currentKeyword != null 
+                      : _currentKeyword != null
                           ? Column(
                               children: [
                                 Text(l10n.homeTextNoMore(_currentKeyword!), style: TextStyle(color: secondaryText)),
                                 const SizedBox(height: 10),
                                 TextButton(
                                   onPressed: () {
-                                    setState(() { _currentKeyword = null; _currentVibe = "lo mejor"; });
+                                    setState(() {
+                                      _currentKeyword = null;
+                                      _currentVibe = "lo mejor";
+                                    });
                                     _loadData(keyword: null, refresh: true);
                                   },
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: accentColor.withOpacity(0.1),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
-                                  ),
+                                  style: TextButton.styleFrom(backgroundColor: accentColor.withOpacity(0.1), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                                   child: Text(l10n.homeBtnViewAll, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
                                 ),
                               ],
@@ -554,7 +565,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildSectionHeader(title: title, subtitle: subtitle, primaryText: primaryText, secondaryText: secondaryText, accentColor: accent, cardBg: cardBg),
         SizedBox(
-          height: 280, 
+          height: 280,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -588,13 +599,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
+    final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final locale = Localizations.localeOf(context).toString();
     final String dayNum = DateFormat('d').format(concert.date);
-    final String monthName = DateFormat('MMM', locale).format(concert.date).toUpperCase().replaceAll('.', '');
-    String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange : "Info";
+    final String monthName = DateFormat('MMM', Localizations.localeOf(context).languageCode).format(concert.date).toUpperCase().replaceAll('.', '');
+    String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange : l10n.detailCheckPrices;
     String uniqueHeroTag = "${concert.name}_${concert.date}_home_${DateTime.now().millisecondsSinceEpoch}_${concert.hashCode}";
-    String concertId = concert.name; 
+    String concertId = concert.name;
     bool isLiked = _likedIds.contains(concertId);
     bool isSaved = _savedIds.contains(concertId);
 
@@ -603,7 +614,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert, initialIsLiked: isLiked, initialIsSaved: isSaved, heroTag: uniqueHeroTag, onStateChanged: (liked, saved) { setState(() { if (liked) _likedIds.add(concertId); else _likedIds.remove(concertId); if (saved) _savedIds.add(concertId); else _savedIds.remove(concertId); }); })));
       },
       child: Container(
-        height: 320, decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), color: cardBg, boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 10))]),
+        height: 320,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), color: cardBg, boxShadow: [BoxShadow(color: isDarkMode ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 10))]),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Stack(
@@ -613,10 +625,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Positioned(top: 16, left: 16, child: Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(monthName, style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w900, height: 1)), Text(dayNum, style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1))]))),
               Positioned(top: 16, right: 16, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: isDarkMode ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.8), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDarkMode ? Colors.white24 : Colors.grey.shade400)), child: Text(priceLabel, style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 12)))),
               Positioned(bottom: 20, right: 20, child: Row(children: [
-                _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
-                const SizedBox(width: 8), 
-                _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)), 
-                const SizedBox(width: 8), 
+                _AnimatedIconButton(isSelected: false, iconSelected: Icons.ios_share_rounded, iconUnselected: Icons.ios_share_rounded, colorSelected: Colors.white, onTap: () => _shareConcert(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
+                const SizedBox(width: 8),
+                _AnimatedIconButton(isSelected: isLiked, iconSelected: Icons.favorite, iconUnselected: Icons.favorite_border_rounded, colorSelected: Colors.redAccent, fillColorSelected: Colors.redAccent.withOpacity(0.2), onTap: () => _toggleLike(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5)),
+                const SizedBox(width: 8),
                 _AnimatedIconButton(isSelected: isSaved, iconSelected: Icons.bookmark, iconUnselected: Icons.bookmark_border_rounded, colorSelected: accentColor, fillColorSelected: accentColor.withOpacity(0.2), onTap: () => _toggleSave(concert), fillColor: isDarkMode ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.5))
               ])),
               Positioned(bottom: 20, left: 20, right: 150, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(concert.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1, shadows: [Shadow(color: Colors.black, blurRadius: 10)])), const SizedBox(height: 6), Row(children: [Icon(Icons.location_on, color: accentColor, size: 14), const SizedBox(width: 4), Expanded(child: Text(concert.venue, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis))])]))
@@ -629,8 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildListCard(ConcertDetail concert, Color primaryText, Color secondaryText, Color cardBg) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final locale = Localizations.localeOf(context).toString();
-    final day = DateFormat('d MMM', locale).format(concert.date).toUpperCase();
+    final String day = DateFormat('d MMM', Localizations.localeOf(context).languageCode).format(concert.date).toUpperCase();
     final Color accentColor = Colors.greenAccent;
     return GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert))), child: Container(height: 100, decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.shade300)), child: Row(children: [ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)), child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200)), Expanded(child: Padding(padding: const EdgeInsets.all(12.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 13)), const SizedBox(height: 6), Text(day, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold))]))), Padding(padding: const EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 16))])));
   }

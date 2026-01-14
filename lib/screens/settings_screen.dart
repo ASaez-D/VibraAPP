@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:permission_handler/permission_handler.dart'; 
-import 'package:provider/provider.dart'; // <--- 1. IMPORTANTE
+import 'package:provider/provider.dart'; 
 import '../l10n/app_localizations.dart';
-import '../providers/language_provider.dart'; // <--- 2. IMPORTANTE
+import '../providers/language_provider.dart'; 
 import '../main.dart'; 
 
 class SettingsScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: Text("Ajustes", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+              child: Text(l10n.settingsDialogAjustes, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -121,13 +121,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         children: [
-          // USAMOS l10n PARA LOS HEADERS
-          _buildHeader("Notificaciones", isDark), 
+          _buildHeader(l10n.settingsHeaderNotifications, isDark), 
           _buildCard(
             children: [
               _switchTile(
                 Icons.notifications,
-                "Notificaciones generales",
+                l10n.settingsGeneralNotifications,
                 isDark,
                 accentColor,
                 value: _generalNotifications,
@@ -136,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _divider(isDark),
               _switchTile(
                 Icons.event_available,
-                "Recordatorios de eventos",
+                l10n.settingsEventReminders,
                 isDark,
                 accentColor,
                 value: _eventReminders,
@@ -147,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _divider(isDark),
               _switchTile(
                 Icons.new_releases,
-                "Lanzamiento de entradas",
+                l10n.settingsTicketReleases,
                 isDark,
                 accentColor,
                 value: _ticketReleases,
@@ -160,22 +159,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 28),
 
-          _buildHeader("Privacidad", isDark),
+          _buildHeader(l10n.settingsHeaderPrivacy, isDark),
           _buildCard(
             children: [
-              _linkTile(context, Icons.location_on, "Permisos de ubicación", isDark, chevronColor),
+              _linkTile(context, Icons.location_on, l10n.settingsLocationPermissions, isDark, chevronColor),
               _divider(isDark),
-              _linkTile(context, Icons.shield, "Datos compartidos", isDark, chevronColor),
+              _linkTile(context, Icons.shield, l10n.settingsSharedData, isDark, chevronColor),
               _divider(isDark),
-              _linkTile(context, Icons.download, "Descargar mis datos", isDark, chevronColor),
+              _linkTile(context, Icons.download, l10n.settingsDownloadData, isDark, chevronColor),
               _divider(isDark),
-              _linkTile(context, Icons.delete_forever, "Eliminar cuenta", isDark, chevronColor),
+              _linkTile(context, Icons.delete_forever, l10n.settingsDeleteAccount, isDark, chevronColor),
             ],
             cardColor: cardColor,
           ),
           const SizedBox(height: 28),
 
-          _buildHeader("Preferencias", isDark),
+          _buildHeader(l10n.settingsHeaderPrefs, isDark),
           ValueListenableBuilder<double>(
             valueListenable: textScaleNotifier,
             builder: (context, scale, child) {
@@ -183,11 +182,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   _languageSelectorTile(context, l10n, isDark, chevronColor),
                   _divider(isDark),
-                  _themeSwitcherTile(context, isDark, accentColor),
+                  _themeSwitcherTile(context, isDark, accentColor, l10n),
                   _divider(isDark),
                   _switchTile(
                     Icons.text_fields,
-                    "Texto grande",
+                    l10n.settingsLargeText,
                     isDark,
                     accentColor,
                     value: _isLargeTextActive(),
@@ -206,7 +205,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _languageSelectorTile(BuildContext context, AppLocalizations l10n, bool isDark, Color chevronColor) {
     final contentColor = isDark ? Colors.white : Colors.black;
-    // Detectamos el idioma actual para mostrarlo a la derecha
     final currentLang = Localizations.localeOf(context).languageCode.toUpperCase();
     
     return InkWell(
@@ -270,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _themeSwitcherTile(BuildContext context, bool isDark, Color accentColor) {
+  Widget _themeSwitcherTile(BuildContext context, bool isDark, Color accentColor, AppLocalizations l10n) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
       builder: (context, mode, child) {
@@ -286,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  isCurrentlyDark ? "Modo oscuro" : "Modo claro",
+                  l10n.settingsThemeMode,
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
                     fontSize: 16,
@@ -352,9 +350,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final contentColor = isDark ? Colors.white : Colors.black;
     return InkWell(
       onTap: () {
-        if (text == "Permisos de ubicación") {
+        if (text == AppLocalizations.of(context)!.settingsLocationPermissions) {
           AppSettings.openAppSettings(type: AppSettingsType.location);
-        } else if (text == "Datos compartidos") {
+        } else if (text == AppLocalizations.of(context)!.settingsSharedData) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const SharedDataScreen()));
         }
       },
@@ -411,8 +409,8 @@ class SharedDataScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.accountConnection)),
-      body: const Center(child: Text("Información de privacidad")),
+      appBar: AppBar(title: Text(l10n.settingsSharedData)),
+      body: const Center(child: Text("Privacy Info")),
     );
   }
 }

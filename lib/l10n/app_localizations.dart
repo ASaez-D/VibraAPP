@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Explora {vibe}'**
   String homeVibeTitle(String vibe);
 
+  /// No description provided for @vibeBest.
+  ///
+  /// In es, this message translates to:
+  /// **'lo mejor'**
+  String get vibeBest;
+
   /// No description provided for @homeSectionArtists.
   ///
   /// In es, this message translates to:
@@ -673,6 +679,84 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Idioma'**
   String get settingsLanguage;
+
+  /// No description provided for @settingsHeaderNotifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones'**
+  String get settingsHeaderNotifications;
+
+  /// No description provided for @settingsGeneralNotifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones generales'**
+  String get settingsGeneralNotifications;
+
+  /// No description provided for @settingsEventReminders.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorios de eventos'**
+  String get settingsEventReminders;
+
+  /// No description provided for @settingsTicketReleases.
+  ///
+  /// In es, this message translates to:
+  /// **'Lanzamiento de entradas'**
+  String get settingsTicketReleases;
+
+  /// No description provided for @settingsHeaderPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad'**
+  String get settingsHeaderPrivacy;
+
+  /// No description provided for @settingsLocationPermissions.
+  ///
+  /// In es, this message translates to:
+  /// **'Permisos de ubicación'**
+  String get settingsLocationPermissions;
+
+  /// No description provided for @settingsSharedData.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos compartidos'**
+  String get settingsSharedData;
+
+  /// No description provided for @settingsDownloadData.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar mis datos'**
+  String get settingsDownloadData;
+
+  /// No description provided for @settingsDeleteAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar cuenta'**
+  String get settingsDeleteAccount;
+
+  /// No description provided for @settingsHeaderPrefs.
+  ///
+  /// In es, this message translates to:
+  /// **'Preferencias'**
+  String get settingsHeaderPrefs;
+
+  /// No description provided for @settingsThemeMode.
+  ///
+  /// In es, this message translates to:
+  /// **'Modo oscuro'**
+  String get settingsThemeMode;
+
+  /// No description provided for @settingsLargeText.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto grande'**
+  String get settingsLargeText;
+
+  /// No description provided for @settingsDialogAjustes.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes'**
+  String get settingsDialogAjustes;
 
   /// No description provided for @commonError.
   ///

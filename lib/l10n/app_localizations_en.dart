@@ -45,6 +45,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get vibeBest => 'the best';
+
+  @override
   String get homeSectionArtists => 'YOUR ARTISTS';
 
   @override
@@ -322,6 +325,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsHeaderNotifications => 'Notifications';
+
+  @override
+  String get settingsGeneralNotifications => 'General Notifications';
+
+  @override
+  String get settingsEventReminders => 'Event Reminders';
+
+  @override
+  String get settingsTicketReleases => 'Ticket Releases';
+
+  @override
+  String get settingsHeaderPrivacy => 'Privacy';
+
+  @override
+  String get settingsLocationPermissions => 'Location Permissions';
+
+  @override
+  String get settingsSharedData => 'Shared Data';
+
+  @override
+  String get settingsDownloadData => 'Download my data';
+
+  @override
+  String get settingsDeleteAccount => 'Delete account';
+
+  @override
+  String get settingsHeaderPrefs => 'Preferences';
+
+  @override
+  String get settingsThemeMode => 'Dark mode';
+
+  @override
+  String get settingsLargeText => 'Large text';
+
+  @override
+  String get settingsDialogAjustes => 'Settings';
 
   @override
   String get commonError => 'An error occurred';
