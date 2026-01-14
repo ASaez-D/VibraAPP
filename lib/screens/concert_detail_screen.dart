@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_localizations.dart';
 
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart'; 
-import '../services/user_data_service.dart'; // <--- 1. IMPORTAR SERVICIO DB
+import '../services/user_data_service.dart'; 
 
 class ConcertDetailScreen extends StatefulWidget {
   final ConcertDetail concert;
@@ -33,7 +34,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
   final Color accentColor = Colors.greenAccent;
   
   final TicketmasterService _ticketmasterService = TicketmasterService();
-  final UserDataService _userDataService = UserDataService(); // <--- 2. INSTANCIAR SERVICIO DB
+  final UserDataService _userDataService = UserDataService();
 
   late bool isLiked;
   late bool isSaved;
@@ -102,12 +103,13 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     _launchURL(googleMapsUrl.toString());
   }
 
-  void _shareEvent() {
+  void _shareEvent(AppLocalizations l10n) {
     final dateStr = DateFormat('d MMM yyyy').format(widget.concert.date);
+    // Usamos texto traducido o dejamos este si es muy específico
     Share.share('¡Mira este planazo en Vibra! 🎸\n${widget.concert.name}\n📅 $dateStr\n📍 ${widget.concert.venue}\n${widget.concert.ticketUrl}');
   }
 
-  // --- 3. CONECTAR BOTONES A FIREBASE ---
+  // --- CONECTAR BOTONES A FIREBASE ---
 
   void _toggleLike() {
     HapticFeedback.lightImpact();
@@ -117,7 +119,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
       isLiked = !isLiked;
     });
 
-    // GUARDAR EN NUBE
     _userDataService.toggleFavorite(widget.concert.name, {
       'name': widget.concert.name,
       'date': widget.concert.date.toIso8601String(),
@@ -128,7 +129,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     _notifyChanges();
   }
 
-  void _toggleSave() {
+  void _toggleSave(AppLocalizations l10n) {
     HapticFeedback.lightImpact();
     _saveController.forward().then((_) => _saveController.reverse());
     
@@ -136,7 +137,6 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
       isSaved = !isSaved;
     });
 
-    // GUARDAR EN NUBE
     _userDataService.toggleSaved(widget.concert.name, {
       'name': widget.concert.name,
       'date': widget.concert.date.toIso8601String(),
@@ -147,7 +147,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     if (isSaved) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Guardado", style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)),
+          content: Text(l10n.commonSuccess, style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)),
           backgroundColor: accentColor, 
           duration: const Duration(milliseconds: 800)
         )
@@ -177,6 +177,10 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
   @override
   Widget build(BuildContext context) {
+    // 2. Traducciones
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = Localizations.localeOf(context).languageCode;
+
     final colors = _getThemedColors(context);
     final scaffoldBg = colors['scaffoldBg']!;
     final cardBg = colors['cardBg']!;
@@ -186,8 +190,14 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     final borderColor = colors['borderColor']!;
     final shadowColor = colors['shadowColor']!;
     
-    final String formattedDate = DateFormat('EEE d MMM, HH:mm', 'es_ES').format(widget.concert.date);
+    // Fecha automática según idioma
+    final String formattedDate = DateFormat('EEE d MMM, HH:mm', currentLocale).format(widget.concert.date);
+    
+    // Precios: "Ver precios" se traduce si es ese string exacto, si no, se muestra tal cual
     String mainPrice = widget.concert.priceRange; 
+    if (mainPrice == "Ver precios") mainPrice = l10n.detailCheckPrices; 
+    else if (mainPrice == "GRATIS") mainPrice = l10n.detailFree;
+
     final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
 
     return Scaffold(
@@ -196,7 +206,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         backgroundColor: scaffoldBg,
         elevation: 0,
         centerTitle: true,
-        title: Text("Evento", style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text(l10n.detailEventTitle, style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.bold)), // "Evento"
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: primaryText, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -268,26 +278,26 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 children: [
                   _buildAnimatedActionButton(
                     icon: isSaved ? Icons.bookmark : Icons.bookmark_border_rounded, 
-                    label: isSaved ? "Guardado" : "Guardar",
+                    label: isSaved ? l10n.detailBtnSaved : l10n.detailBtnSave, // "Guardado" / "Guardar"
                     iconColor: isSaved ? accentColor : primaryText,
                     textColor: secondaryText,
                     buttonBg: primaryText.withOpacity(0.08),
                     borderColor: isSaved ? accentColor.withOpacity(0.7) : borderColor,
-                    onTap: _toggleSave,
+                    onTap: () => _toggleSave(l10n),
                     animation: _saveAnimation,
                   ),
                   _buildAnimatedActionButton(
                     icon: Icons.ios_share_rounded, 
-                    label: "Compartir",
+                    label: l10n.detailBtnShare, // "Compartir"
                     iconColor: primaryText,
                     textColor: secondaryText,
                     buttonBg: primaryText.withOpacity(0.08),
                     borderColor: borderColor,
-                    onTap: _shareEvent,
+                    onTap: () => _shareEvent(l10n),
                   ),
                   _buildAnimatedActionButton(
                     icon: isLiked ? Icons.favorite : Icons.thumb_up_off_alt_rounded, 
-                    label: "Me gusta",
+                    label: l10n.detailBtnLike, // "Me gusta"
                     iconColor: isLiked ? Colors.redAccent : primaryText, 
                     textColor: secondaryText,
                     buttonBg: primaryText.withOpacity(0.08),
@@ -302,7 +312,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               Divider(color: primaryText.withOpacity(0.1)),
               const SizedBox(height: 32),
 
-              _buildSectionTitle("Información", primaryText),
+              _buildSectionTitle(l10n.detailInfoTitle, primaryText), // "Información"
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -313,19 +323,19 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 ),
                 child: Column(
                   children: [
-                    _buildInfoRow(Icons.info_outline_rounded, "Mayores de 18 años (DNI requerido).", secondaryText, primaryText),
+                    _buildInfoRow(Icons.info_outline_rounded, l10n.detailAgeRestricted, secondaryText, primaryText), // "Mayores de 18..."
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: Divider(color: primaryText.withOpacity(0.1)),
                     ),
-                    _buildInfoRow(Icons.campaign_outlined, "Organizado por ${widget.concert.venue}", secondaryText, primaryText),
+                    _buildInfoRow(Icons.campaign_outlined, l10n.detailOrganizedBy(widget.concert.venue), secondaryText, primaryText), // "Organizado por..."
                   ],
                 ),
               ),
               
               const SizedBox(height: 32),
               
-              _buildSectionTitle("Ubicación", primaryText),
+              _buildSectionTitle(l10n.detailLocationTitle, primaryText), // "Ubicación"
               const SizedBox(height: 16),
               
               Container(
@@ -342,7 +352,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          _buildInfoRow(Icons.meeting_room_rounded, "Apertura puertas: ${DateFormat('HH:mm').format(widget.concert.date)}", secondaryText, primaryText),
+                          _buildInfoRow(Icons.meeting_room_rounded, "${l10n.detailDoorsOpen}: ${DateFormat('HH:mm').format(widget.concert.date)}", secondaryText, primaryText),
                           const SizedBox(height: 16),
                           Row(
                             children: [
@@ -406,7 +416,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text("Ver mapa", style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      Text(l10n.detailViewMap, style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.bold)), // "Ver mapa"
                                       const SizedBox(width: 6),
                                       Icon(Icons.open_in_new, color: primaryText, size: 14),
                                     ],
@@ -425,7 +435,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               const SizedBox(height: 32),
 
               if (!_isLoadingRelated && _relatedConcerts.isNotEmpty) ...[
-                _buildSectionTitle("Otras fechas / Gira", primaryText),
+                _buildSectionTitle(l10n.detailRelatedEvents, primaryText), // "Otras fechas / Gira"
                 const SizedBox(height: 16),
                 SizedBox(
                   height: 130, 
@@ -459,7 +469,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(DateFormat('d MMM yyyy', 'es_ES').format(related.date), style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                                    Text(DateFormat('d MMM yyyy', currentLocale).format(related.date), style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 12)),
                                     const SizedBox(height: 4),
                                     Text(related.city, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
                                     const SizedBox(height: 4),
@@ -506,9 +516,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  if (mainPrice != "Ver precios" && mainPrice != "GRATIS")
+                  if (mainPrice != l10n.detailCheckPrices && mainPrice != l10n.detailFree)
                     Text(
-                      "Consulta en web",
+                      l10n.detailCheckWeb, // "Consulta en web"
                       style: TextStyle(color: secondaryText, fontSize: 11),
                     )
                 ],
@@ -525,7 +535,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    child: const Text('COMPRAR ENTRADAS', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                    child: Text(l10n.detailBtnBuy, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.5)), // "COMPRAR ENTRADAS"
                   ),
                 ),
               ),

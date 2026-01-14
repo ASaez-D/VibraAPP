@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
 import 'concert_detail_screen.dart';
 
@@ -8,7 +9,6 @@ class SavedEventsScreen extends StatelessWidget {
 
   const SavedEventsScreen({super.key, required this.savedConcerts});
 
-  // --- FUNCIÓN DE COLORES DINÁMICOS ---
   Map<String, dynamic> _getThemedColors(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
@@ -16,14 +16,14 @@ class SavedEventsScreen extends StatelessWidget {
       'scaffoldBg': isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
       'primaryText': isDarkMode ? Colors.white : Colors.black87,
       'secondaryText': isDarkMode ? Colors.grey[400] : Colors.grey[600],
-      'accentColor': Colors.greenAccent, // Mantenido fijo
+      'accentColor': Colors.greenAccent,
       'cardGradient': isDarkMode 
-          ? const LinearGradient( // Modo oscuro: Degradado sutil de negro
+          ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [Color(0xFF252525), Color(0xFF151515)],
             )
-          : const LinearGradient( // Modo claro: Degradado sutil de blanco/gris claro
+          : const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [Color(0xFFFFFFFF), Color(0xFFEEEEEE)],
@@ -39,6 +39,7 @@ class SavedEventsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; // 2. Traductor
     final colors = _getThemedColors(context);
     final Color scaffoldBg = colors['scaffoldBg'];
     final Color primaryText = colors['primaryText'];
@@ -54,7 +55,7 @@ class SavedEventsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "MIS GUARDADOS",
+          l10n.menuSaved.toUpperCase(), // "MIS GUARDADOS"
           style: TextStyle(
             color: primaryText,
             fontWeight: FontWeight.w900,
@@ -64,21 +65,20 @@ class SavedEventsScreen extends StatelessWidget {
         ),
       ),
       body: savedConcerts.isEmpty
-          ? _buildEmptyState(colors)
+          ? _buildEmptyState(context, colors, l10n)
           : ListView.separated(
               padding: const EdgeInsets.all(20),
               physics: const BouncingScrollPhysics(),
               itemCount: savedConcerts.length,
               separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, savedConcerts[index], index, colors);
+                return _buildConcertCard(context, savedConcerts[index], index, colors, l10n);
               },
             ),
     );
   }
 
-  // Aceptamos el MAPA de colores
-  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, int index, Map<String, dynamic> colors) {
+  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, int index, Map<String, dynamic> colors, AppLocalizations l10n) {
     final Color primaryText = colors['primaryText'];
     final Color secondaryText = colors['secondaryText'];
     final Color accentColor = colors['accentColor'];
@@ -86,15 +86,17 @@ class SavedEventsScreen extends StatelessWidget {
     final BoxShadow cardShadow = colors['cardShadow'];
     final Color cardBorderColor = colors['cardBorderColor'];
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final currentLocale = Localizations.localeOf(context).languageCode;
 
-    final String day = DateFormat('d', 'es_ES').format(concert.date);
-    final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
-    final String time = DateFormat('HH:mm', 'es_ES').format(concert.date);
+    // Fechas dinámicas por idioma
+    final String day = DateFormat('d', currentLocale).format(concert.date);
+    final String month = DateFormat('MMM', currentLocale).format(concert.date).toUpperCase();
+    final String time = DateFormat('HH:mm', currentLocale).format(concert.date);
 
     final String uniqueHeroTag = "saved_${concert.name}_$index";
 
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
-    if (priceLabel.length > 8) priceLabel = "Ver más";
+    if (priceLabel.length > 8) priceLabel = l10n.savedPriceInfo; // "Ver más"
 
     return GestureDetector(
       onTap: () {
@@ -119,7 +121,6 @@ class SavedEventsScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // HERO CON TAG ÚNICO
             Hero(
               tag: uniqueHeroTag, 
               child: Container(
@@ -144,7 +145,6 @@ class SavedEventsScreen extends StatelessWidget {
               ),
             ),
 
-            // CONTENIDO
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -186,13 +186,11 @@ class SavedEventsScreen extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          // Borde y texto del precio dinámico
                           decoration: BoxDecoration(border: Border.all(color: cardBorderColor), borderRadius: BorderRadius.circular(20)),
                           child: Text(priceLabel, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 11)),
                         ),
                         Container(
                           padding: const EdgeInsets.all(6),
-                          // Fondo del icono dinámico
                           decoration: BoxDecoration(
                             color: isDarkMode ? Colors.black : Colors.grey[100], 
                             shape: BoxShape.circle, 
@@ -212,8 +210,7 @@ class SavedEventsScreen extends StatelessWidget {
     );
   }
 
-  // Aceptamos el MAPA de colores
-  Widget _buildEmptyState(Map<String, dynamic> colors) {
+  Widget _buildEmptyState(BuildContext context, Map<String, dynamic> colors, AppLocalizations l10n) {
     final Color emptyIconColor = colors['emptyIconColor'];
     final Color emptyTextColor = colors['emptyTextColor'];
 
@@ -223,9 +220,9 @@ class SavedEventsScreen extends StatelessWidget {
         children: [
           Icon(Icons.bookmark_border, size: 80, color: emptyIconColor),
           const SizedBox(height: 16),
-          Text('No tienes conciertos guardados', style: TextStyle(color: emptyTextColor, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.savedEmptyTitle, style: TextStyle(color: emptyTextColor, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text('¡Dale al icono de guardar en la Home!', style: TextStyle(color: emptyIconColor, fontSize: 14)),
+          Text(l10n.savedEmptySub, style: TextStyle(color: emptyIconColor, fontSize: 14)),
         ],
       ),
     );

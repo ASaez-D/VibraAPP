@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'concerts_in_range_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import '../l10n/app_localizations.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -23,7 +23,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting('es_ES', null);
+    // No necesitamos initializeDateFormatting explícito aquí si configuramos bien main.dart
   }
 
   @override
@@ -34,7 +34,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Detección del tema y Colores Dinámicos
+    // 2. Acceso a traducciones
+    final l10n = AppLocalizations.of(context)!;
+    
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
     final Color headerBg = isDarkMode ? Colors.black : const Color(0xFFF7F7F7);
@@ -60,51 +62,50 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- AQUÍ ESTÁ EL CAMBIO: TÍTULO CON BOTÓN ATRÁS ---
                   Row(
                     children: [
                       // Botón Atrás
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios_new, color: primaryText, size: 22),
-                        onPressed: () => Navigator.pop(context), // Vuelve atrás
+                        onPressed: () => Navigator.pop(context),
                         padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(), // Quita márgenes extra
+                        constraints: const BoxConstraints(),
                       ),
                       const SizedBox(width: 16),
                       // Título
                       Expanded(
                         child: Text(
-                          "¿Cuándo quieres salir?",
+                          l10n.calendarTitle, // "¿Cuándo quieres salir?"
                           style: TextStyle(
                             color: primaryText,
                             fontWeight: FontWeight.bold,
-                            fontSize: 22, // Un pelín más pequeño para ajustar
+                            fontSize: 22,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  // ---------------------------------------------------
 
                   const SizedBox(height: 20),
 
-                  // QUICK BUTTONS
+                  // QUICK BUTTONS (Textos traducidos)
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _quickSelectButton("Hoy", DateTime.now(), accentColor, primaryText), 
+                      _quickSelectButton(l10n.calendarToday, DateTime.now(), accentColor, primaryText), // "Hoy"
                       _quickSelectButton(
-                          "Mañana", DateTime.now().add(const Duration(days: 1)), accentColor, primaryText), 
-                      _quickSelectButton("Esta semana", null, accentColor, primaryText, rangeWeek: true), 
-                      _quickSelectButton("Próximos 30 días", null, accentColor, primaryText,
-                          rangeNext30Days: true), 
+                          l10n.calendarTomorrow, DateTime.now().add(const Duration(days: 1)), accentColor, primaryText), // "Mañana"
+                      _quickSelectButton(l10n.calendarWeek, null, accentColor, primaryText, rangeWeek: true), // "Esta semana"
+                      _quickSelectButton(l10n.calendarMonth, null, accentColor, primaryText,
+                          rangeNext30Days: true), // "Próximos 30 días"
                     ],
                   ),
 
                   const SizedBox(height: 20),
 
-                  // WEEKDAY LABELS
+                  // WEEKDAY LABELS (L, M, X...) -> Estos suelen ser universales o se pueden traducir también
+                  // Por simplicidad, los dejamos fijos o podrías usar DateFormat.E()
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: ['L', 'M', 'X', 'J', 'V', 'S', 'D']
@@ -168,7 +169,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                   child: Text(
-                    _getButtonLabel(),
+                    _getButtonLabel(l10n), // Pasamos l10n para traducir "ESCOGER FECHA"
                     style: const TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ),
@@ -181,30 +182,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   // ---------------------------------------------------------
-  // GET BUTTON LABEL
+  // GET BUTTON LABEL (Ahora recibe l10n)
   // ---------------------------------------------------------
-  String _getButtonLabel() {
+  String _getButtonLabel(AppLocalizations l10n) {
     final sd = startDate;
     final ed = endDate;
+    
+    // Obtenemos el locale actual para formatear fechas (es o en)
+    final String currentLocale = Localizations.localeOf(context).languageCode;
 
     if (sd == null && ed == null) {
-      return "ESCOGER FECHA";
+      return l10n.calendarBtnSelect; // "ESCOGER FECHA"
     }
 
     if (sd == null && ed != null) {
-      return DateFormat('d MMMM', 'es_ES').format(ed).toUpperCase();
+      return DateFormat('d MMMM', currentLocale).format(ed).toUpperCase();
     }
 
     if (sd != null && ed == null) {
-      return DateFormat('d MMMM', 'es_ES').format(sd).toUpperCase();
+      return DateFormat('d MMMM', currentLocale).format(sd).toUpperCase();
     }
 
     if (sd!.isAtSameMomentAs(ed!)) {
-      return DateFormat('d MMMM', 'es_ES').format(sd).toUpperCase();
+      return DateFormat('d MMMM', currentLocale).format(sd).toUpperCase();
     }
 
-    return "${DateFormat('d MMMM', 'es_ES').format(sd)} -> "
-        "${DateFormat('d MMMM', 'es_ES').format(ed)}"
+    return "${DateFormat('d MMMM', currentLocale).format(sd)} -> "
+        "${DateFormat('d MMMM', currentLocale).format(ed)}"
         .toUpperCase();
   }
 
@@ -213,6 +217,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ---------------------------------------------------------
   Widget _quickSelectButton(String label, DateTime? date, Color accentColor, Color primaryText,
       {bool rangeWeek = false, bool rangeNext30Days = false}) {
+    // Usamos label como ID interno, pero para comparar usamos variables de estado
+    // Truco: Comparamos el texto actual del botón con el activo
     final isActive = activeQuickButton == label;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -268,7 +274,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ---------------------------------------------------------
   Widget _buildMonthCalendar(DateTime month, Color primaryText, Color secondaryText, Color accentColor) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final monthName = _getMonthName(month.month);
+    
+    // Obtenemos nombre del mes traducido automáticamente por el sistema
+    final String currentLocale = Localizations.localeOf(context).languageCode;
+    final monthName = DateFormat('MMMM', currentLocale).format(month);
+    // Capitalizamos la primera letra
+    final capitalizedMonth = monthName[0].toUpperCase() + monthName.substring(1);
+
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     
     final Color pastDateColor = isDarkMode ? Colors.white38 : Colors.grey.shade400;
@@ -279,7 +291,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       children: [
         const SizedBox(height: 24),
         Text(
-          "$monthName ${month.year}",
+          "$capitalizedMonth ${month.year}",
           style: TextStyle(
             color: primaryText, 
             fontSize: 20,
@@ -402,23 +414,5 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
       ],
     );
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre"
-    ];
-    return months[month - 1];
   }
 }

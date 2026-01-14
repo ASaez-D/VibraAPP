@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
+// import 'package:intl/date_symbol_data_local.dart'; // Ya no es necesario aquí si está en main
+import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart';
 import 'concert_detail_screen.dart'; 
@@ -26,7 +27,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting('es_ES', null);
+    // initializeDateFormatting('es_ES', null); // Se hace globalmente
     
     DateTime start = widget.startDate;
     DateTime end = DateTime(widget.endDate.year, widget.endDate.month, widget.endDate.day, 23, 59, 59);
@@ -36,11 +37,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = Localizations.localeOf(context).languageCode;
+
     String titleDate = "";
     if (widget.startDate.day == widget.endDate.day && widget.startDate.month == widget.endDate.month) {
-      titleDate = DateFormat('d MMM', 'es_ES').format(widget.startDate).toUpperCase();
+      titleDate = DateFormat('d MMM', currentLocale).format(widget.startDate).toUpperCase();
     } else {
-      titleDate = "${DateFormat('d MMM', 'es_ES').format(widget.startDate)} - ${DateFormat('d MMM', 'es_ES').format(widget.endDate)}".toUpperCase();
+      titleDate = "${DateFormat('d MMM', currentLocale).format(widget.startDate)} - ${DateFormat('d MMM', currentLocale).format(widget.endDate)}".toUpperCase();
     }
 
     return Scaffold(
@@ -56,7 +60,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         title: Column(
           children: [
             const Text(
-              "EVENTOS DISPONIBLES",
+              "EVENTOS DISPONIBLES", // Puedes añadir "eventsAvailable" al ARB si quieres traducirlo
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: 14),
             ),
             Text(titleDate, style: const TextStyle(color: Colors.greenAccent, fontSize: 10, fontWeight: FontWeight.bold)),
@@ -71,18 +75,15 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
           } else if (snapshot.hasError) {
             return _buildErrorState(snapshot.error.toString());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return _buildEmptyState();
+            return _buildEmptyState(l10n); // Pasamos l10n
           } else {
-            // --- FILTRADO MANUAL ESTRICTO ---
-            // Esto elimina cualquier evento que la API haya colado por error de zona horaria
             final allConcerts = snapshot.data!;
             final validConcerts = allConcerts.where((c) {
-              // Comprobamos que la fecha local esté dentro del rango local seleccionado
               return c.date.isAfter(widget.startDate.subtract(const Duration(seconds: 1))) && 
-                     c.date.isBefore(widget.endDate.add(const Duration(days: 1))); // Margen de seguridad fin del día
+                     c.date.isBefore(widget.endDate.add(const Duration(days: 1))); 
             }).toList();
 
-            if (validConcerts.isEmpty) return _buildEmptyState();
+            if (validConcerts.isEmpty) return _buildEmptyState(l10n);
 
             return ListView.separated(
               padding: const EdgeInsets.all(20),
@@ -90,7 +91,7 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
               itemCount: validConcerts.length,
               separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, validConcerts[index]);
+                return _buildConcertCard(context, validConcerts[index], currentLocale, l10n);
               },
             );
           }
@@ -100,13 +101,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   }
 
   // --- TARJETA ---
-  Widget _buildConcertCard(BuildContext context, ConcertDetail concert) {
-    final String day = DateFormat('d', 'es_ES').format(concert.date);
-    final String month = DateFormat('MMM', 'es_ES').format(concert.date).toUpperCase();
-    final String time = DateFormat('HH:mm', 'es_ES').format(concert.date);
+  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, String locale, AppLocalizations l10n) {
+    final String day = DateFormat('d', locale).format(concert.date);
+    final String month = DateFormat('MMM', locale).format(concert.date).toUpperCase();
+    final String time = DateFormat('HH:mm', locale).format(concert.date);
 
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
-    if (priceLabel.length > 8) priceLabel = "Ver más";
+    // "Ver más" -> Podrías añadirlo al ARB como "seeMore"
+    if (priceLabel.length > 8) priceLabel = "Ver más"; 
 
     return GestureDetector(
       onTap: () {
@@ -179,16 +181,16 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.event_busy_rounded, size: 60, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text('No hay conciertos', style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.homeErrorNoEvents(''), style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)), // "No hay eventos"
           const SizedBox(height: 8),
-          Text('Prueba con otras fechas', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
+          Text('Prueba con otras fechas', style: TextStyle(color: Colors.grey[800], fontSize: 14)), // Podrías añadir esto al ARB también
         ],
       ),
     );

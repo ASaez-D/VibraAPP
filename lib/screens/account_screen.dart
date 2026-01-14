@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/app_localizations.dart';
 import 'login_screen.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -44,9 +45,12 @@ class _AccountScreenState extends State<AccountScreen> {
     if (profileUrl != null && profileUrl!.isNotEmpty) {
       final uri = Uri.parse(profileUrl!);
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No se pudo abrir el perfil")),
-        );
+        if (mounted) {
+          // Usamos un texto genérico de error si falla
+          ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(content: Text(AppLocalizations.of(context)!.commonError)),
+          );
+        }
       }
     }
   }
@@ -67,6 +71,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 2. Acceso a traducciones
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Paleta de colores VIBRA
@@ -89,7 +95,7 @@ class _AccountScreenState extends State<AccountScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "Mi Cuenta",
+          l10n.accountTitle, // "Mi Cuenta"
           style: GoogleFonts.montserrat(
             color: textColor,
             fontWeight: FontWeight.w700,
@@ -108,13 +114,12 @@ class _AccountScreenState extends State<AccountScreen> {
           children: [
             const SizedBox(height: 30),
 
-            // --- 1. AVATAR (Limpio y Elegante) ---
+            // --- 1. AVATAR ---
             Container(
-              padding: const EdgeInsets.all(4), // Espacio entre foto y borde
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: serviceColor.withOpacity(0.5), width: 2),
-                // Sin sombras raras, solo un borde sutil
               ),
               child: CircleAvatar(
                 radius: 55,
@@ -130,7 +135,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
             const SizedBox(height: 20),
 
-            // --- 2. TEXTOS (Montserrat) ---
+            // --- 2. TEXTOS ---
             Text(
               displayName!,
               textAlign: TextAlign.center,
@@ -153,7 +158,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
             const SizedBox(height: 40),
 
-            // --- 3. TARJETA DE VINCULACIÓN (Estilo Home) ---
+            // --- 3. TARJETA DE VINCULACIÓN ---
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -161,14 +166,14 @@ class _AccountScreenState extends State<AccountScreen> {
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: borderColor),
                 boxShadow: isDark 
-                  ? [] // Sin sombra en modo oscuro para ser más plano
+                  ? [] 
                   : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "CONEXIÓN ACTIVA",
+                    l10n.accountConnection, // "CONEXIÓN ACTIVA"
                     style: GoogleFonts.montserrat(
                       color: secondaryText,
                       fontSize: 11,
@@ -201,7 +206,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               ),
                             ),
                             Text(
-                              "Cuenta vinculada correctamente",
+                              l10n.accountLinked, // "Cuenta vinculada correctamente"
                               style: GoogleFonts.montserrat(
                                 color: secondaryText,
                                 fontSize: 12,
@@ -214,7 +219,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ],
                   ),
                   
-                  // Botón Perfil Externo (Solo Spotify suele tener URL pública útil)
+                  // Botón Perfil Externo
                   if (profileUrl != null && profileUrl!.isNotEmpty) ...[
                     const SizedBox(height: 20),
                     const Divider(color: Colors.white10),
@@ -229,7 +234,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: Text(
-                          "Abrir perfil en $serviceName",
+                          l10n.accountOpenProfile(serviceName), // "Abrir perfil en Spotify"
                           style: GoogleFonts.montserrat(
                             color: serviceColor,
                             fontWeight: FontWeight.w600,
@@ -244,7 +249,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
             const SizedBox(height: 50),
 
-            // --- 4. BOTÓN CERRAR SESIÓN (Minimalista) ---
+            // --- 4. BOTÓN CERRAR SESIÓN ---
             TextButton(
               onPressed: _logout,
               style: TextButton.styleFrom(
@@ -261,7 +266,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   const Icon(Icons.logout, size: 20),
                   const SizedBox(width: 10),
                   Text(
-                    "Cerrar Sesión",
+                    l10n.menuLogout, // "Cerrar Sesión"
                     style: GoogleFonts.montserrat(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1A1A), // Fondo oscuro igual a HomeScreen
+    final l10n = AppLocalizations.of(context)!;
 
-      // 🔝 AppBar personalizado (Igual a HomeScreen)
+    return Scaffold(
+      backgroundColor: const Color(0xFF1B1A1A), 
+
+      // 🔝 AppBar personalizado
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
@@ -16,7 +19,6 @@ class HelpScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                // Botón atrás (opcional, por si es una pantalla secundaria)
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   borderRadius: BorderRadius.circular(50),
@@ -39,22 +41,21 @@ class HelpScreen extends StatelessWidget {
                       color: Colors.white10,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const TextField(
+                    child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Buscar ayuda...',
-                        hintStyle: TextStyle(color: Colors.white54),
-                        prefixIcon: Icon(Icons.search, color: Colors.white54),
+                        hintText: l10n.helpSearchHint, // "Buscar ayuda..."
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        prefixIcon: const Icon(Icons.search, color: Colors.white54),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(top: 8),
+                        contentPadding: const EdgeInsets.only(top: 8),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
 
                 const SizedBox(width: 10),
 
-                // 👤 Icono perfil (Consistencia visual)
                 Container(
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
@@ -69,50 +70,41 @@ class HelpScreen extends StatelessWidget {
         ),
       ),
 
-      // 📜 CUERPO
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 👋 Título Principal
-            const Text(
-              'Centro de Ayuda',
-              style: TextStyle(
+            Text(
+              l10n.menuHelp, // "Ayuda" / "Help"
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              '¿En qué podemos ayudarte hoy?',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+            Text(
+              l10n.helpMainSubtitle, // "¿En qué podemos ayudarte hoy?"
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
             ),
 
             const SizedBox(height: 24),
 
             // SECCIÓN 1: FAQ
-            _sectionHeader("PREGUNTAS FRECUENTES"),
+            _sectionHeader(l10n.helpSectionFaq),
             const SizedBox(height: 12),
             
-            _faqItem(
-              "¿Cómo compro una entrada?",
-              "Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.",
-            ),
-            _faqItem(
-              "¿Cómo gestiono mis notificaciones?",
-              "En el apartado Notificaciones podrás habilitar avisos de conciertos, artistas y recomendaciones.",
-            ),
-            _faqItem(
-              "Invitar amigos",
-              "En la página del evento, pulsa “Invitar amigos” para enviarles una notificación directa.",
-            ),
+            _faqItem(l10n.helpFaq1Q, l10n.helpFaq1A),
+            _faqItem(l10n.helpFaq2Q, l10n.helpFaq2A),
+            _faqItem(l10n.helpFaq3Q, l10n.helpFaq3A),
 
             const SizedBox(height: 24),
 
             // SECCIÓN 2: Tutoriales
-            _sectionHeader("TUTORIALES RÁPIDOS"),
+            _sectionHeader(l10n.helpSectionTutorials),
             const SizedBox(height: 12),
             
             Container(
@@ -122,11 +114,11 @@ class HelpScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _simpleListItem(Icons.shopping_cart_outlined, "Guía de compra"),
+                  _simpleListItem(Icons.shopping_cart_outlined, l10n.helpTut1),
                   _divider(),
-                  _simpleListItem(Icons.confirmation_number_outlined, "Usar tus tickets"),
+                  _simpleListItem(Icons.confirmation_number_outlined, l10n.helpTut2),
                   _divider(),
-                  _simpleListItem(Icons.calendar_today_outlined, "Sincronizar calendario"),
+                  _simpleListItem(Icons.calendar_today_outlined, l10n.helpTut3),
                 ],
               ),
             ),
@@ -134,15 +126,14 @@ class HelpScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // SECCIÓN 3: Soporte y Políticas
-            _sectionHeader("SOPORTE Y LEGAL"),
+            _sectionHeader(l10n.helpSectionSupport),
             const SizedBox(height: 12),
             
-            // Tarjetas pequeñas en Grid o Columna
-            _supportCard(Icons.email_outlined, "Contactar Soporte", "support@tuapp.com"),
+            _supportCard(Icons.email_outlined, l10n.helpSupportContact, "support@tuapp.com"),
             const SizedBox(height: 10),
-            _supportCard(Icons.bug_report_outlined, "Reportar Problema", "Envíanos detalles del error"),
+            _supportCard(Icons.bug_report_outlined, l10n.helpSupportReport, "Envíanos detalles"),
             const SizedBox(height: 10),
-            _supportCard(Icons.article_outlined, "Términos y condiciones", "Lee nuestras normas"),
+            _supportCard(Icons.article_outlined, l10n.helpSupportTerms, "Lee nuestras normas"),
             
             const SizedBox(height: 40),
           ],
@@ -151,9 +142,6 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGETS AUXILIARES (Estilo Home) ---
-
-  // Texto pequeño estilo "RECOMENDACIONES"
   Widget _sectionHeader(String title) {
     return Text(
       title,
@@ -166,16 +154,15 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  // Item de FAQ estilo Card Oscura
   Widget _faqItem(String question, String answer) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF242323), // Color de las cards del Home
+        color: const Color(0xFF242323),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Theme(
-        data: ThemeData(dividerColor: Colors.transparent), // Quitar lineas por defecto
+        data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
           iconColor: Colors.white,
           collapsedIconColor: Colors.white54,
@@ -202,7 +189,6 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  // Item simple para listas (Tutoriales)
   Widget _simpleListItem(IconData icon, String text) {
     return ListTile(
       leading: Icon(icon, color: Colors.white70, size: 22),
@@ -212,7 +198,6 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  // Divisor sutil dentro de cards
   Widget _divider() {
     return const Divider(
       height: 1,
@@ -222,7 +207,6 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  // Tarjeta de soporte (Similar a "Tus artistas" pero en bloque)
   Widget _supportCard(IconData icon, String title, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(16),

@@ -1,0 +1,178 @@
+{
+    "@@locale": "es",
+    "appTitle": "Vibra",
+    "loginSpotify": "Iniciar con Spotify",
+    "loginGoogle": "Iniciar con Google",
+    "loginLoading": "Cargando...",
+    "loginTerms": "Al continuar, aceptas nuestros Términos y Política de privacidad.",
+    "loginError": "Error al iniciar sesión: {error}",
+    "@loginError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "homeSearchHint": "Buscar en {country}...",
+    "@homeSearchHint": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
+    "homeGreeting": "Hola, {name}",
+    "@homeGreeting": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "homeVibeTitle": "Explora {vibe}",
+    "@homeVibeTitle": {
+        "placeholders": {
+            "vibe": {
+                "type": "String"
+            }
+        }
+    },
+    "homeSectionArtists": "TUS ARTISTAS",
+    "homeSectionArtistsSub": "Basado en lo que más escuchas",
+    "homeSectionForYou": "SOLO PARA TI",
+    "homeSectionForYouSub": "Porque escuchas a {artist}...",
+    "@homeSectionForYouSub": {
+        "placeholders": {
+            "artist": {
+                "type": "String"
+            }
+        }
+    },
+    "homeSectionTrends": "TENDENCIAS EN {country}",
+    "@homeSectionTrends": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
+    "homeSectionTrendsSub": "Lo más popular de la semana",
+    "homeSectionWeekend": "¡YA ES FINDE!",
+    "homeSectionWeekendSub": "Planes para este fin de semana",
+    "homeSectionDiscover": "DESCUBRE MÁS",
+    "homeSectionDiscoverSub": "Explora nuevos géneros",
+    "homeSectionCollections": "EXPLORA VIBRAS",
+    "homeSectionCollectionsSub": "Encuentra tu plan ideal",
+    "homeBtnShowMore": "Mostrar más eventos",
+    "homeBtnViewAll": "Ver todos los eventos",
+    "homeTextNoMore": "No hay más eventos de {keyword}",
+    "@homeTextNoMore": {
+        "placeholders": {
+            "keyword": {
+                "type": "String"
+            }
+        }
+    },
+    "homeTextEnd": "¡Has llegado al final!",
+    "homeErrorNoEvents": "No hay eventos en {country}",
+    "@homeErrorNoEvents": {
+        "placeholders": {
+            "country": {
+                "type": "String"
+            }
+        }
+    },
+    "homeBtnRetryCountry": "Ver eventos en España",
+    "homeSearchNoResults": "No hemos encontrado nada",
+    "homeSearchClear": "Borrar búsqueda",
+    "menuAccount": "Mi Cuenta",
+    "menuSaved": "Eventos guardados",
+    "menuSettings": "Configuración",
+    "menuHelp": "Ayuda",
+    "menuLogout": "Cerrar sesión",
+    "menuEditProfile": "Editar perfil",
+    "prefsTitle": "¡Hola, {name}! 🎧",
+    "@prefsTitle": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "prefsSubtitle": "Personaliza tu feed. ¿Qué te mueve?",
+    "prefsSearchHint": "Buscar artista (ej: Bad Bunny)...",
+    "prefsYourArtists": "Tus Artistas:",
+    "prefsGenres": "Géneros y Estilos:",
+    "prefsBtnStart": "Comenzar",
+    "accountTitle": "Mi Cuenta",
+    "accountConnection": "CONEXIÓN ACTIVA",
+    "accountLinked": "Cuenta vinculada correctamente",
+    "accountOpenProfile": "Abrir perfil en {service}",
+    "@accountOpenProfile": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
+    "calendarTitle": "¿Cuándo quieres salir?",
+    "calendarToday": "Hoy",
+    "calendarTomorrow": "Mañana",
+    "calendarWeek": "Esta semana",
+    "calendarMonth": "Próximos 30 días",
+    "calendarBtnSelect": "ESCOGER FECHA",
+    "rangeTitle": "EVENTOS DISPONIBLES",
+    "detailEventTitle": "Evento",
+    "detailBtnLike": "Me gusta",
+    "detailBtnSave": "Guardar",
+    "detailBtnSaved": "Guardado",
+    "detailBtnShare": "Compartir",
+    "detailInfoTitle": "Información",
+    "detailAgeRestricted": "Mayores de 18 años (DNI requerido).",
+    "detailOrganizedBy": "Organizado por {venue}",
+    "@detailOrganizedBy": {
+        "placeholders": {
+            "venue": {
+                "type": "String"
+            }
+        }
+    },
+    "detailLocationTitle": "Ubicación",
+    "detailDoorsOpen": "Apertura puertas",
+    "detailViewMap": "Ver mapa",
+    "detailRelatedEvents": "Otras fechas / Gira",
+    "detailCheckPrices": "Ver precios",
+    "detailFree": "GRATIS",
+    "detailCheckWeb": "Consulta en web",
+    "detailBtnBuy": "COMPRAR ENTRADAS",
+    "editProfileChangePhoto": "Cambiar foto",
+    "editProfileName": "Nombre",
+    "editProfileNickname": "Apodo",
+    "editProfileSave": "Guardar",
+    "editProfileCancel": "Cancelar",
+    "editProfileSuccess": "Perfil actualizado correctamente",
+    "editProfileImageNotImplemented": "Funcionalidad de subir imagen no implementada",
+    "helpSearchHint": "Buscar ayuda...",
+    "helpMainSubtitle": "¿En qué podemos ayudarte hoy?",
+    "helpSectionFaq": "PREGUNTAS FRECUENTES",
+    "helpSectionTutorials": "TUTORIALES RÁPIDOS",
+    "helpSectionSupport": "SOPORTE Y LEGAL",
+    "helpFaq1Q": "¿Cómo compro una entrada?",
+    "helpFaq1A": "Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.",
+    "helpFaq2Q": "¿Cómo gestiono mis notificaciones?",
+    "helpFaq2A": "En el apartado Notificaciones podrás habilitar avisos de conciertos, artistas y recomendaciones.",
+    "helpFaq3Q": "Invitar amigos",
+    "helpFaq3A": "En la página del evento, pulsa “Invitar amigos” para enviarles una notificación directa.",
+    "helpTut1": "Guía de compra",
+    "helpTut2": "Usar tus tickets",
+    "helpTut3": "Sincronizar calendario",
+    "helpSupportContact": "Contactar Soporte",
+    "helpSupportReport": "Reportar Problema",
+    "helpSupportTerms": "Términos y condiciones",
+    "savedEmptyTitle": "No tienes conciertos guardados",
+    "savedEmptySub": "¡Dale al icono de guardar en la Home!",
+    "savedPriceInfo": "Ver más",
+    "settingsLanguage": "Idioma",
+    "commonError": "Ha ocurrido un error",
+    "commonSuccess": "Guardado con éxito"
+}

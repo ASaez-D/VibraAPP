@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/app_localizations.dart';
 
 class CustomizeProfileScreen extends StatefulWidget {
   const CustomizeProfileScreen({super.key});
@@ -21,23 +22,30 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
   }
 
   void _pickImage() {
-    // Aquí se implementaría la selección de imagen
+    // Usamos el traductor directamente con el context
+    final l10n = AppLocalizations.of(context)!;
+    
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Funcionalidad de subir imagen no implementada"))
+      SnackBar(content: Text(l10n.editProfileImageNotImplemented))
     );
   }
 
   void _saveChanges() {
+    final l10n = AppLocalizations.of(context)!;
+    
     HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Perfil actualizado correctamente"))
+      SnackBar(content: Text(l10n.editProfileSuccess))
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // 2. Traducciones
+    final l10n = AppLocalizations.of(context)!;
+
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color accentColor = Colors.greenAccent.shade700; // Mismo verde que LoginScreen
+    final Color accentColor = Colors.greenAccent.shade700; 
     final Color scaffoldBg = isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
     final Color cardBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
     final Color primaryText = isDarkMode ? Colors.white : const Color(0xFF222222);
@@ -48,7 +56,7 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
         backgroundColor: scaffoldBg,
         elevation: 0,
         iconTheme: IconThemeData(color: primaryText),
-        title: Text("Editar perfil", style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
+        title: Text(l10n.menuEditProfile, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)), // "Editar perfil"
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -59,7 +67,7 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
               onTap: _pickImage,
               child: Container(
                 padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: CircleAvatar(
@@ -73,13 +81,13 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
             const SizedBox(height: 12),
             TextButton(
               onPressed: _pickImage,
-              child: Text("Cambiar foto", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+              child: Text(l10n.editProfileChangePhoto, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)), // "Cambiar foto"
             ),
             const SizedBox(height: 20),
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: "Nombre",
+                labelText: l10n.editProfileName, // "Nombre"
                 filled: true,
                 fillColor: cardBg,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -89,7 +97,7 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
             TextField(
               controller: _nicknameController,
               decoration: InputDecoration(
-                labelText: "Apodo",
+                labelText: l10n.editProfileNickname, // "Apodo"
                 filled: true,
                 fillColor: cardBg,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -106,7 +114,7 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text("Guardar", style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(l10n.editProfileSave, style: const TextStyle(fontWeight: FontWeight.bold)), // "Guardar"
                 ),
                 OutlinedButton(
                   onPressed: () => Navigator.pop(context),
@@ -114,7 +122,7 @@ class _CustomizeProfileScreenState extends State<CustomizeProfileScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text("Cancelar", style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
+                  child: Text(l10n.editProfileCancel, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)), // "Cancelar"
                 ),
               ],
             ),

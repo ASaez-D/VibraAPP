@@ -3,6 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'screens/login_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:provider/provider.dart';
+
+// --- IMPORTACIONES PARA IDIOMAS ---
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart'; 
+import 'providers/language_provider.dart'; // <--- Asegúrate de crear este archivo
 
 // --------------------------------------------------------
 // NOTIFICADORES GLOBALES
@@ -12,7 +18,7 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 final ValueNotifier<double> textScaleNotifier = ValueNotifier(1.0); 
 
 // --------------------------------------------------------
-// LÓGICA DE PERSISTENCIA
+// LÓGICA DE PERSISTENCIA DE TEMA
 // --------------------------------------------------------
 
 const String _themeKey = 'userThemeMode';
@@ -32,21 +38,31 @@ Future<void> _saveThemeMode(ThemeMode mode) async {
 }
 
 // --------------------------------------------------------
-// MAIN (CORREGIDO)
+// MAIN
 // --------------------------------------------------------
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  
+  // Inicializamos fechas para los idiomas soportados
   await initializeDateFormatting('es_ES', null);
+  await initializeDateFormatting('en_US', null);
 
+  // Cargamos la preferencia de tema
   themeNotifier.value = await _loadThemeMode(); 
   
   themeNotifier.addListener(() {
     _saveThemeMode(themeNotifier.value);
   });
 
-  runApp(const MyApp());
+  runApp(
+    // 1. Envolvemos la app con el Provider de Lenguaje
+    ChangeNotifierProvider(
+      create: (context) => LanguageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -54,12 +70,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Escuchamos cambios en la escala de texto
+    // 2. Obtenemos el estado del idioma del Provider
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return ValueListenableBuilder<double>(
       valueListenable: textScaleNotifier,
       builder: (context, currentScale, child) {
 
-        // 2. Escuchamos cambios en el tema
         return ValueListenableBuilder<ThemeMode>(
           valueListenable: themeNotifier,
           builder: (context, currentMode, child) {
@@ -68,15 +85,24 @@ class MyApp extends StatelessWidget {
               title: 'Vibra',
               debugShowCheckedModeBanner: false,
 
-              // 3. AQUÍ ESTÁ LA MAGIA: Usamos 'builder' para inyectar el textScale
+              // 3. PASO CLAVE: Usamos el locale que dicta el Provider
+              locale: languageProvider.locale,
+
+              // CONFIGURACIÓN DE DELEGADOS
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+
               builder: (context, child) {
                 return MediaQuery(
-                  // Usamos copyWith para mantener otras propiedades del sistema (brillo, tamaño, etc.)
-                  // y solo sobreescribimos el factor de escala de texto.
                   data: MediaQuery.of(context).copyWith(
-                    textScaler: TextScaler.linear(currentScale), // <--- CAMBIO IMPORTANTE: 'textScaleFactor' está obsoleto en Flutter nuevo, usa 'textScaler'
+                    textScaler: TextScaler.linear(currentScale),
                   ),
-                  child: child!, // Renderizamos la pantalla que toque
+                  child: child!,
                 );
               },
 
@@ -96,7 +122,7 @@ class MyApp extends StatelessWidget {
                   seedColor: const Color(0xFF54FF78),
                   brightness: Brightness.light,
                 ),
-                useMaterial3: true, // Recomendado para Flutter moderno
+                useMaterial3: true,
               ),
 
               // TEMA OSCURO
@@ -111,7 +137,7 @@ class MyApp extends StatelessWidget {
                 colorScheme: ColorScheme.fromSeed(
                   seedColor: const Color(0xFF54FF78),
                   brightness: Brightness.dark,
-                  surface: const Color(0xFF1C1C1E), // Color para tarjetas en modo oscuro
+                  surface: const Color(0xFF1C1C1E),
                 ),
                 useMaterial3: true,
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../l10n/app_localizations.dart';
 import '../services/spotify_api_service.dart';
 import '../services/user_data_service.dart';
 import 'home_screen.dart';
@@ -26,17 +27,11 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
   List<Map<String, String>> searchResults = [];
   final Set<Map<String, String>> selectedArtists = {};
-  
-  // Guardamos el "value" (lo que sirve para la API), no el emoji
   final Set<String> selectedGenres = {}; 
 
   bool _isSearching = false;
   bool _isSaving = false;
 
-  // --- LISTA MAESTRA DE GÉNEROS OPTIMIZADA PARA TICKETMASTER ---
-  // label: Lo que ve el usuario
-  // value: Lo que usamos para filtrar en la API
-  // color: Para darle vida visual
   final List<Map<String, dynamic>> genreOptions = [
     {'label': '🔥 Urbano & Reggaeton', 'value': 'Urbano', 'color': Colors.orangeAccent},
     {'label': '🎸 Rock & Alternative', 'value': 'Rock', 'color': Colors.redAccent},
@@ -70,17 +65,15 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
   Future<void> _saveAndContinue() async {
     setState(() => _isSaving = true);
-
     try {
       final List<String> artistNames = selectedArtists.map((a) => a['name']!).toList();
       final List<String> genreValues = selectedGenres.toList();
 
-      // Guardamos en Firebase las preferencias "limpias"
       await _userDataService.saveUserPreferences(
         widget.userProfile['uid'] ?? widget.userProfile['id'], 
         {
           'favoriteArtists': artistNames,
-          'favoriteGenres': genreValues, // Guardamos ej: ["Rock", "Urbano"]
+          'favoriteGenres': genreValues,
           'preferencesSet': true,
         }
       );
@@ -96,7 +89,6 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
           ),
         ),
       );
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error guardando: $e')),
@@ -108,6 +100,8 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 2. Acceso a traducciones
+    final l10n = AppLocalizations.of(context)!;
     final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
 
     return Scaffold(
@@ -119,23 +113,22 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '¡Hola, $displayName! 🎧',
+                l10n.prefsTitle(displayName), // "¡Hola, {name}! 🎧"
                 style: GoogleFonts.montserrat(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Personaliza tu feed. ¿Qué te mueve?',
+                l10n.prefsSubtitle, // "Personaliza tu feed. ¿Qué te mueve?"
                 style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 15),
               ),
               const SizedBox(height: 25),
 
-              // --- BUSCADOR ARTISTAS ---
               TextField(
                 controller: _searchController,
                 onChanged: _searchArtists,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Buscar artista (ej: Bad Bunny)...',
+                  hintText: l10n.prefsSearchHint, // "Buscar artista..."
                   hintStyle: const TextStyle(color: Colors.white38),
                   prefixIcon: const Icon(Icons.search, color: Colors.white38),
                   filled: true,
@@ -145,7 +138,6 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                 ),
               ),
               
-              // --- LISTA RESULTADOS BÚSQUEDA ---
               if (_isSearching)
                  const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(color: Colors.greenAccent)))
               else if (searchResults.isNotEmpty)
@@ -178,16 +170,14 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
               const SizedBox(height: 20),
 
-              // --- ZONA SCROLLABLE ---
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // CHIPS ARTISTAS SELECCIONADOS
                       if (selectedArtists.isNotEmpty) ...[
-                        Text('Tus Artistas:', style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text(l10n.prefsYourArtists, style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)), // "Tus Artistas:"
                         const SizedBox(height: 10),
                         Wrap(
                           spacing: 10, runSpacing: 10,
@@ -205,10 +195,9 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                         const SizedBox(height: 25),
                       ],
 
-                      Text('Géneros y Estilos:', style: GoogleFonts.montserrat(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(l10n.prefsGenres, style: GoogleFonts.montserrat(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)), // "Géneros y Estilos:"
                       const SizedBox(height: 15),
                       
-                      // GRID DE GÉNEROS (Más visual)
                       Wrap(
                         spacing: 10, runSpacing: 10,
                         children: genreOptions.map((genre) {
@@ -229,7 +218,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                               });
                             },
                             backgroundColor: const Color(0xFF1F1F1F),
-                            selectedColor: color, // Usa el color específico del género al seleccionarlo
+                            selectedColor: color, 
                             checkmarkColor: Colors.black,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -275,7 +264,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
             child: _isSaving 
               ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
               : Text(
-                  'Comenzar', 
+                  l10n.prefsBtnStart, // "Comenzar"
                   style: TextStyle(
                     color: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) ? Colors.black : Colors.white38, 
                     fontWeight: FontWeight.bold, 

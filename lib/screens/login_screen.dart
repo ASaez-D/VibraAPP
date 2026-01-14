@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
-import '../services/user_data_service.dart'; // Importante: Conexión con BD
+import '../services/user_data_service.dart';
 import 'home_screen.dart';
 import 'music_preferences_screen.dart';
 
@@ -18,8 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 2. Acceso corto a las traducciones
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E), // Fondo negro fijo
+      backgroundColor: const Color(0xFF0E0E0E),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -35,9 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 24),
 
-              const Text(
-                'Vibra',
-                style: TextStyle(
+              Text(
+                l10n.appTitle, // "Vibra"
+                style: const TextStyle( // El estilo sí puede ser const
                   color: Colors.white,
                   fontSize: 42,
                   fontWeight: FontWeight.w800,
@@ -55,7 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Colors.greenAccent.shade400,
                 ],
                 iconPath: 'assets/spotifyLogo.png',
-                text: _isLoadingSpotify ? 'Cargando...' : 'Iniciar con Spotify',
+                // Texto dinámico: Cargando... o Iniciar con...
+                text: _isLoadingSpotify ? l10n.loginLoading : l10n.loginSpotify,
                 textColor: Colors.black,
                 onPressed: _isLoadingSpotify
                     ? null
@@ -64,11 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         final spotify = SpotifyAuth();
 
                         try {
-                          // 1. Login con Spotify
                           final profile = await spotify.login();
-                          if (profile == null) throw 'No se obtuvo perfil';
+                          if (profile == null) throw 'No profile data';
 
-                          // 2. Extraer token y foto
                           final String? accessToken = profile['access_token']; 
                           String? photoUrl;
                           final images = profile['images'];
@@ -76,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             photoUrl = images[0]['url'] as String?;
                           }
 
-                          // 3. Preparar datos del usuario
                           final Map<String, dynamic> userProfile = {
                             'id': profile['id'],
                             'displayName': profile['display_name'] ?? 'Usuario',
@@ -85,12 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             'profileUrl': profile['external_urls']?['spotify'],
                           };
 
-                          // 4. GUARDAR EN FIREBASE
                           await UserDataService().saveUserFromMap(userProfile);
 
                           if (!mounted) return;
 
-                          // 5. Navegar a Home (Spotify no necesita preferencias manuales)
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -103,9 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                           
                         } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error Spotify: $e')),
-                          );
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              // "Error al iniciar sesión: {error}"
+                              SnackBar(content: Text(l10n.loginError(e.toString()))),
+                            );
+                          }
                         } finally {
                           if (mounted) setState(() => _isLoadingSpotify = false);
                         }
@@ -124,14 +127,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              // --- BOTÓN GOOGLE (INTELIGENTE) ---
+              // --- BOTÓN GOOGLE ---
               _buildLoginButton(
                 gradientColors: [
                   Colors.blueAccent.shade700,
                   Colors.blueAccent.shade400,
                 ],
                 iconPath: 'assets/googleLogo.png',
-                text: _isLoadingGoogle ? 'Cargando...' : 'Iniciar con Google',
+                // Texto dinámico
+                text: _isLoadingGoogle ? l10n.loginLoading : l10n.loginGoogle,
                 textColor: Colors.white,
                 isGoogle: true,
                 onPressed: _isLoadingGoogle
@@ -140,13 +144,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _isLoadingGoogle = true);
 
                         try {
-                          // 1. Login con Google
                           final googleAuth = GoogleAuth();
                           final profile = await googleAuth.login();
 
-                          if (profile == null) throw 'No se pudo iniciar sesión';
+                          if (profile == null) throw 'No profile data';
 
-                          // 2. Preparar datos
                           final Map<String, dynamic> userProfile = {
                             'displayName': profile['displayName'] ?? 'Usuario',
                             'email': profile['email'],
@@ -154,19 +156,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             'uid': profile['uid'],
                           };
 
-                          // 3. GUARDAR EN FIREBASE
                           await UserDataService().saveUserFromMap(userProfile);
 
-                          // 4. 🧠 CEREBRO: ¿TIENE YA PREFERENCIAS?
-                          // Consultamos a la base de datos si ya configuró sus gustos
                           final prefs = await UserDataService().getUserPreferences();
                           final bool hasPreferences = prefs != null && prefs['preferencesSet'] == true;
 
                           if (!mounted) return;
 
-                          // 5. NAVEGACIÓN INTELIGENTE
                           if (hasPreferences) {
-                            // A) YA TIENE GUSTOS -> A LA HOME DIRECTO
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -177,7 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           } else {
-                            // B) ES NUEVO -> A ELEGIR GUSTOS
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -190,9 +186,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
 
                         } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error Google: $e')),
-                          );
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              // "Error al iniciar sesión: {error}"
+                              SnackBar(content: Text(l10n.loginError(e.toString()))),
+                            );
+                          }
                         } finally {
                           if (mounted) setState(() => _isLoadingGoogle = false);
                         }
@@ -201,9 +200,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 40),
 
-              const Text(
-                'Al continuar, aceptas nuestros Términos y Política de privacidad.',
-                style: TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
+              // Términos y condiciones
+              Text(
+                l10n.loginTerms, 
+                style: const TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
                 textAlign: TextAlign.center,
               ),
             ],
