@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart';
+import '../l10n/app_localizations.dart';
 import 'concert_detail_screen.dart';
 
 class FilteredEventsScreen extends StatefulWidget {
   final String categoryName;
-  final String categoryId; 
+  final String categoryId;
   final Color accentColor;
 
   const FilteredEventsScreen({
@@ -28,39 +28,51 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadEvents();
-  }
-
-  void _loadEvents() {
-    DateTime start = DateTime.now();
-    DateTime end = DateTime.now().add(const Duration(days: 60));
-    String? filterId = widget.categoryId;
-
-    if (widget.categoryId == 'tonight') {
-      end = DateTime.now().add(const Duration(days: 1)); 
-      filterId = null; 
-    }
-
-    _eventsFuture = _service.getConcerts(start, end, classificationId: filterId);
+    _eventsFuture = _service.getConcerts(
+      DateTime.now(),
+      DateTime.now().add(const Duration(days: 90)),
+      classificationId: widget.categoryId,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // 1. Obtenemos las traducciones actuales
     final l10n = AppLocalizations.of(context)!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final String currentLocale = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0E0E0E),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          widget.categoryName, 
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)
-        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDarkMode ? Colors.white : Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: Column(
+          children: [
+            // 2. Usamos la clave traducida en mayúsculas
+            Text(
+              l10n.rangeTitle.toUpperCase(), // Debería mostrar "AVAILABLE EVENTS"
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
+            ),
+            Text(
+              widget.categoryName,
+              style: TextStyle(
+                color: widget.accentColor,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
       body: FutureBuilder<List<ConcertDetail>>(
@@ -68,19 +80,13 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: widget.accentColor));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          }
+
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.event_busy, color: Colors.white24, size: 60),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.homeErrorNoEvents(widget.categoryName), // "No hay eventos en {categoryName}"
-                    style: const TextStyle(color: Colors.white54, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              child: Text(
+                l10n.homeSearchNoResults,
+                style: const TextStyle(color: Colors.grey),
               ),
             );
           }
@@ -89,103 +95,125 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
 
           return ListView.separated(
             padding: const EdgeInsets.all(16),
-            physics: const BouncingScrollPhysics(),
             itemCount: events.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 20),
-            itemBuilder: (context, index) => _buildCard(context, events[index]),
+            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              return _buildEventCard(context, events[index], l10n, currentLocale);
+            },
           );
         },
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, ConcertDetail concert) {
-    // Obtenemos el idioma actual para formatear la fecha de la tarjeta
-    final currentLocale = Localizations.localeOf(context).languageCode;
-    final String dayNum = DateFormat('d').format(concert.date);
-    final String monthName = DateFormat('MMM', currentLocale).format(concert.date).toUpperCase().replaceAll('.', '');
+  Widget _buildEventCard(BuildContext context, ConcertDetail event, AppLocalizations l10n, String locale) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    // Formato de fecha localizado (JAN/ENE)
+    final String dateStr = DateFormat('dd MMM', locale).format(event.date).toUpperCase();
+    final String timeStr = DateFormat('HH:mm').format(event.date);
 
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: event)),
+      ),
       child: Container(
-        height: 220,
+        height: 120,
         decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          color: const Color(0xFF1C1C1E),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: concert.imageUrl.isNotEmpty
-                    ? Image.network(
-                        concert.imageUrl,
-                        fit: BoxFit.cover,
-                        cacheWidth: 500,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(color: const Color(0xFF2A2A2A), child: const Icon(Icons.music_note, color: Colors.white10, size: 60));
-                        },
-                      )
-                    : Container(color: const Color(0xFF2A2A2A)),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+              child: Image.network(
+                event.imageUrl,
+                width: 100,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(width: 100, color: Colors.grey),
               ),
-
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
-                    stops: const [0.5, 1.0],
-                  ),
-                ),
-              ),
-
-              Positioned(
-                top: 12, left: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    children: [
-                      Text(monthName, style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
-                      Text(dayNum, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w900)),
-                    ],
-                  ),
-                ),
-              ),
-
-              Positioned(
-                bottom: 16, left: 16, right: 16,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      concert.name, 
-                      maxLines: 1, 
-                      overflow: TextOverflow.ellipsis, 
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)
-                    ),
-                    const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.location_on, color: widget.accentColor, size: 14),
+                        Text(
+                          "$dateStr  •  $timeStr",
+                          style: TextStyle(
+                            color: widget.accentColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      event.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on, size: 12, color: Colors.grey),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            concert.venue, 
-                            style: const TextStyle(color: Colors.white70, fontSize: 13), 
-                            maxLines: 1, 
-                            overflow: TextOverflow.ellipsis
-                          )
+                            event.venue,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    // BOTÓN VER MÁS
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        l10n.savedPriceInfo, // "See more" / "Ver más"
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Icon(Icons.chevron_right, color: Colors.grey.shade700),
+            ),
+          ],
         ),
       ),
     );

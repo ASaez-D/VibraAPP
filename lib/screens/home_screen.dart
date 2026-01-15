@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final SpotifyAPIService _spotifyService = SpotifyAPIService();
   final UserDataService _userDataService = UserDataService();
 
+  // DATOS
   Future<List<ConcertDetail>>? _concertsFuture;
   late Future<List<Map<String, String>>> _artistsFuture;
 
@@ -68,10 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   String _userCountryCode = 'ES';
-  String _currentVibe = "lo mejor";
+  String _currentVibe = "lo mejor"; // Clave interna
   String _secondaryVibeTitle = "";
   String _topArtistName = "";
 
+  // PAGINACIÓN
   int _currentPage = 0;
   bool _isLoadingMore = false;
   bool _hasMore = true;
@@ -161,7 +163,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (secondaryGenre != null) _loadSecondaryVibe(secondaryGenre);
         }
       }
-    } catch (e) { debugPrint("Error DB: $e"); }
+    } catch (e) {
+      debugPrint("Error DB: $e");
+    }
 
     if (!hasPreferences) {
       _loadGenericArtistsImages();
@@ -178,20 +182,26 @@ class _HomeScreenState extends State<HomeScreen> {
       if (topArtistsData.isNotEmpty) {
         final allGenres = topArtistsData.expand((e) => e['genres'] as List).join(" ").toLowerCase();
         if (allGenres.contains("reggaeton") || allGenres.contains("urbano") || allGenres.contains("latino")) {
-          dominantKeyword = "Urbano"; secondaryKeyword = "Electronic";
+          dominantKeyword = "Urbano";
+          secondaryKeyword = "Electronic";
         } else if (allGenres.contains("rock") || allGenres.contains("metal") || allGenres.contains("punk")) {
-          dominantKeyword = "Rock"; secondaryKeyword = "Pop";
+          dominantKeyword = "Rock";
+          secondaryKeyword = "Pop";
         } else if (allGenres.contains("indie") || allGenres.contains("alternative")) {
-          dominantKeyword = "Indie"; secondaryKeyword = "Rock";
+          dominantKeyword = "Indie";
+          secondaryKeyword = "Rock";
         } else if (allGenres.contains("electronic") || allGenres.contains("house") || allGenres.contains("techno")) {
-          dominantKeyword = "Electronic"; secondaryKeyword = "Pop";
+          dominantKeyword = "Electronic";
+          secondaryKeyword = "Pop";
         } else {
           dominantKeyword = "Pop";
         }
         _currentVibe = dominantKeyword ?? "lo mejor";
         _loadSpecificRecommendations(topArtistsData.map((e) => e['name'] as String).toList());
         if (secondaryKeyword != null) _loadSecondaryVibe(secondaryKeyword);
-      } else { _loadGenericArtistsImages(); }
+      } else {
+        _loadGenericArtistsImages();
+      }
       _loadData(keyword: dominantKeyword, refresh: true);
     } catch (e) {
       _loadGenericArtistsImages();
@@ -211,7 +221,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadSecondaryVibe(String keyword) {
-    setState(() { _secondaryVibeTitle = keyword; });
+    setState(() {
+      _secondaryVibeTitle = keyword;
+    });
     _ticketmasterService.getConcerts(DateTime.now(), DateTime.now().add(const Duration(days: 90)), countryCode: _userCountryCode, keyword: keyword, size: 10).then((events) {
       if (mounted) setState(() => _secondaryVibeConcerts = _filterDuplicates(events));
     });
@@ -233,13 +245,19 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_currentKeyword != null && _currentPage == 0) {
             Future.microtask(() {
               if (mounted) {
-                setState(() { _currentKeyword = null; _currentVibe = "lo mejor"; });
+                setState(() {
+                  _currentKeyword = null;
+                  _currentVibe = "lo mejor";
+                });
                 _loadData(refresh: true);
               }
             });
             return [];
           }
-          setState(() { _hasMore = false; _isLoadingMore = false; });
+          setState(() {
+            _hasMore = false;
+            _isLoadingMore = false;
+          });
           return _cachedConcerts;
         }
         final seenNames = _cachedConcerts.map((c) => c.name.trim().toLowerCase()).toSet();
@@ -308,21 +326,33 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      if (query.isEmpty) { _isSearching = false; _searchResults = []; } else {
+      if (query.isEmpty) {
+        _isSearching = false;
+        _searchResults = [];
+      } else {
         _isSearching = true;
         _searchResults = _cachedConcerts.where((concert) => concert.name.toLowerCase().contains(query) || concert.venue.toLowerCase().contains(query)).toList();
       }
     });
   }
 
-  void _clearSearch() { _searchController.clear(); FocusScope.of(context).unfocus(); }
+  void _clearSearch() {
+    _searchController.clear();
+    FocusScope.of(context).unfocus();
+  }
 
   void _onTabTapped(int index) {
     if (index != 0) {
       switch (index) {
-        case 1: Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen())); break;
-        case 2: Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets))); break;
-        case 3: Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen())); break;
+        case 1:
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
+          break;
+        case 2:
+          Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)));
+          break;
+        case 3:
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen()));
+          break;
       }
     }
     setState(() => _currentIndex = index);
@@ -337,11 +367,17 @@ class _HomeScreenState extends State<HomeScreen> {
     HapticFeedback.lightImpact();
     final id = concert.name;
     setState(() {
-      if (_likedIds.contains(id)) _likedIds.remove(id);
-      else _likedIds.add(id);
+      if (_likedIds.contains(id)) {
+        _likedIds.remove(id);
+      } else {
+        _likedIds.add(id);
+      }
     });
     _userDataService.toggleFavorite(id, {
-      'name': concert.name, 'date': concert.date.toIso8601String(), 'imageUrl': concert.imageUrl, 'venue': concert.venue,
+      'name': concert.name,
+      'date': concert.date.toIso8601String(),
+      'imageUrl': concert.imageUrl,
+      'venue': concert.venue,
     });
   }
 
@@ -359,7 +395,10 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
     _userDataService.toggleSaved(id, {
-      'name': concert.name, 'date': concert.date.toIso8601String(), 'imageUrl': concert.imageUrl, 'venue': concert.venue,
+      'name': concert.name,
+      'date': concert.date.toIso8601String(),
+      'imageUrl': concert.imageUrl,
+      'venue': concert.venue,
     });
   }
 
@@ -452,7 +491,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final concerts = _cachedConcerts;
-        String displayVibe = _currentVibe == "lo mejor" ? l10n.vibeBest : _currentVibe;
+        // CORRECCIÓN "LO MEJOR": Forzamos la traducción si la vibe es la predeterminada
+        String displayVibe = (_currentVibe.toLowerCase() == "lo mejor") ? l10n.vibeBest : _currentVibe;
 
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -491,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (index == 9) {
                     final displayList = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeConcerts : concerts.reversed.take(8).toList();
                     final title = _secondaryVibeConcerts.isNotEmpty ? l10n.homeVibeTitle(_secondaryVibeTitle) : l10n.homeSectionDiscover;
-                    final sub = l10n.homeSectionDiscoverSub;
+                    final sub = _secondaryVibeConcerts.isNotEmpty ? l10n.homeSectionDiscoverSub : l10n.homeSectionDiscoverSub;
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.purpleAccent, cardBg) : const SizedBox.shrink();
                   }
 
@@ -527,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   backgroundColor: cardBg,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(30),
-                                      side: BorderSide(color: secondaryText.withOpacity(0.2)))), // FIX: 'border' cambiado por 'side'
+                                      side: BorderSide(color: secondaryText.withOpacity(0.2)))), 
                               child: Text(l10n.homeBtnShowMore, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold)),
                             )
                       : _currentKeyword != null
@@ -601,9 +641,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
     final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    // CORRECCIÓN FECHAS (JAN/ENE)
     final String dayNum = DateFormat('d').format(concert.date);
     final String monthName = DateFormat('MMM', Localizations.localeOf(context).languageCode).format(concert.date).toUpperCase().replaceAll('.', '');
-    String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange : l10n.detailCheckPrices;
+    
+    // CORRECCIÓN PRECIOS: Si viene el texto hardcodeado "Ver precios" o "Info", usamos la traducción
+    String rawPrice = concert.priceRange;
+    String priceLabel;
+    
+    if (rawPrice.isEmpty || rawPrice == "Ver precios" || rawPrice == "Info") {
+      priceLabel = l10n.detailCheckPrices; // "Check prices" / "Ver precios"
+    } else {
+      priceLabel = rawPrice;
+    }
+    
     String uniqueHeroTag = "${concert.name}_${concert.date}_home_${DateTime.now().millisecondsSinceEpoch}_${concert.hashCode}";
     String concertId = concert.name;
     bool isLiked = _likedIds.contains(concertId);

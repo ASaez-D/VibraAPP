@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/login_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-
-// --- IMPORTACIONES PARA IDIOMAS ---
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'l10n/app_localizations.dart'; 
-import 'providers/language_provider.dart'; // <--- Asegúrate de crear este archivo
+
+// --- IMPORTACIONES INTERNAS ---
+import 'l10n/app_localizations.dart';
+import 'providers/language_provider.dart';
+import 'screens/login_screen.dart';
 
 // --------------------------------------------------------
 // NOTIFICADORES GLOBALES
 // --------------------------------------------------------
-
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
-final ValueNotifier<double> textScaleNotifier = ValueNotifier(1.0); 
+final ValueNotifier<double> textScaleNotifier = ValueNotifier(1.0);
 
 // --------------------------------------------------------
 // LÓGICA DE PERSISTENCIA DE TEMA
 // --------------------------------------------------------
-
 const String _themeKey = 'userThemeMode';
 
 Future<ThemeMode> _loadThemeMode() async {
@@ -40,24 +38,23 @@ Future<void> _saveThemeMode(ThemeMode mode) async {
 // --------------------------------------------------------
 // MAIN
 // --------------------------------------------------------
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
-  // Inicializamos fechas para los idiomas soportados
+
+  // Inicializamos soporte de fechas para los idiomas de la app
   await initializeDateFormatting('es_ES', null);
   await initializeDateFormatting('en_US', null);
 
-  // Cargamos la preferencia de tema
-  themeNotifier.value = await _loadThemeMode(); 
-  
+  // Cargamos la preferencia de tema guardada
+  themeNotifier.value = await _loadThemeMode();
+
   themeNotifier.addListener(() {
     _saveThemeMode(themeNotifier.value);
   });
 
   runApp(
-    // 1. Envolvemos la app con el Provider de Lenguaje
+    // Envolvemos la app con el Provider de Lenguaje
     ChangeNotifierProvider(
       create: (context) => LanguageProvider(),
       child: const MyApp(),
@@ -70,33 +67,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 2. Obtenemos el estado del idioma del Provider
+    // Obtenemos el estado del idioma del Provider
     final languageProvider = Provider.of<LanguageProvider>(context);
 
     return ValueListenableBuilder<double>(
       valueListenable: textScaleNotifier,
       builder: (context, currentScale, child) {
-
         return ValueListenableBuilder<ThemeMode>(
           valueListenable: themeNotifier,
           builder: (context, currentMode, child) {
-            
             return MaterialApp(
               title: 'Vibra',
               debugShowCheckedModeBanner: false,
 
-              // 3. PASO CLAVE: Usamos el locale que dicta el Provider
+              // --- CONFIGURACIÓN DE IDIOMA ---
               locale: languageProvider.locale,
-
-              // CONFIGURACIÓN DE DELEGADOS
+              supportedLocales: AppLocalizations.supportedLocales,
               localizationsDelegates: const [
                 AppLocalizations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: AppLocalizations.supportedLocales,
 
+              // --- ESCALADO DE TEXTO ACCESIBLE ---
               builder: (context, child) {
                 return MediaQuery(
                   data: MediaQuery.of(context).copyWith(
@@ -106,17 +100,22 @@ class MyApp extends StatelessWidget {
                 );
               },
 
+              // --- TEMAS ---
               themeMode: currentMode,
 
               // TEMA CLARO
               theme: ThemeData(
                 brightness: Brightness.light,
                 scaffoldBackgroundColor: Colors.white,
-                primarySwatch: Colors.green,
                 appBarTheme: const AppBarTheme(
                   backgroundColor: Colors.white,
+                  elevation: 0,
                   iconTheme: IconThemeData(color: Colors.black),
-                  titleTextStyle: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                  titleTextStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 colorScheme: ColorScheme.fromSeed(
                   seedColor: const Color(0xFF54FF78),
@@ -129,10 +128,15 @@ class MyApp extends StatelessWidget {
               darkTheme: ThemeData(
                 brightness: Brightness.dark,
                 scaffoldBackgroundColor: const Color(0xFF0C0C0C),
-                primarySwatch: Colors.green,
                 appBarTheme: const AppBarTheme(
                   backgroundColor: Color(0xFF0C0C0C),
+                  elevation: 0,
                   iconTheme: IconThemeData(color: Colors.white),
+                  titleTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 colorScheme: ColorScheme.fromSeed(
                   seedColor: const Color(0xFF54FF78),
