@@ -370,4 +370,61 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get commonSuccess => 'Salvo com sucesso';
+
+  @override
+  String get privacyTransparencyTitle => 'Transparência de Dados';
+
+  @override
+  String get privacyTransparencyDesc =>
+      'Na Vibra, valorizamos sua privacidade. Aqui mostramos quais informações são compartilhadas e por quê.';
+
+  @override
+  String get privacyProfile => 'Perfil Público';
+
+  @override
+  String get privacyProfileDesc =>
+      'Seu nome e foto ficam visíveis se você compartilhar eventos.';
+
+  @override
+  String get privacyLocation => 'Localização';
+
+  @override
+  String get privacyLocationDesc =>
+      'Usado apenas para mostrar shows próximos a você.';
+
+  @override
+  String get privacyAnalytics => 'Análise';
+
+  @override
+  String get privacyAnalyticsDesc =>
+      'Dados anônimos de uso para melhorar o aplicativo.';
+
+  @override
+  String get dialogDeleteTitle => 'Excluir conta?';
+
+  @override
+  String get dialogDeleteBody =>
+      'Esta ação é irreversível. Todos os seus dados e ingressos serão excluídos.';
+
+  @override
+  String get dialogDeleteBtn => 'Excluir';
+
+  @override
+  String get dialogCancel => 'Cancelar';
+
+  @override
+  String get dialogGenerating => 'Gerando arquivo...';
+
+  @override
+  String get dialogError => 'Ocorreu um erro inesperado.';
+
+  @override
+  String get snackDeleteSuccess => 'Sua conta foi excluída.';
+
+  @override
+  String get snackDeleteReauth =>
+      'Por segurança, faça logout e login novamente para excluir sua conta.';
+
+  @override
+  String get shareDataText => 'Aqui estão seus dados exportados do Vibra.';
 }

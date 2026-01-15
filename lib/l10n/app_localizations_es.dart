@@ -280,7 +280,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helpFaq1A =>
-      'Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.';
+      'Ve al concierto que t\'interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.';
 
   @override
   String get helpFaq2Q => '¿Cómo gestiono mis notificaciones?';
@@ -370,4 +370,61 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get commonSuccess => 'Guardado con éxito';
+
+  @override
+  String get privacyTransparencyTitle => 'Transparencia de Datos';
+
+  @override
+  String get privacyTransparencyDesc =>
+      'En Vibra, valoramos tu privacidad. Aquí te mostramos qué información se comparte y con qué fin.';
+
+  @override
+  String get privacyProfile => 'Perfil Público';
+
+  @override
+  String get privacyProfileDesc =>
+      'Tu nombre y foto son visibles si compartes eventos.';
+
+  @override
+  String get privacyLocation => 'Ubicación';
+
+  @override
+  String get privacyLocationDesc =>
+      'Solo se usa para mostrarte conciertos cercanos.';
+
+  @override
+  String get privacyAnalytics => 'Analíticas';
+
+  @override
+  String get privacyAnalyticsDesc =>
+      'Datos anónimos de uso para mejorar la app.';
+
+  @override
+  String get dialogDeleteTitle => '¿Eliminar cuenta?';
+
+  @override
+  String get dialogDeleteBody =>
+      'Esta acción es irreversible. Se borrarán todos tus datos y entradas.';
+
+  @override
+  String get dialogDeleteBtn => 'Eliminar';
+
+  @override
+  String get dialogCancel => 'Cancelar';
+
+  @override
+  String get dialogGenerating => 'Generando archivo...';
+
+  @override
+  String get dialogError => 'Ocurrió un error inesperado.';
+
+  @override
+  String get snackDeleteSuccess => 'Tu cuenta ha sido eliminada.';
+
+  @override
+  String get snackDeleteReauth =>
+      'Por seguridad, cierra sesión y vuelve a entrar para eliminar la cuenta.';
+
+  @override
+  String get shareDataText => 'Aquí tienes tus datos exportados de Vibra.';
 }

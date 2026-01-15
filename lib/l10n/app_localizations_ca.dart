@@ -370,4 +370,61 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get commonSuccess => 'Desat amb èxit';
+
+  @override
+  String get privacyTransparencyTitle => 'Transparència de Dades';
+
+  @override
+  String get privacyTransparencyDesc =>
+      'A Vibra, valorem la teva privadesa. Aquí et mostrem quina informació es comparteix i amb quina finalitat.';
+
+  @override
+  String get privacyProfile => 'Perfil Públic';
+
+  @override
+  String get privacyProfileDesc =>
+      'El teu nom i foto són visibles si comparteixes esdeveniments.';
+
+  @override
+  String get privacyLocation => 'Ubicació';
+
+  @override
+  String get privacyLocationDesc =>
+      'Només s\'utilitza per mostrar-te concerts propers.';
+
+  @override
+  String get privacyAnalytics => 'Analítiques';
+
+  @override
+  String get privacyAnalyticsDesc =>
+      'Dades anònimes d\'ús per millorar l\'app.';
+
+  @override
+  String get dialogDeleteTitle => 'Eliminar compte?';
+
+  @override
+  String get dialogDeleteBody =>
+      'Aquesta acció és irreversible. S\'esborraran totes les teves dades i entrades.';
+
+  @override
+  String get dialogDeleteBtn => 'Eliminar';
+
+  @override
+  String get dialogCancel => 'Cancel·lar';
+
+  @override
+  String get dialogGenerating => 'Generant fitxer...';
+
+  @override
+  String get dialogError => 'S\'ha produït un error inesperat.';
+
+  @override
+  String get snackDeleteSuccess => 'El teu compte ha estat eliminat.';
+
+  @override
+  String get snackDeleteReauth =>
+      'Per seguretat, tanca la sessió i torna a entrar per eliminar el compte.';
+
+  @override
+  String get shareDataText => 'Aquí tens les teves dades exportades de Vibra.';
 }

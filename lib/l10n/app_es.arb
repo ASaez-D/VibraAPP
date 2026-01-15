@@ -8,33 +8,25 @@
     "loginError": "Error al iniciar sesión: {error}",
     "@loginError": {
         "placeholders": {
-            "error": {
-                "type": "String"
-            }
+            "error": { "type": "String" }
         }
     },
     "homeSearchHint": "Buscar en {country}...",
     "@homeSearchHint": {
         "placeholders": {
-            "country": {
-                "type": "String"
-            }
+            "country": { "type": "String" }
         }
     },
     "homeGreeting": "Hola, {name}",
     "@homeGreeting": {
         "placeholders": {
-            "name": {
-                "type": "String"
-            }
+            "name": { "type": "String" }
         }
     },
     "homeVibeTitle": "Explora {vibe}",
     "@homeVibeTitle": {
         "placeholders": {
-            "vibe": {
-                "type": "String"
-            }
+            "vibe": { "type": "String" }
         }
     },
     "vibeBest": "lo mejor",
@@ -44,17 +36,13 @@
     "homeSectionForYouSub": "Porque escuchas a {artist}...",
     "@homeSectionForYouSub": {
         "placeholders": {
-            "artist": {
-                "type": "String"
-            }
+            "artist": { "type": "String" }
         }
     },
     "homeSectionTrends": "TENDENCIAS EN {country}",
     "@homeSectionTrends": {
         "placeholders": {
-            "country": {
-                "type": "String"
-            }
+            "country": { "type": "String" }
         }
     },
     "homeSectionTrendsSub": "Lo más popular de la semana",
@@ -69,18 +57,14 @@
     "homeTextNoMore": "No hay más eventos de {keyword}",
     "@homeTextNoMore": {
         "placeholders": {
-            "keyword": {
-                "type": "String"
-            }
+            "keyword": { "type": "String" }
         }
     },
     "homeTextEnd": "¡Has llegado al final!",
     "homeErrorNoEvents": "No hay eventos en {country}",
     "@homeErrorNoEvents": {
         "placeholders": {
-            "country": {
-                "type": "String"
-            }
+            "country": { "type": "String" }
         }
     },
     "homeBtnRetryCountry": "Ver eventos en España",
@@ -95,9 +79,7 @@
     "prefsTitle": "¡Hola, {name}! 🎧",
     "@prefsTitle": {
         "placeholders": {
-            "name": {
-                "type": "String"
-            }
+            "name": { "type": "String" }
         }
     },
     "prefsSubtitle": "Personaliza tu feed. ¿Qué te mueve?",
@@ -111,9 +93,7 @@
     "accountOpenProfile": "Abrir perfil en {service}",
     "@accountOpenProfile": {
         "placeholders": {
-            "service": {
-                "type": "String"
-            }
+            "service": { "type": "String" }
         }
     },
     "calendarTitle": "¿Cuándo quieres salir?",
@@ -133,9 +113,7 @@
     "detailOrganizedBy": "Organizado por {venue}",
     "@detailOrganizedBy": {
         "placeholders": {
-            "venue": {
-                "type": "String"
-            }
+            "venue": { "type": "String" }
         }
     },
     "detailLocationTitle": "Ubicación",
@@ -159,7 +137,7 @@
     "helpSectionTutorials": "TUTORIALES RÁPIDOS",
     "helpSectionSupport": "SOPORTE Y LEGAL",
     "helpFaq1Q": "¿Cómo compro una entrada?",
-    "helpFaq1A": "Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.",
+    "helpFaq1A": "Ve al concierto que t'interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.",
     "helpFaq2Q": "¿Cómo gestiono mis notificaciones?",
     "helpFaq2A": "En el apartado Notificaciones podrás habilitar avisos de conciertos, artistas y recomendaciones.",
     "helpFaq3Q": "Invitar amigos",
@@ -188,5 +166,24 @@
     "settingsLargeText": "Texto grande",
     "settingsDialogAjustes": "Ajustes",
     "commonError": "Ha ocurrido un error",
-    "commonSuccess": "Guardado con éxito"
+    "commonSuccess": "Guardado con éxito",
+    
+    "privacyTransparencyTitle": "Transparencia de Datos",
+    "privacyTransparencyDesc": "En Vibra, valoramos tu privacidad. Aquí te mostramos qué información se comparte y con qué fin.",
+    "privacyProfile": "Perfil Público",
+    "privacyProfileDesc": "Tu nombre y foto son visibles si compartes eventos.",
+    "privacyLocation": "Ubicación",
+    "privacyLocationDesc": "Solo se usa para mostrarte conciertos cercanos.",
+    "privacyAnalytics": "Analíticas",
+    "privacyAnalyticsDesc": "Datos anónimos de uso para mejorar la app.",
+    
+    "dialogDeleteTitle": "¿Eliminar cuenta?",
+    "dialogDeleteBody": "Esta acción es irreversible. Se borrarán todos tus datos y entradas.",
+    "dialogDeleteBtn": "Eliminar",
+    "dialogCancel": "Cancelar",
+    "dialogGenerating": "Generando archivo...",
+    "dialogError": "Ocurrió un error inesperado.",
+    "snackDeleteSuccess": "Tu cuenta ha sido eliminada.",
+    "snackDeleteReauth": "Por seguridad, cierra sesión y vuelve a entrar para eliminar la cuenta.",
+    "shareDataText": "Aquí tienes tus datos exportados de Vibra."
 }

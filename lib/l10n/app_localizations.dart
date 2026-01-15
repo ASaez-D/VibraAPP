@@ -601,7 +601,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpFaq1A.
   ///
   /// In es, this message translates to:
-  /// **'Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.'**
+  /// **'Ve al concierto que t\'interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.'**
   String get helpFaq1A;
 
   /// No description provided for @helpFaq2Q.
@@ -777,6 +777,108 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Guardado con éxito'**
   String get commonSuccess;
+
+  /// No description provided for @privacyTransparencyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Transparencia de Datos'**
+  String get privacyTransparencyTitle;
+
+  /// No description provided for @privacyTransparencyDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'En Vibra, valoramos tu privacidad. Aquí te mostramos qué información se comparte y con qué fin.'**
+  String get privacyTransparencyDesc;
+
+  /// No description provided for @privacyProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil Público'**
+  String get privacyProfile;
+
+  /// No description provided for @privacyProfileDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu nombre y foto son visibles si compartes eventos.'**
+  String get privacyProfileDesc;
+
+  /// No description provided for @privacyLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación'**
+  String get privacyLocation;
+
+  /// No description provided for @privacyLocationDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo se usa para mostrarte conciertos cercanos.'**
+  String get privacyLocationDesc;
+
+  /// No description provided for @privacyAnalytics.
+  ///
+  /// In es, this message translates to:
+  /// **'Analíticas'**
+  String get privacyAnalytics;
+
+  /// No description provided for @privacyAnalyticsDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos anónimos de uso para mejorar la app.'**
+  String get privacyAnalyticsDesc;
+
+  /// No description provided for @dialogDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar cuenta?'**
+  String get dialogDeleteTitle;
+
+  /// No description provided for @dialogDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta acción es irreversible. Se borrarán todos tus datos y entradas.'**
+  String get dialogDeleteBody;
+
+  /// No description provided for @dialogDeleteBtn.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get dialogDeleteBtn;
+
+  /// No description provided for @dialogCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get dialogCancel;
+
+  /// No description provided for @dialogGenerating.
+  ///
+  /// In es, this message translates to:
+  /// **'Generando archivo...'**
+  String get dialogGenerating;
+
+  /// No description provided for @dialogError.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocurrió un error inesperado.'**
+  String get dialogError;
+
+  /// No description provided for @snackDeleteSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta ha sido eliminada.'**
+  String get snackDeleteSuccess;
+
+  /// No description provided for @snackDeleteReauth.
+  ///
+  /// In es, this message translates to:
+  /// **'Por seguridad, cierra sesión y vuelve a entrar para eliminar la cuenta.'**
+  String get snackDeleteReauth;
+
+  /// No description provided for @shareDataText.
+  ///
+  /// In es, this message translates to:
+  /// **'Aquí tienes tus datos exportados de Vibra.'**
+  String get shareDataText;
 }
 
 class _AppLocalizationsDelegate

@@ -371,4 +371,61 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get commonSuccess => 'Erfolgreich gespeichert';
+
+  @override
+  String get privacyTransparencyTitle => 'Datentransparenz';
+
+  @override
+  String get privacyTransparencyDesc =>
+      'Bei Vibra schätzen wir Ihre Privatsphäre. Hier ist, was wir teilen und warum.';
+
+  @override
+  String get privacyProfile => 'Öffentliches Profil';
+
+  @override
+  String get privacyProfileDesc =>
+      'Dein Name und Foto sind sichtbar, wenn du Events teilst.';
+
+  @override
+  String get privacyLocation => 'Standort';
+
+  @override
+  String get privacyLocationDesc =>
+      'Wird nur verwendet, um dir Konzerte in der Nähe anzuzeigen.';
+
+  @override
+  String get privacyAnalytics => 'Analytik';
+
+  @override
+  String get privacyAnalyticsDesc =>
+      'Anonyme Nutzungsdaten zur Verbesserung der App.';
+
+  @override
+  String get dialogDeleteTitle => 'Konto löschen?';
+
+  @override
+  String get dialogDeleteBody =>
+      'Diese Aktion ist unwiderruflich. Alle deine Daten und Tickets werden gelöscht.';
+
+  @override
+  String get dialogDeleteBtn => 'Löschen';
+
+  @override
+  String get dialogCancel => 'Abbrechen';
+
+  @override
+  String get dialogGenerating => 'Datei wird erstellt...';
+
+  @override
+  String get dialogError => 'Ein unerwarteter Fehler ist aufgetreten.';
+
+  @override
+  String get snackDeleteSuccess => 'Dein Konto wurde gelöscht.';
+
+  @override
+  String get snackDeleteReauth =>
+      'Aus Sicherheitsgründen bitte abmelden und erneut anmelden, um das Konto zu löschen.';
+
+  @override
+  String get shareDataText => 'Hier sind deine exportierten Daten von Vibra.';
 }

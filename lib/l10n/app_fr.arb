@@ -111,5 +111,24 @@
     "settingsLargeText": "Texte agrandi",
     "settingsDialogAjustes": "Paramètres",
     "commonError": "Une erreur est survenue",
-    "commonSuccess": "Enregistré avec succès"
+    "commonSuccess": "Enregistré avec succès",
+    
+    "privacyTransparencyTitle": "Transparence des données",
+    "privacyTransparencyDesc": "Chez Vibra, nous tenons à votre confidentialité. Voici ce que nous partageons et pourquoi.",
+    "privacyProfile": "Profil public",
+    "privacyProfileDesc": "Votre nom et photo sont visibles si vous partagez des événements.",
+    "privacyLocation": "Localisation",
+    "privacyLocationDesc": "Utilisé uniquement pour vous montrer des concerts à proximité.",
+    "privacyAnalytics": "Analytique",
+    "privacyAnalyticsDesc": "Données d'utilisation anonymes pour améliorer l'application.",
+    
+    "dialogDeleteTitle": "Supprimer le compte ?",
+    "dialogDeleteBody": "Cette action est irréversible. Toutes vos données et billets seront supprimés.",
+    "dialogDeleteBtn": "Supprimer",
+    "dialogCancel": "Annuler",
+    "dialogGenerating": "Génération du fichier...",
+    "dialogError": "Une erreur inattendue s'est produite.",
+    "snackDeleteSuccess": "Votre compte a été supprimé.",
+    "snackDeleteReauth": "Par sécurité, veuillez vous déconnecter et vous reconnecter pour supprimer votre compte.",
+    "shareDataText": "Voici vos données exportées de Vibra."
 }

@@ -111,5 +111,24 @@
     "settingsLargeText": "Großer Text",
     "settingsDialogAjustes": "Einstellungen",
     "commonError": "Ein Fehler ist aufgetreten",
-    "commonSuccess": "Erfolgreich gespeichert"
+    "commonSuccess": "Erfolgreich gespeichert",
+    
+    "privacyTransparencyTitle": "Datentransparenz",
+    "privacyTransparencyDesc": "Bei Vibra schätzen wir Ihre Privatsphäre. Hier ist, was wir teilen und warum.",
+    "privacyProfile": "Öffentliches Profil",
+    "privacyProfileDesc": "Dein Name und Foto sind sichtbar, wenn du Events teilst.",
+    "privacyLocation": "Standort",
+    "privacyLocationDesc": "Wird nur verwendet, um dir Konzerte in der Nähe anzuzeigen.",
+    "privacyAnalytics": "Analytik",
+    "privacyAnalyticsDesc": "Anonyme Nutzungsdaten zur Verbesserung der App.",
+    
+    "dialogDeleteTitle": "Konto löschen?",
+    "dialogDeleteBody": "Diese Aktion ist unwiderruflich. Alle deine Daten und Tickets werden gelöscht.",
+    "dialogDeleteBtn": "Löschen",
+    "dialogCancel": "Abbrechen",
+    "dialogGenerating": "Datei wird erstellt...",
+    "dialogError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "snackDeleteSuccess": "Dein Konto wurde gelöscht.",
+    "snackDeleteReauth": "Aus Sicherheitsgründen bitte abmelden und erneut anmelden, um das Konto zu löschen.",
+    "shareDataText": "Hier sind deine exportierten Daten von Vibra."
 }

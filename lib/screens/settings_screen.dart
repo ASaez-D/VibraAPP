@@ -1,8 +1,16 @@
+import 'dart:io';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:permission_handler/permission_handler.dart'; 
 import 'package:provider/provider.dart'; 
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../screens/login_screen.dart'; 
 import '../l10n/app_localizations.dart';
 import '../providers/language_provider.dart'; 
 import '../main.dart'; 
@@ -34,6 +42,159 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _generalNotifications = status.isGranted;
       });
     }
+  }
+
+  // --- LÓGICA DE DESCARGA DE DATOS ---
+  Future<void> _handleDownloadData() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: accentColor),
+              const SizedBox(height: 16),
+              // TRADUCCIÓN CORREGIDA
+              Text(l10n.dialogGenerating, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+      
+      final Map<String, dynamic> userData = {
+        "app": "Vibra",
+        "generated_at": DateTime.now().toIso8601String(),
+        "preferences": {
+          "theme": themeNotifier.value.toString(),
+          "language": Provider.of<LanguageProvider>(context, listen: false).locale.languageCode,
+        }
+      };
+
+      final String jsonString = const JsonEncoder.withIndent('  ').convert(userData);
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/vibra_data.json');
+      await file.writeAsString(jsonString);
+
+      if (mounted) Navigator.pop(context);
+
+      // TRADUCCIÓN CORREGIDA
+      await Share.shareXFiles([XFile(file.path)], text: l10n.shareDataText);
+
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.dialogError), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  // --- LÓGICA DE ELIMINAR CUENTA (CORREGIDA LA TRADUCCIÓN) ---
+  Future<void> _handleDeleteAccount() async {
+    final l10n = AppLocalizations.of(context)!; // Cargamos traducciones
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          // AQUÍ ESTABA EL ERROR: AHORA USA L10N
+          title: Text(
+            l10n.dialogDeleteTitle, // "¿Eliminar cuenta?" traducido
+            style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)
+          ),
+          content: Text(
+            l10n.dialogDeleteBody, // "Esta acción es irreversible..." traducido
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(l10n.dialogCancel, style: const TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text(l10n.dialogDeleteBtn, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+    if (!mounted) return;
+    
+    // Indicador de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.redAccent)),
+    );
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Borramos Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+        // Borramos Auth
+        await user.delete();
+
+        if (mounted) {
+          Navigator.pop(context); // Cierra el spinner
+          // Redirige al Login
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (Route<dynamic> route) => false,
+          );
+          // Mensaje de éxito traducido
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.snackDeleteSuccess)),
+          );
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        if (e.code == 'requires-recent-login') {
+          _showErrorDialog(l10n.snackDeleteReauth);
+        } else {
+          _showErrorDialog(l10n.dialogError);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        _showErrorDialog(l10n.dialogError);
+      }
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK"))
+        ],
+      ),
+    );
   }
 
   Future<void> _toggleGeneralNotifications(bool newValue) async {
@@ -374,6 +535,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           AppSettings.openAppSettings(type: AppSettingsType.location);
         } else if (text == AppLocalizations.of(context)!.settingsSharedData) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const SharedDataScreen()));
+        } else if (text == AppLocalizations.of(context)!.settingsDownloadData) {
+          _handleDownloadData();
+        } else if (text == AppLocalizations.of(context)!.settingsDeleteAccount) {
+          _handleDeleteAccount();
         }
       },
       child: Padding(
@@ -388,7 +553,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(color: contentColor, fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: chevronColor, size: 22),
+            Icon(
+              text == AppLocalizations.of(context)!.settingsDownloadData ? Icons.download_rounded : Icons.chevron_right_rounded, 
+              color: chevronColor, 
+              size: 22
+            ),
           ],
         ),
       ),
@@ -423,14 +592,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
+// --------------------------------------------------------
+// PANTALLA DE DATOS COMPARTIDOS
+// --------------------------------------------------------
 class SharedDataScreen extends StatelessWidget {
   const SharedDataScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final cardColor = isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.05);
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settingsSharedData)),
-      body: const Center(child: Text("Privacy Info")),
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        title: Text(l10n.settingsSharedData, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+        leading: BackButton(color: textColor),
+        elevation: 0,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.shield_outlined, size: 48, color: textColor.withOpacity(0.8)),
+                const SizedBox(height: 16),
+                // TRADUCCIÓN CORREGIDA
+                Text(l10n.privacyTransparencyTitle, style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                const SizedBox(height: 8),
+                Text(l10n.privacyTransparencyDesc, style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 14), textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          _infoTile(Icons.person_outline, l10n.privacyProfile, l10n.privacyProfileDesc, isDark),
+          _infoTile(Icons.location_on_outlined, l10n.privacyLocation, l10n.privacyLocationDesc, isDark),
+          _infoTile(Icons.analytics_outlined, l10n.privacyAnalytics, l10n.privacyAnalyticsDesc, isDark),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoTile(IconData icon, String title, String subtitle, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon, color: isDark ? Colors.white : Colors.black, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), Text(subtitle, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 14))]))
+        ],
+      ),
     );
   }
 }

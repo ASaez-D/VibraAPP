@@ -111,5 +111,24 @@
     "settingsLargeText": "Texto grande",
     "settingsDialogAjustes": "Configurações",
     "commonError": "Ocorreu um erro",
-    "commonSuccess": "Salvo com sucesso"
+    "commonSuccess": "Salvo com sucesso",
+    
+    "privacyTransparencyTitle": "Transparência de Dados",
+    "privacyTransparencyDesc": "Na Vibra, valorizamos sua privacidade. Aqui mostramos quais informações são compartilhadas e por quê.",
+    "privacyProfile": "Perfil Público",
+    "privacyProfileDesc": "Seu nome e foto ficam visíveis se você compartilhar eventos.",
+    "privacyLocation": "Localização",
+    "privacyLocationDesc": "Usado apenas para mostrar shows próximos a você.",
+    "privacyAnalytics": "Análise",
+    "privacyAnalyticsDesc": "Dados anônimos de uso para melhorar o aplicativo.",
+    
+    "dialogDeleteTitle": "Excluir conta?",
+    "dialogDeleteBody": "Esta ação é irreversível. Todos os seus dados e ingressos serão excluídos.",
+    "dialogDeleteBtn": "Excluir",
+    "dialogCancel": "Cancelar",
+    "dialogGenerating": "Gerando arquivo...",
+    "dialogError": "Ocorreu um erro inesperado.",
+    "snackDeleteSuccess": "Sua conta foi excluída.",
+    "snackDeleteReauth": "Por segurança, faça logout e login novamente para excluir sua conta.",
+    "shareDataText": "Aqui estão seus dados exportados do Vibra."
 }

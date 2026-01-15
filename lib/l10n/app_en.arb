@@ -111,5 +111,24 @@
     "settingsLargeText": "Large text",
     "settingsDialogAjustes": "Settings",
     "commonError": "An error occurred",
-    "commonSuccess": "Saved successfully"
+    "commonSuccess": "Saved successfully",
+    
+    "privacyTransparencyTitle": "Data Transparency",
+    "privacyTransparencyDesc": "At Vibra, we value your privacy. Here is what we share and why.",
+    "privacyProfile": "Public Profile",
+    "privacyProfileDesc": "Your name and photo are visible if you share events.",
+    "privacyLocation": "Location",
+    "privacyLocationDesc": "Used only to show you nearby concerts.",
+    "privacyAnalytics": "Analytics",
+    "privacyAnalyticsDesc": "Anonymous usage data to improve the app.",
+    
+    "dialogDeleteTitle": "Delete account?",
+    "dialogDeleteBody": "This action is irreversible. All your data and tickets will be deleted.",
+    "dialogDeleteBtn": "Delete",
+    "dialogCancel": "Cancel",
+    "dialogGenerating": "Generating file...",
+    "dialogError": "An unexpected error occurred.",
+    "snackDeleteSuccess": "Your account has been deleted.",
+    "snackDeleteReauth": "For security, please log out and log in again to delete your account.",
+    "shareDataText": "Here is your exported data from Vibra."
 }

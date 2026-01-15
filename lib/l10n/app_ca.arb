@@ -111,5 +111,24 @@
     "settingsLargeText": "Text gran",
     "settingsDialogAjustes": "Configuració",
     "commonError": "S'ha produït un error",
-    "commonSuccess": "Desat amb èxit"
+    "commonSuccess": "Desat amb èxit",
+    
+    "privacyTransparencyTitle": "Transparència de Dades",
+    "privacyTransparencyDesc": "A Vibra, valorem la teva privadesa. Aquí et mostrem quina informació es comparteix i amb quina finalitat.",
+    "privacyProfile": "Perfil Públic",
+    "privacyProfileDesc": "El teu nom i foto són visibles si comparteixes esdeveniments.",
+    "privacyLocation": "Ubicació",
+    "privacyLocationDesc": "Només s'utilitza per mostrar-te concerts propers.",
+    "privacyAnalytics": "Analítiques",
+    "privacyAnalyticsDesc": "Dades anònimes d'ús per millorar l'app.",
+    
+    "dialogDeleteTitle": "Eliminar compte?",
+    "dialogDeleteBody": "Aquesta acció és irreversible. S'esborraran totes les teves dades i entrades.",
+    "dialogDeleteBtn": "Eliminar",
+    "dialogCancel": "Cancel·lar",
+    "dialogGenerating": "Generant fitxer...",
+    "dialogError": "S'ha produït un error inesperat.",
+    "snackDeleteSuccess": "El teu compte ha estat eliminat.",
+    "snackDeleteReauth": "Per seguretat, tanca la sessió i torna a entrar per eliminar el compte.",
+    "shareDataText": "Aquí tens les teves dades exportades de Vibra."
 }

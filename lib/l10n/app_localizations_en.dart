@@ -370,4 +370,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonSuccess => 'Saved successfully';
+
+  @override
+  String get privacyTransparencyTitle => 'Data Transparency';
+
+  @override
+  String get privacyTransparencyDesc =>
+      'At Vibra, we value your privacy. Here is what we share and why.';
+
+  @override
+  String get privacyProfile => 'Public Profile';
+
+  @override
+  String get privacyProfileDesc =>
+      'Your name and photo are visible if you share events.';
+
+  @override
+  String get privacyLocation => 'Location';
+
+  @override
+  String get privacyLocationDesc => 'Used only to show you nearby concerts.';
+
+  @override
+  String get privacyAnalytics => 'Analytics';
+
+  @override
+  String get privacyAnalyticsDesc => 'Anonymous usage data to improve the app.';
+
+  @override
+  String get dialogDeleteTitle => 'Delete account?';
+
+  @override
+  String get dialogDeleteBody =>
+      'This action is irreversible. All your data and tickets will be deleted.';
+
+  @override
+  String get dialogDeleteBtn => 'Delete';
+
+  @override
+  String get dialogCancel => 'Cancel';
+
+  @override
+  String get dialogGenerating => 'Generating file...';
+
+  @override
+  String get dialogError => 'An unexpected error occurred.';
+
+  @override
+  String get snackDeleteSuccess => 'Your account has been deleted.';
+
+  @override
+  String get snackDeleteReauth =>
+      'For security, please log out and log in again to delete your account.';
+
+  @override
+  String get shareDataText => 'Here is your exported data from Vibra.';
 }
