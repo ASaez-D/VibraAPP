@@ -342,21 +342,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onTabTapped(int index) {
-    if (index != 0) {
-      switch (index) {
-        case 1:
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
-          break;
-        case 2:
-          Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)));
-          break;
-        case 3:
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SocialScreen()));
-          break;
-      }
+  if (index != 0) {
+    switch (index) {
+      case 1:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
+        break;
+      case 2:
+        // Ahora se abre "Eventos guardados"
+        Navigator.push(context, MaterialPageRoute(
+          builder: (_) => SavedEventsScreen(
+            savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),
+          ),
+        ));
+        break;
+      case 3:
+        // Ahora se abre "Tus entradas"
+        Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)));
+        break;
     }
-    setState(() => _currentIndex = index);
   }
+  setState(() => _currentIndex = index);
+}
+
+   
 
   void _shareConcert(ConcertDetail concert) {
     final dateStr = DateFormat('d MMM yyyy').format(concert.date);
@@ -459,16 +467,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _isSearching ? _buildSearchResults(l10n, primaryText, secondaryText, cardBg) : _buildHomeContent(l10n, primaryText, secondaryText, accentColor, cardBg, displayName),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: scaffoldBg,
-        selectedItemColor: accentColor,
-        unselectedItemColor: secondaryText,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''), BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: ''), BottomNavigationBarItem(icon: Icon(Icons.confirmation_number_outlined), label: ''), BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: '')],
-      ),
+  backgroundColor: scaffoldBg,
+  selectedItemColor: accentColor,
+  unselectedItemColor: secondaryText,
+  type: BottomNavigationBarType.fixed,
+  currentIndex: _currentIndex,
+  onTap: _onTabTapped,
+  showSelectedLabels: false,
+  showUnselectedLabels: false,
+  items: const [
+    BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.bookmark_outline), label: ''), // Ahora "Eventos guardados"
+    BottomNavigationBarItem(icon: Icon(Icons.confirmation_number_outlined), label: ''), // Ahora "Tus entradas"
+  ],
+),
+
       endDrawer: _buildDrawer(context, l10n, primaryText, accentColor, scaffoldBg, dividerColor, displayName, photoUrl, isLinked, serviceColor, fallbackIcon),
     );
   }
@@ -699,7 +713,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDrawer(BuildContext context, AppLocalizations l10n, Color primaryText, Color accentColor, Color scaffoldBg, Color dividerColor, String displayName, String photoUrl, bool isLinked, Color serviceColor, IconData fallbackIcon) {
-    return Drawer(backgroundColor: scaffoldBg, child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Padding(padding: const EdgeInsets.only(right: 10), child: CircleAvatar(radius: 18, backgroundColor: serviceColor, backgroundImage: isLinked ? NetworkImage(photoUrl) : null, child: !isLinked ? Icon(fallbackIcon, color: primaryText, size: 20) : null)), Text(displayName, style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.bold))]), const SizedBox(height: 4), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), child: Text(l10n.menuEditProfile, style: TextStyle(color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500)))]),), const Divider(color: Colors.white24), _menuItem(context, l10n.menuAccount, Icons.account_circle, AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)), _menuItem(context, l10n.menuSaved, Icons.bookmark_outline, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())), _menuItem(context, l10n.menuSettings, Icons.settings, const SettingsScreen()), _menuItem(context, l10n.menuHelp, Icons.help_outline, const HelpScreen()), const Spacer(), Divider(color: dividerColor), ListTile(leading: const Icon(Icons.logout, color: Colors.redAccent), title: Text(l10n.menuLogout, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), onTap: () { Navigator.of(context).pop(); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }),])));
+    return Drawer(backgroundColor: scaffoldBg, child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Padding(padding: const EdgeInsets.only(right: 10), child: CircleAvatar(radius: 18, backgroundColor: serviceColor, backgroundImage: isLinked ? NetworkImage(photoUrl) : null, child: !isLinked ? Icon(fallbackIcon, color: primaryText, size: 20) : null)), Text(displayName, style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.bold))]), const SizedBox(height: 4), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), child: Text(l10n.menuEditProfile, style: TextStyle(color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500)))]),), const Divider(color: Colors.white24), _menuItem(context, l10n.menuAccount, Icons.account_circle, AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)),
+// _menuItem(context, l10n.menuSaved, Icons.bookmark_outline, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())),
+_menuItem(context, l10n.menuSettings, Icons.settings, const SettingsScreen()),
+_menuItem(context, l10n.menuHelp, Icons.help_outline, const HelpScreen()),
+ const Spacer(), Divider(color: dividerColor), ListTile(leading: const Icon(Icons.logout, color: Colors.redAccent), title: Text(l10n.menuLogout, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), onTap: () { Navigator.of(context).pop(); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }),])));
   }
 
   Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {
