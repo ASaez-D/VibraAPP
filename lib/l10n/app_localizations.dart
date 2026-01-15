@@ -601,7 +601,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpFaq1A.
   ///
   /// In es, this message translates to:
-  /// **'Ve al concierto que t\'interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.'**
+  /// **'Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.'**
   String get helpFaq1A;
 
   /// No description provided for @helpFaq2Q.
@@ -879,6 +879,96 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Aquí tienes tus datos exportados de Vibra.'**
   String get shareDataText;
+
+  /// No description provided for @dialogPermissionTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Permisos necesarios'**
+  String get dialogPermissionTitle;
+
+  /// No description provided for @dialogPermissionContent.
+  ///
+  /// In es, this message translates to:
+  /// **'Para activar estas notificaciones, necesitas dar permiso en los ajustes del sistema.'**
+  String get dialogPermissionContent;
+
+  /// No description provided for @dialogSettingsBtn.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes'**
+  String get dialogSettingsBtn;
+
+  /// No description provided for @notifPreviewTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Vista previa de notificación'**
+  String get notifPreviewTitle;
+
+  /// No description provided for @notifPreviewBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Así es como verás las alertas en tu pantalla de bloqueo:'**
+  String get notifPreviewBody;
+
+  /// No description provided for @btnActivate.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar'**
+  String get btnActivate;
+
+  /// No description provided for @notifGeneralTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Novedades Vibra'**
+  String get notifGeneralTitle;
+
+  /// No description provided for @notifGeneralBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¡La app se ha actualizado! Descubre el nuevo modo oscuro y mejoras.'**
+  String get notifGeneralBody;
+
+  /// No description provided for @notifReminderTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'📅 ¡Es mañana!'**
+  String get notifReminderTitle;
+
+  /// No description provided for @notifReminderBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu evento guardado \'Bad Bunny - World Tour\' es mañana. ¿Tienes tus entradas?'**
+  String get notifReminderBody;
+
+  /// No description provided for @notifTicketsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'🎟️ Entradas Disponibles'**
+  String get notifTicketsTitle;
+
+  /// No description provided for @notifTicketsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Corre! Han salido nuevas entradas para \'Taylor Swift\'. ¡No te quedes sin ellas!'**
+  String get notifTicketsBody;
+
+  /// No description provided for @timeNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora'**
+  String get timeNow;
+
+  /// No description provided for @time5min.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace 5 min'**
+  String get time5min;
+
+  /// No description provided for @time1min.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace 1 min'**
+  String get time1min;
 }
 
 class _AppLocalizationsDelegate

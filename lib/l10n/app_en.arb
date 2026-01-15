@@ -130,5 +130,21 @@
     "dialogError": "An unexpected error occurred.",
     "snackDeleteSuccess": "Your account has been deleted.",
     "snackDeleteReauth": "For security, please log out and log in again to delete your account.",
-    "shareDataText": "Here is your exported data from Vibra."
+    "shareDataText": "Here is your exported data from Vibra.",
+
+    "dialogPermissionTitle": "Permissions needed",
+    "dialogPermissionContent": "To enable these notifications, you need to grant permission in system settings.",
+    "dialogSettingsBtn": "Settings",
+    "notifPreviewTitle": "Notification Preview",
+    "notifPreviewBody": "Here is how alerts will look on your lock screen:",
+    "btnActivate": "Activate",
+    "notifGeneralTitle": "Vibra News",
+    "notifGeneralBody": "App updated! Discover the new dark mode and improvements.",
+    "notifReminderTitle": "📅 It's tomorrow!",
+    "notifReminderBody": "Your saved event 'Bad Bunny - World Tour' is tomorrow. Got your tickets?",
+    "notifTicketsTitle": "🎟️ Tickets Available",
+    "notifTicketsBody": "Run! New tickets released for 'Taylor Swift'. Don't miss out!",
+    "timeNow": "Now",
+    "time5min": "5 min ago",
+    "time1min": "1 min ago"
 }

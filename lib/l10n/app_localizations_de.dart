@@ -428,4 +428,54 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get shareDataText => 'Hier sind deine exportierten Daten von Vibra.';
+
+  @override
+  String get dialogPermissionTitle => 'Berechtigungen erforderlich';
+
+  @override
+  String get dialogPermissionContent =>
+      'Um diese Benachrichtigungen zu aktivieren, müssen Sie die Erlaubnis in den Einstellungen erteilen.';
+
+  @override
+  String get dialogSettingsBtn => 'Einstellungen';
+
+  @override
+  String get notifPreviewTitle => 'Benachrichtigungsvorschau';
+
+  @override
+  String get notifPreviewBody =>
+      'So sehen die Warnungen auf Ihrem Sperrbildschirm aus:';
+
+  @override
+  String get btnActivate => 'Aktivieren';
+
+  @override
+  String get notifGeneralTitle => 'Neuigkeiten Vibra';
+
+  @override
+  String get notifGeneralBody =>
+      'Die App wurde aktualisiert! Entdecken Sie den neuen Dunkelmodus.';
+
+  @override
+  String get notifReminderTitle => '📅 Es ist morgen!';
+
+  @override
+  String get notifReminderBody =>
+      'Dein gespeichertes Event \'Bad Bunny\' ist morgen. Hast du deine Tickets?';
+
+  @override
+  String get notifTicketsTitle => '🎟️ Tickets verfügbar';
+
+  @override
+  String get notifTicketsBody =>
+      'Lauf! Neue Tickets für \'Taylor Swift\' sind verfügbar.';
+
+  @override
+  String get timeNow => 'Jetzt';
+
+  @override
+  String get time5min => 'Vor 5 Min';
+
+  @override
+  String get time1min => 'Vor 1 Min';
 }

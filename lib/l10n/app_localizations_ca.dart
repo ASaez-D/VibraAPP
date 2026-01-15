@@ -427,4 +427,54 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get shareDataText => 'Aquí tens les teves dades exportades de Vibra.';
+
+  @override
+  String get dialogPermissionTitle => 'Permisos necessaris';
+
+  @override
+  String get dialogPermissionContent =>
+      'Per activar aquestes notificacions, cal donar permís als ajustos del sistema.';
+
+  @override
+  String get dialogSettingsBtn => 'Ajustos';
+
+  @override
+  String get notifPreviewTitle => 'Vista prèvia de notificació';
+
+  @override
+  String get notifPreviewBody =>
+      'Així és com veuràs les alertes a la teva pantalla de bloqueig:';
+
+  @override
+  String get btnActivate => 'Activar';
+
+  @override
+  String get notifGeneralTitle => 'Novetats Vibra';
+
+  @override
+  String get notifGeneralBody =>
+      'L\'app s\'ha actualitzat! Descobreix el nou mode fosc i millores.';
+
+  @override
+  String get notifReminderTitle => '📅 És demà!';
+
+  @override
+  String get notifReminderBody =>
+      'El teu esdeveniment desat \'Bad Bunny - World Tour\' és demà. Tens les entrades?';
+
+  @override
+  String get notifTicketsTitle => '🎟️ Entrades Disponibles';
+
+  @override
+  String get notifTicketsBody =>
+      'Corre! Han sortit noves entrades per a \'Taylor Swift\'. No et quedis sense!';
+
+  @override
+  String get timeNow => 'Ara';
+
+  @override
+  String get time5min => 'Fa 5 min';
+
+  @override
+  String get time1min => 'Fa 1 min';
 }

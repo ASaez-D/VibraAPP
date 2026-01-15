@@ -130,5 +130,21 @@
     "dialogError": "S'ha produït un error inesperat.",
     "snackDeleteSuccess": "El teu compte ha estat eliminat.",
     "snackDeleteReauth": "Per seguretat, tanca la sessió i torna a entrar per eliminar el compte.",
-    "shareDataText": "Aquí tens les teves dades exportades de Vibra."
+    "shareDataText": "Aquí tens les teves dades exportades de Vibra.",
+
+    "dialogPermissionTitle": "Permisos necessaris",
+    "dialogPermissionContent": "Per activar aquestes notificacions, cal donar permís als ajustos del sistema.",
+    "dialogSettingsBtn": "Ajustos",
+    "notifPreviewTitle": "Vista prèvia de notificació",
+    "notifPreviewBody": "Així és com veuràs les alertes a la teva pantalla de bloqueig:",
+    "btnActivate": "Activar",
+    "notifGeneralTitle": "Novetats Vibra",
+    "notifGeneralBody": "L'app s'ha actualitzat! Descobreix el nou mode fosc i millores.",
+    "notifReminderTitle": "📅 És demà!",
+    "notifReminderBody": "El teu esdeveniment desat 'Bad Bunny - World Tour' és demà. Tens les entrades?",
+    "notifTicketsTitle": "🎟️ Entrades Disponibles",
+    "notifTicketsBody": "Corre! Han sortit noves entrades per a 'Taylor Swift'. No et quedis sense!",
+    "timeNow": "Ara",
+    "time5min": "Fa 5 min",
+    "time1min": "Fa 1 min"
 }

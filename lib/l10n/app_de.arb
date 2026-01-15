@@ -130,5 +130,21 @@
     "dialogError": "Ein unerwarteter Fehler ist aufgetreten.",
     "snackDeleteSuccess": "Dein Konto wurde gelöscht.",
     "snackDeleteReauth": "Aus Sicherheitsgründen bitte abmelden und erneut anmelden, um das Konto zu löschen.",
-    "shareDataText": "Hier sind deine exportierten Daten von Vibra."
+    "shareDataText": "Hier sind deine exportierten Daten von Vibra.",
+
+    "dialogPermissionTitle": "Berechtigungen erforderlich",
+    "dialogPermissionContent": "Um diese Benachrichtigungen zu aktivieren, müssen Sie die Erlaubnis in den Einstellungen erteilen.",
+    "dialogSettingsBtn": "Einstellungen",
+    "notifPreviewTitle": "Benachrichtigungsvorschau",
+    "notifPreviewBody": "So sehen die Warnungen auf Ihrem Sperrbildschirm aus:",
+    "btnActivate": "Aktivieren",
+    "notifGeneralTitle": "Neuigkeiten Vibra",
+    "notifGeneralBody": "Die App wurde aktualisiert! Entdecken Sie den neuen Dunkelmodus.",
+    "notifReminderTitle": "📅 Es ist morgen!",
+    "notifReminderBody": "Dein gespeichertes Event 'Bad Bunny' ist morgen. Hast du deine Tickets?",
+    "notifTicketsTitle": "🎟️ Tickets verfügbar",
+    "notifTicketsBody": "Lauf! Neue Tickets für 'Taylor Swift' sind verfügbar.",
+    "timeNow": "Jetzt",
+    "time5min": "Vor 5 Min",
+    "time1min": "Vor 1 Min"
 }

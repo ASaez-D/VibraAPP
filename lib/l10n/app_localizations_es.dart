@@ -280,7 +280,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helpFaq1A =>
-      'Ve al concierto que t\'interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.';
+      'Ve al concierto que te interese y pulsa en “Comprar entrada”. Podrás elegir el método de pago y confirmar.';
 
   @override
   String get helpFaq2Q => '¿Cómo gestiono mis notificaciones?';
@@ -427,4 +427,54 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shareDataText => 'Aquí tienes tus datos exportados de Vibra.';
+
+  @override
+  String get dialogPermissionTitle => 'Permisos necesarios';
+
+  @override
+  String get dialogPermissionContent =>
+      'Para activar estas notificaciones, necesitas dar permiso en los ajustes del sistema.';
+
+  @override
+  String get dialogSettingsBtn => 'Ajustes';
+
+  @override
+  String get notifPreviewTitle => 'Vista previa de notificación';
+
+  @override
+  String get notifPreviewBody =>
+      'Así es como verás las alertas en tu pantalla de bloqueo:';
+
+  @override
+  String get btnActivate => 'Activar';
+
+  @override
+  String get notifGeneralTitle => 'Novedades Vibra';
+
+  @override
+  String get notifGeneralBody =>
+      '¡La app se ha actualizado! Descubre el nuevo modo oscuro y mejoras.';
+
+  @override
+  String get notifReminderTitle => '📅 ¡Es mañana!';
+
+  @override
+  String get notifReminderBody =>
+      'Tu evento guardado \'Bad Bunny - World Tour\' es mañana. ¿Tienes tus entradas?';
+
+  @override
+  String get notifTicketsTitle => '🎟️ Entradas Disponibles';
+
+  @override
+  String get notifTicketsBody =>
+      '¡Corre! Han salido nuevas entradas para \'Taylor Swift\'. ¡No te quedes sin ellas!';
+
+  @override
+  String get timeNow => 'Ahora';
+
+  @override
+  String get time5min => 'Hace 5 min';
+
+  @override
+  String get time1min => 'Hace 1 min';
 }

@@ -130,5 +130,21 @@
     "dialogError": "Ocorreu um erro inesperado.",
     "snackDeleteSuccess": "Sua conta foi excluída.",
     "snackDeleteReauth": "Por segurança, faça logout e login novamente para excluir sua conta.",
-    "shareDataText": "Aqui estão seus dados exportados do Vibra."
+    "shareDataText": "Aqui estão seus dados exportados do Vibra.",
+
+    "dialogPermissionTitle": "Permissões necessárias",
+    "dialogPermissionContent": "Para ativar essas notificações, você precisa dar permissão nas configurações do sistema.",
+    "dialogSettingsBtn": "Configurações",
+    "notifPreviewTitle": "Pré-visualização da notificação",
+    "notifPreviewBody": "É assim que você verá os alertas na tela de bloqueio:",
+    "btnActivate": "Ativar",
+    "notifGeneralTitle": "Novidades Vibra",
+    "notifGeneralBody": "O aplicativo foi atualizado! Descubra o novo modo escuro e melhorias.",
+    "notifReminderTitle": "📅 É amanhã!",
+    "notifReminderBody": "Seu evento salvo 'Bad Bunny - World Tour' é amanhã. Você tem seus ingressos?",
+    "notifTicketsTitle": "🎟️ Ingressos Disponíveis",
+    "notifTicketsBody": "Corre! Novos ingressos para 'Taylor Swift' foram lançados. Não perca!",
+    "timeNow": "Agora",
+    "time5min": "Há 5 min",
+    "time1min": "Há 1 min"
 }

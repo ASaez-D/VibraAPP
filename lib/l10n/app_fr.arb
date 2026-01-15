@@ -130,5 +130,21 @@
     "dialogError": "Une erreur inattendue s'est produite.",
     "snackDeleteSuccess": "Votre compte a été supprimé.",
     "snackDeleteReauth": "Par sécurité, veuillez vous déconnecter et vous reconnecter pour supprimer votre compte.",
-    "shareDataText": "Voici vos données exportées de Vibra."
+    "shareDataText": "Voici vos données exportées de Vibra.",
+
+    "dialogPermissionTitle": "Permissions requises",
+    "dialogPermissionContent": "Pour activer ces notifications, vous devez donner l'autorisation dans les paramètres.",
+    "dialogSettingsBtn": "Paramètres",
+    "notifPreviewTitle": "Aperçu de la notification",
+    "notifPreviewBody": "Voici comment les alertes apparaîtront sur votre écran de verrouillage :",
+    "btnActivate": "Activer",
+    "notifGeneralTitle": "Nouveautés Vibra",
+    "notifGeneralBody": "L'application a été mise à jour ! Découvrez le mode sombre et les améliorations.",
+    "notifReminderTitle": "📅 C'est demain !",
+    "notifReminderBody": "Votre événement 'Bad Bunny - World Tour' est demain. Avez-vous vos billets ?",
+    "notifTicketsTitle": "🎟️ Billets disponibles",
+    "notifTicketsBody": "Courez ! De nouveaux billets pour 'Taylor Swift' sont sortis. Ne les ratez pas !",
+    "timeNow": "Maintenant",
+    "time5min": "Il y a 5 min",
+    "time1min": "Il y a 1 min"
 }
