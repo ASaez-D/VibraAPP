@@ -2,29 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageProvider extends ChangeNotifier {
-  Locale _locale = const Locale('es'); // Idioma por defecto
+  Locale _locale = const Locale('es');
+  static const String _languageKey = 'selected_language';
 
   Locale get locale => _locale;
 
   LanguageProvider() {
-    _loadSavedLanguage();
+    _loadLanguage();
   }
 
-  // Cargar el idioma guardado al iniciar la app
-  void _loadSavedLanguage() async {
+  // Carga el idioma guardado al iniciar la app
+  Future<void> _loadLanguage() async {
     final prefs = await SharedPreferences.getInstance();
-    String? languageCode = prefs.getString('language_code');
+    String? languageCode = prefs.getString(_languageKey);
     if (languageCode != null) {
       _locale = Locale(languageCode);
       notifyListeners();
     }
   }
 
-  // Cambiar el idioma y guardarlo
-  void changeLanguage(Locale type) async {
+  // Cambia el idioma y lo guarda
+  Future<void> setLocale(Locale locale) async {
+    final supportedCodes = ['es', 'en', 'fr', 'pt', 'ca', 'de'];
+    if (!supportedCodes.contains(locale.languageCode)) return;
+
+    _locale = locale;
     final prefs = await SharedPreferences.getInstance();
-    _locale = type;
-    await prefs.setString('language_code', type.languageCode);
+    await prefs.setString(_languageKey, locale.languageCode);
     notifyListeners();
   }
 }

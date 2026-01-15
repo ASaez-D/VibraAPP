@@ -205,7 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _languageSelectorTile(BuildContext context, AppLocalizations l10n, bool isDark, Color chevronColor) {
     final contentColor = isDark ? Colors.white : Colors.black;
-    final currentLang = Localizations.localeOf(context).languageCode.toUpperCase();
+    final langProvider = Provider.of<LanguageProvider>(context);
+    final String currentLangLabel = _getLanguageName(langProvider.locale.languageCode);
     
     return InkWell(
       onTap: () => _showLanguagePicker(context),
@@ -222,7 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             Text(
-              currentLang,
+              currentLangLabel,
               style: TextStyle(color: contentColor.withOpacity(0.5), fontSize: 14),
             ),
             const SizedBox(width: 8),
@@ -233,8 +234,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  String _getLanguageName(String code) {
+    switch (code) {
+      case 'en': return "English";
+      case 'fr': return "Français";
+      case 'pt': return "Português";
+      case 'ca': return "Català";
+      case 'de': return "Deutsch";
+      default: return "Español";
+    }
+  }
+
   void _showLanguagePicker(BuildContext context) {
     final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
     
     showModalBottomSheet(
       context: context,
@@ -245,25 +258,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: const Text("Español"),
-                trailing: langProvider.locale.languageCode == 'es' ? Icon(Icons.check, color: accentColor) : null,
-                onTap: () {
-                  langProvider.changeLanguage(const Locale('es'));
-                  Navigator.pop(context);
-                },
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(l10n.settingsLanguage, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              ListTile(
-                title: const Text("English"),
-                trailing: langProvider.locale.languageCode == 'en' ? Icon(Icons.check, color: accentColor) : null,
-                onTap: () {
-                  langProvider.changeLanguage(const Locale('en'));
-                  Navigator.pop(context);
-                },
-              ),
+              _languageListTile(context, langProvider, "Español", 'es'),
+              _languageListTile(context, langProvider, "English", 'en'),
+              _languageListTile(context, langProvider, "Français", 'fr'),
+              _languageListTile(context, langProvider, "Português", 'pt'),
+              _languageListTile(context, langProvider, "Català", 'ca'),
+              _languageListTile(context, langProvider, "Deutsch", 'de'),
+              const SizedBox(height: 12),
             ],
           ),
         );
+      },
+    );
+  }
+
+  Widget _languageListTile(BuildContext context, LanguageProvider provider, String name, String code) {
+    final isSelected = provider.locale.languageCode == code;
+    return ListTile(
+      title: Text(name, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      trailing: isSelected ? Icon(Icons.check_circle, color: accentColor) : null,
+      onTap: () {
+        provider.setLocale(Locale(code));
+        Navigator.pop(context);
       },
     );
   }

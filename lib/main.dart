@@ -42,9 +42,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Inicializamos soporte de fechas para los idiomas de la app
+  // Inicializamos soporte de fechas para TODOS los idiomas soportados
   await initializeDateFormatting('es_ES', null);
   await initializeDateFormatting('en_US', null);
+  await initializeDateFormatting('fr_FR', null);
+  await initializeDateFormatting('pt_PT', null);
+  await initializeDateFormatting('ca_ES', null);
+  await initializeDateFormatting('de_DE', null);
 
   // Cargamos la preferencia de tema guardada
   themeNotifier.value = await _loadThemeMode();
@@ -54,7 +58,6 @@ void main() async {
   });
 
   runApp(
-    // Envolvemos la app con el Provider de Lenguaje
     ChangeNotifierProvider(
       create: (context) => LanguageProvider(),
       child: const MyApp(),
