@@ -1,7 +1,7 @@
 # 🎵 Vibra - Tu Música, Tu Momento
 
 <div align="center">
-  <img src="https://via.placeholder.com/1200x300?text=Vibra+App+Banner" alt="Banner Vibra" width="100%">
+  <img src="assets/banner.png" alt="Banner Vibra" width="100%">
 </div>
 
 ## Insignias
