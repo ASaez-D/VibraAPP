@@ -1,118 +1,104 @@
 # 🎵 Vibra - Tu Música, Tu Momento
 
+<div align="center">
+  <img src="https://via.placeholder.com/1200x300?text=Vibra+App+Banner" alt="Banner Vibra" width="100%">
+</div>
+
+## Insignias
+
+<div align="center">
+
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Scrum](https://img.shields.io/badge/Metodología-Scrum-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Estado-En_Desarrollo_(MVP)-orange?style=for-the-badge)
 
-## 📄 Descripción General (Fase 0)
+</div>
 
-**Vibra** es una aplicación móvil desarrollada en Flutter diseñada para revolucionar la forma en que los usuarios descubren y asisten a eventos musicales en vivo. Conecta a los fans con sus artistas favoritos y las tendencias locales.
+## Índice
 
-### 🎯 Objetivos
-
-**Objetivo General:**
-Centralizar la experiencia de descubrimiento de conciertos, facilitando la compra de entradas y la socialización en torno a la música en vivo.
-
-**Objetivos Específicos:**
-* Personalizar el feed de eventos basándose en los gustos musicales del usuario (integración con Spotify).
-* Permitir guardar y gestionar eventos favoritos y entradas.
-* Notificar al usuario sobre lanzamientos de tickets y recordatorios de fechas.
-
-### 🔭 Alcance del Proyecto
-Esta primera versión (MVP) incluirá:
-* Autenticación (Google, Spotify, Email).
-* Feed de eventos personalizado ("Solo para ti", "Tendencias", "Tus Artistas").
-* Buscador avanzado por país y artista.
-* Gestión de perfil, ajustes (idioma/tema) y eventos guardados.
-* Sistema de notificaciones simulado (General, Recordatorios, Tickets).
-
-> **Nota:** No se incluirá la pasarela de pagos real ni el chat social en tiempo real en esta primera iteración.
+* [Título e imagen de portada](#-vibra---tu-música-tu-momento)
+* [Insignias](#insignias)
+* [Descripción del proyecto](#descripción-del-proyecto)
+* [Estado del proyecto](#estado-del-proyecto)
+* [Características de la aplicación y demostración](#características-de-la-aplicación-y-demostración)
+* [Acceso al proyecto](#acceso-al-proyecto)
+* [Tecnologías utilizadas](#tecnologías-utilizadas)
+* [Personas Contribuyentes](#personas-contribuyentes)
+* [Personas-Desarrolladores del Proyecto](#personas-desarrolladores-del-proyecto)
+* [Licencia](#licencia)
+* [Conclusión](#conclusión)
 
 ---
 
-## 🧠 Análisis de Requisitos (Fase 1)
+## Descripción del proyecto
 
-### Contexto
-Los amantes de la música a menudo se pierden conciertos por falta de información centralizada o notificaciones tardías. Vibra resuelve esto ofreciendo una agenda personalizada y alertas proactivas.
+**Vibra** es una aplicación móvil multiplataforma desarrollada en Flutter que revoluciona la forma en que los usuarios descubren y asisten a eventos musicales en vivo.
 
-### ⚙️ Requisitos Funcionales (RF)
-
-| ID | Descripción |
-|----|-------------|
-| **RF1** | Login social (Spotify/Google) y gestión de sesión persistente. |
-| **RF2** | Visualización de eventos categorizados (Tendencias, Fin de semana, Colecciones). |
-| **RF3** | Detalle de evento con ubicación (Mapa), fecha, precios y enlace de compra. |
-| **RF4** | Funcionalidad de "Guardar" eventos en una lista personal. |
-| **RF5** | Configuración de preferencias: cambio de idioma (i18n) y tema (Claro/Oscuro). |
-| **RF6** | Gestión de permisos y simulación de notificaciones push. |
-
-### 🧩 Requisitos No Funcionales (RNF)
-
-| ID | Descripción |
-|----|-------------|
-| **RNF1** | Internacionalización completa (6 idiomas: ES, EN, DE, FR, PT, CA). |
-| **RNF2** | Persistencia de datos locales (SharedPreferences) para ajustes de usuario. |
-| **RNF3** | Interfaz responsiva y adaptada a Modo Oscuro nativo. |
-| **RNF4** | Arquitectura escalable basada en Providers. |
-
-### 👤 Historias de Usuario Iniciales
-* **HU1:** Como **fan de la música**, quiero **iniciar sesión con Spotify** para que la app conozca mis gustos automáticamente.
-* **HU2:** Como **usuario**, quiero **recibir una notificación** 5 minutos antes de que salgan las entradas de mi artista favorito.
-* **HU3:** Como **turista**, quiero **cambiar el país de búsqueda** para ver conciertos en mi destino de viaje.
-* **HU4:** Como **usuario preocupado por la privacidad**, quiero **poder descargar mis datos** o eliminar mi cuenta fácilmente desde la app.
+La aplicación nace de la necesidad de centralizar la experiencia del fan: desde el descubrimiento de conciertos basado en gustos personales (integración con Spotify) hasta la gestión de entradas y alertas de lanzamientos. Vibra conecta a los fans con sus artistas favoritos y las tendencias locales de su ciudad o destino de viaje.
 
 ---
 
-## 🗓️ Planificación y Backlog (Fase 2)
+## Estado del proyecto
 
-### 🧭 Roadmap
-1.  **Hito 1: Core & UI:** Estructura base, navegación, internacionalización y diseño de pantallas (Home, Detail, Settings).
-2.  **Hito 2: Datos & Auth:** Conexión con Firebase Auth y Firestore, gestión de estado con Provider.
-3.  **Hito 3: Features:** Lógica de guardado, búsqueda dinámica y sistema de notificaciones.
-4.  **Hito 4: Refactorización:** Limpieza de código (SonarLint), gestión de errores y lanzamiento.
+🚧 **Fase de Desarrollo (MVP)**
 
-### 🧱 Product Backlog Priorizado
-
-| ID | Historia / Tarea | Prioridad | Esfuerzo | Criterios de Aceptación |
-|----|------------------|-----------|----------|-------------------------|
-| **T1** | Configuración i18n | Alta 🔴 | Medio | Soporte funcional para 6 idiomas mediante archivos .arb. |
-| **T2** | Pantalla Home | Alta 🔴 | Alto | Scroll vertical/horizontal, secciones dinámicas. |
-| **T3** | Lógica de Settings | Media 🟡 | Medio | Persistencia de tema y notificaciones con previsualización. |
-| **T4** | Eliminar Cuenta | Alta 🔴 | Bajo | Borrado en Auth y Firestore con confirmación de seguridad. |
+Actualmente, el proyecto se encuentra en la fase de desarrollo del Producto Mínimo Viable. Las funcionalidades "Core" (núcleo) están implementadas, mientras que características avanzadas como la pasarela de pago real y el chat social están planificadas para futuras iteraciones.
 
 ---
 
-## 🚀 Desarrollo y Metodología (Fase 3)
+## Características de la aplicación y demostración
 
-### 🛠️ Stack Tecnológico
-* **Framework:** Flutter (Dart).
-* **Gestión de Estado:** Provider.
-* **Backend (BaaS):** Firebase (Authentication, Firestore).
-* **Localización:** `flutter_localizations` & `intl`.
-* **Paquetes Clave:** `permission_handler`, `url_launcher`, `share_plus`, `path_provider`.
+### 🌟 Funcionalidades Principales
 
-### 🧪 Calidad y Pruebas (QA)
-* **Análisis Estático:** Uso de **SonarLint** para mantener la deuda técnica bajo mínimos (Ratio < 5%).
-* **Clean Code:** Separación estricta entre UI (`screens`, `widgets`) y Lógica (`providers`, `services`).
-* **UX/UI:** Feedback visual inmediato (SnackBar, Dialogs) para acciones del usuario (guardar, errores, permisos).
+| Característica | Descripción |
+| :--- | :--- |
+| **🔐 Autenticación Social** | Inicio de sesión seguro con Google, Spotify y Email (Firebase Auth). |
+| **🎸 Feed Personalizado** | Algoritmo de recomendación basado en "Tus Artistas", "Tendencias" y ubicación. |
+| **🌍 Internacionalización (i18n)** | Soporte completo en 6 idiomas: Español, Inglés, Alemán, Francés, Portugués y Catalán. |
+| **📅 Gestión de Eventos** | Búsqueda avanzada, detalle de conciertos con mapas y guardado en "Favoritos". |
+| **🔔 Notificaciones Smart** | Sistema simulado de alertas para recordatorios de fechas y lanzamiento de tickets con previsualización en UI. |
+| **⚙️ Ajustes y Privacidad** | Modo Oscuro/Claro, descarga de datos personales (GDPR) y eliminación de cuenta segura. |
+
+### 📱 Demostración (Screenshots)
+
+> *Nota: Inserta aquí GIFs o capturas de pantalla de tu emulador.*
+
+| Pantalla de Inicio | Detalle de Evento | Ajustes y Notificaciones |
+|:---:|:---:|:---:|
+| <img src="https://via.placeholder.com/200x400?text=Home" width="200"> | <img src="https://via.placeholder.com/200x400?text=Detail" width="200"> | <img src="https://via.placeholder.com/200x400?text=Settings" width="200"> |
 
 ---
 
-## 📦 Instalación y Configuración
+## Acceso al proyecto
+
+Para ejecutar este proyecto localmente, sigue estos pasos:
+
+### Prerrequisitos
+* [Flutter SDK](https://flutter.dev/docs/get-started/install) instalado.
+* Un editor de código (VS Code o Android Studio).
+* Un dispositivo físico o emulador (Android/iOS).
+
+### Instalación
 
 1.  **Clonar el repositorio:**
     ```bash
     git clone [https://github.com/tu-usuario/vibra-app.git](https://github.com/tu-usuario/vibra-app.git)
     ```
+
 2.  **Instalar dependencias:**
     ```bash
+    cd vibra-app
     flutter pub get
     ```
-3.  **Generar traducciones (si se modifican los .arb):**
+
+3.  **Generar archivos de traducción:**
+    Es necesario ejecutar este comando cada vez que se actualizan los archivos `.arb`.
     ```bash
     flutter gen-l10n
     ```
+
 4.  **Ejecutar la aplicación:**
     ```bash
     flutter run
@@ -120,10 +106,49 @@ Los amantes de la música a menudo se pierden conciertos por falta de informaci�
 
 ---
 
-## 👥 Equipo
+## Tecnologías utilizadas
 
-* **Product Owner:** [Tu Nombre]
-* **Lead Developer:** [Tu Nombre]
+El proyecto está construido utilizando una arquitectura escalable y las siguientes tecnologías:
+
+* **Framework:** [Flutter](https://flutter.dev/) (Lenguaje Dart).
+* **Gestión de Estado:** `provider` (Arquitectura MVVM/Clean).
+* **Backend as a Service:**
+    * `firebase_auth`: Gestión de usuarios.
+    * `cloud_firestore`: Base de datos NoSQL para eventos y usuarios.
+* **Internacionalización:** `flutter_localizations` & `intl`.
+* **Paquetes Clave:**
+    * `permission_handler`: Gestión de permisos de notificaciones.
+    * `share_plus`: Compartir eventos y exportar datos.
+    * `url_launcher`: Abrir mapas y correos electrónicos.
+    * `path_provider`: Gestión de archivos temporales.
 
 ---
-*Proyecto Intermodular - Desarrollo de Aplicaciones Multiplataforma*
+
+## Personas Contribuyentes
+
+Agradecemos a las herramientas y comunidades open source que hacen posible este desarrollo.
+
+* Comunidad de Flutter & Dart.
+* Documentación de Firebase.
+* Iconos proporcionados por Material Design.
+
+---
+
+## Personas-Desarrolladores del Proyecto
+
+Este proyecto ha sido desarrollado como parte del módulo **Desarrollo de Aplicaciones Multiplataforma (PMDM)**.
+
+* **[Tu Nombre]** - *Product Owner & Lead Developer* - [Enlace a tu GitHub/LinkedIn]
+* **[Nombre Compañero/a si hay]** - *Scrum Master & Developer*
+
+---
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE.md](LICENSE.md) para más detalles.
+
+---
+
+## Conclusión
+
+**Vibra** representa la aplicación práctica de la metodología Scrum en un entorno de desarrollo móvil moderno. A través de este proyecto, se ha logrado implementar una arquitectura robusta, gestionar deuda técnica con herramientas de calidad (SonarLint) y crear una experiencia de usuario centrada en la accesibilidad (multi-idioma) y la privacidad del usuario.
