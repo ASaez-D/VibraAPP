@@ -67,7 +67,7 @@ Actualmente, el proyecto se encuentra en la fase de desarrollo del Producto Mín
 
 | Pantalla de Inicio | Detalle de Evento | Ajustes y Notificaciones |
 |:---:|:---:|:---:|
-| <img src="https://via.placeholder.com/200x400?text=Home" width="200"> | <img src="https://via.placeholder.com/200x400?text=Detail" width="200"> | <img src="https://via.placeholder.com/200x400?text=Settings" width="200"> |
+| <img src="assets/menu.png" width="200"> | <img src="https://via.placeholder.com/200x400?text=Detail" width="200"> | <img src="assets/config.png" width="200"> |
 
 ---
 
