@@ -1,4 +1,3 @@
-```markdown
 # 🎵 Vibra - Tu Música, Tu Momento
 
 <div align="center">
@@ -231,7 +230,5 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE.md](https
 ## Conclusión
 
 **Vibra** representa la aplicación práctica de la metodología Scrum en un entorno de desarrollo móvil moderno. A través de este proyecto, el equipo conformado por Ángel, David y Marcelo ha logrado implementar una arquitectura robusta, gestionar la deuda técnica con herramientas de calidad profesional (**SonarQube**) y crear una experiencia de usuario centrada en la accesibilidad (multi-idioma con 6 locales) y la privacidad (gestión granular de permisos).
-
-```
 
 ```
