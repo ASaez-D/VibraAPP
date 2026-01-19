@@ -1,5 +1,3 @@
-Aquí tienes el archivo **README.md** completo, estructurado profesionalmente y en un único bloque de código Markdown, incluyendo todos los detalles exactos de tus dependencias, versiones y estructura de archivos tal como aparecen en tus capturas.
-
 ```markdown
 # 🎵 Vibra - Tu Música, Tu Momento
 
@@ -95,23 +93,14 @@ lib/
 ├── screens/                   # Pantallas de la aplicación (UI)
 │   ├── account_screen.dart    # Perfil de usuario
 │   ├── calendar_screen.dart   # Calendario de eventos
-│   ├── concert_detail_screen.dart
-│   ├── concerts_in_range_screen.dart
-│   ├── customizeProfile_screen.dart
-│   ├── filtered_events_screen.dart
-│   ├── help_screen.dart       # Ayuda y Soporte
 │   ├── home_screen.dart       # Pantalla principal
 │   ├── login_screen.dart      # Autenticación
-│   ├── music_preferences_screen.dart
-│   ├── saved_events_screen.dart
 │   ├── settings_screen.dart   # Ajustes y Privacidad
-│   ├── social_screen.dart
-│   └── ticket_screen.dart
+│   └── ... (otras pantallas)
 ├── services/                  # Lógica de negocio externa
-│   ├── AuthServices.dart      # Gestión general de Auth
+│   ├── auth_services.dart     # Gestión general de Auth
 │   ├── google_auth.dart       # Lógica específica de Google
 │   ├── spotify_api_service.dart # Conexión API Spotify
-│   ├── spotify_auth.dart      # Autenticación Spotify
 │   ├── ticketmaster_service.dart # API Eventos
 │   └── user_data_service.dart # Gestión de Firestore
 ├── utils/                     # Utilidades y constantes
@@ -221,13 +210,13 @@ El proyecto está construido utilizando herramientas de vanguardia en el ecosist
 
 ## Personas-Desarrolladores del Proyecto
 
-Este proyecto ha sido desarrollado con pasión y rigor técnico por el siguiente equipo, como parte del módulo **Desarrollo de Aplicaciones Multiplataforma (PMDM)**:
+Este proyecto ha sido desarrollado por el siguiente equipo, como parte del módulo **Desarrollo de Aplicaciones Multiplataforma (DAM)**:
 
 | Desarrollador | Roles Principales | Contacto |
 | --- | --- | --- |
-| **Ángel Sáez Díaz** | *Product Owner & Full Stack Developer* | [GitHub](https://www.google.com/search?q=%23) |
-| **David Cruces Manuitt** | *Scrum Master & Backend Specialist* | [GitHub](https://www.google.com/search?q=%23) |
-| **Marcelo Moreira Pereira** | *QA Lead & UI/UX Developer* | [GitHub](https://www.google.com/search?q=%23) |
+| **Ángel Sáez Díaz** | *Desarrollador DAM* | [GitHub](https://github.com/ASaez-D) |
+| **David Cruces Manuitt** | *Desarrollador DAM* | [GitHub](https://github.com/davcruman) |
+| **Marcelo Moreira Pereira** | *Desarrollador DAM* | [GitHub](https://github.com/marmormai) |
 
 > *Agradecemos también a las comunidades open source de Flutter y Firebase por las herramientas que hacen posible este desarrollo.*
 
