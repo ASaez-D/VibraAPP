@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import '../models/concert_detail.dart';
 
 class TicketmasterService {
-  // ⚠️ RECUERDA: Pon tu API Key real de Ticketmaster aquí
+  // ⚠️ RECUERDA: Mantén tu API Key segura. 
   final String apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6';
 
   String _formatDate(DateTime date) {
@@ -20,7 +21,7 @@ class TicketmasterService {
     String countryCode = 'ES', 
     String? keyword,           
     int page = 0,              
-    int size = 50, // <--- AÑADIDO: Ahora aceptamos el tamaño de página (por defecto 50)
+    int size = 50, 
   }) async {
     final startStr = _formatDate(start);
     final endStr = _formatDate(end);
@@ -31,7 +32,7 @@ class TicketmasterService {
         '&startDateTime=$startStr'
         '&endDateTime=$endStr'
         '&countryCode=$countryCode'
-        '&size=$size'     // <--- AÑADIDO: Usamos la variable size aquí
+        '&size=$size'     
         '&page=$page'     
         '&sort=date,asc';
     
@@ -59,11 +60,22 @@ class TicketmasterService {
           return [];
         }
       } else {
-        print("Error Ticketmaster: ${response.statusCode} - ${response.body}");
+        // Reemplazado print por developer.log
+        developer.log(
+          'Error en respuesta de Ticketmaster',
+          name: 'ticketmaster.service',
+          error: 'Status: ${response.statusCode}, Body: ${response.body}',
+        );
         return [];
       }
-    } catch (e) {
-      print("Excepción en servicio TM: $e");
+    } catch (e, stackTrace) {
+      // Reemplazado print por developer.log incluyendo el stackTrace para mejor depuración
+      developer.log(
+        'Excepción en servicio TM',
+        name: 'ticketmaster.service',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return []; 
     }
   }
@@ -89,9 +101,20 @@ class TicketmasterService {
           final events = data['_embedded']['events'] as List<dynamic>;
           return events.map((e) => ConcertDetail.fromJson(e)).toList();
         }
+      } else {
+        developer.log(
+          'Error en búsqueda por keyword',
+          name: 'ticketmaster.service',
+          error: 'Status: ${response.statusCode}',
+        );
       }
       return [];
     } catch (e) {
+      developer.log(
+        'Excepción en búsqueda por keyword',
+        name: 'ticketmaster.service',
+        error: e,
+      );
       return [];
     }
   }
