@@ -122,8 +122,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
             colors: [Color(0xFF252525), Color(0xFF151515)],
           ),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))],
+      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.4), 
+          blurRadius: 15, 
+          offset: const Offset(0, 8)
+        )
+      ],
         ),
         child: Row(
           children: [
