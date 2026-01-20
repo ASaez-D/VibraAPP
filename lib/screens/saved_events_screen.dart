@@ -29,9 +29,9 @@ class SavedEventsScreen extends StatelessWidget {
               colors: [Color(0xFFFFFFFF), Color(0xFFEEEEEE)],
             ),
       'cardShadow': isDarkMode 
-          ? BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))
-          : BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
-      'cardBorderColor': isDarkMode ? Colors.white.withOpacity(0.08) : Colors.grey.withOpacity(0.2),
+          ? BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 15, offset: const Offset(0, 8))
+          : BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
+      'cardBorderColor': isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
       'emptyIconColor': isDarkMode ? Colors.grey[800] : Colors.grey[400],
       'emptyTextColor': isDarkMode ? Colors.grey[600] : Colors.grey[700],
     };
@@ -39,7 +39,7 @@ class SavedEventsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!; // 2. Traductor
+    final l10n = AppLocalizations.of(context)!;
     final colors = _getThemedColors(context);
     final Color scaffoldBg = colors['scaffoldBg'];
     final Color primaryText = colors['primaryText'];
@@ -55,7 +55,7 @@ class SavedEventsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          l10n.menuSaved.toUpperCase(), // "MIS GUARDADOS"
+          l10n.menuSaved.toUpperCase(),
           style: TextStyle(
             color: primaryText,
             fontWeight: FontWeight.w900,
@@ -88,7 +88,6 @@ class SavedEventsScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final currentLocale = Localizations.localeOf(context).languageCode;
 
-    // Fechas dinámicas por idioma
     final String day = DateFormat('d', currentLocale).format(concert.date);
     final String month = DateFormat('MMM', currentLocale).format(concert.date).toUpperCase();
     final String time = DateFormat('HH:mm', currentLocale).format(concert.date);
@@ -96,7 +95,9 @@ class SavedEventsScreen extends StatelessWidget {
     final String uniqueHeroTag = "saved_${concert.name}_$index";
 
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
-    if (priceLabel.length > 8) priceLabel = l10n.savedPriceInfo; // "Ver más"
+    if (priceLabel.length > 8) {
+      priceLabel = l10n.savedPriceInfo;
+    }
 
     return GestureDetector(
       onTap: () {
@@ -140,7 +141,7 @@ class SavedEventsScreen extends StatelessWidget {
                             fit: BoxFit.cover,
                             cacheWidth: 300, 
                         )
-                      : Center(child: Icon(Icons.music_note, color: secondaryText.withOpacity(0.5))),
+                      : Center(child: Icon(Icons.music_note, color: secondaryText.withValues(alpha: 0.5))),
                 ),
               ),
             ),
@@ -156,7 +157,7 @@ class SavedEventsScreen extends StatelessWidget {
                       children: [
                         Text("$day $month", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(width: 8),
-                        Container(width: 4, height: 4, decoration: BoxDecoration(color: secondaryText.withOpacity(0.5), shape: BoxShape.circle)),
+                        Container(width: 4, height: 4, decoration: BoxDecoration(color: secondaryText.withValues(alpha: 0.5), shape: BoxShape.circle)),
                         const SizedBox(width: 8),
                         Text(time, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500)),
                       ],
