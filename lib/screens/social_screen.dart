@@ -5,7 +5,6 @@ class SocialScreen extends StatelessWidget {
 
   // Mantenemos accentColor ya que es el color de marca (verde)
   final Color accentColor = Colors.greenAccent; 
-  // ELIMINADO: final Color backgroundColor = const Color(0xFF0E0E0E);
 
   // Datos de ejemplo
   final List<Map<String, dynamic>> friends = const [
@@ -25,49 +24,54 @@ class SocialScreen extends StatelessWidget {
     final mainTextColor = isDark ? Colors.white : Colors.black;
     final hintColor = isDark ? Colors.grey[600] : Colors.grey[700];
     final searchFieldColor = isDark ? const Color(0xFF1C1C1E) : Colors.grey[200];
-    final listTileDividerColor = isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.1);
+    
+    // --- CAMBIO AQUÍ: Uso de withValues en lugar de withOpacity ---
+    final listTileDividerColor = isDark 
+        ? Colors.white.withValues(alpha: 0.05) 
+        : Colors.black.withValues(alpha: 0.1);
+        
     final trailingIconColor = isDark ? Colors.white54 : Colors.black45;
     
-    // Color de fondo del Scaffold (se usa el del tema global: blanco o negro)
+    // Color de fondo del Scaffold
     final scaffoldBgColor = Theme.of(context).scaffoldBackgroundColor; 
     
-    // Color del fondo de la AppBar (se usa el del tema global)
+    // Color del fondo de la AppBar
     final appBarBgColor = Theme.of(context).appBarTheme.backgroundColor;
-
 
     return Scaffold(
       backgroundColor: scaffoldBgColor,
       appBar: AppBar(
         backgroundColor: appBarBgColor,
         elevation: 0,
+        centerTitle: false,
         title: Text(
           "Mis Amigos",
           style: TextStyle(
             fontWeight: FontWeight.bold, 
             fontSize: 22, 
-            color: mainTextColor // Color dinámico
+            color: mainTextColor
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person_add_alt_1_rounded, color: mainTextColor), // Icono dinámico
+            icon: Icon(Icons.person_add_alt_1_rounded, color: mainTextColor),
             onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          // Barra de búsqueda simple
+          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              style: TextStyle(color: mainTextColor), // Texto de entrada dinámico
+              style: TextStyle(color: mainTextColor),
               decoration: InputDecoration(
                 hintText: "Buscar amigo...",
                 hintStyle: TextStyle(color: hintColor),
                 prefixIcon: Icon(Icons.search, color: hintColor),
                 filled: true,
-                fillColor: searchFieldColor, // Color de relleno dinámico
+                fillColor: searchFieldColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -81,20 +85,19 @@ class SocialScreen extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               itemCount: friends.length,
-              separatorBuilder: (context, index) => Divider(color: listTileDividerColor, height: 1), // Divisor dinámico
+              separatorBuilder: (context, index) => Divider(color: listTileDividerColor, height: 1),
               itemBuilder: (context, index) {
                 final friend = friends[index];
                 final isOnline = friend['status'] == "En línea";
 
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  // Avatar con indicador de estado
                   leading: Stack(
                     children: [
                       CircleAvatar(
                         radius: 24,
                         backgroundImage: NetworkImage(friend['img']),
-                        backgroundColor: Colors.grey[800], // Este color está bien en ambos modos
+                        backgroundColor: Colors.grey[800],
                       ),
                       if (isOnline)
                         Positioned(
@@ -106,34 +109,29 @@ class SocialScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: accentColor,
                               shape: BoxShape.circle,
-                              // El borde debe contrastar con el fondo del Scaffold
                               border: Border.all(color: scaffoldBgColor, width: 2), 
                             ),
                           ),
                         ),
                     ],
                   ),
-                  // Nombre
                   title: Text(
                     friend['name'],
                     style: TextStyle(
-                      color: mainTextColor, // Color dinámico
+                      color: mainTextColor,
                       fontWeight: FontWeight.bold, 
                       fontSize: 16
                     ),
                   ),
-                  // Estado
                   subtitle: Text(
                     friend['status'],
                     style: TextStyle(
-                      // Si está en línea, usa el color de marca (verde). Si no, usa un gris dinámico.
                       color: isOnline ? accentColor : hintColor, 
                       fontSize: 13,
                     ),
                   ),
-                  // Botón de chat
                   trailing: IconButton(
-                    icon: Icon(Icons.chat_bubble_outline_rounded, color: trailingIconColor, size: 22), // Icono dinámico
+                    icon: Icon(Icons.chat_bubble_outline_rounded, color: trailingIconColor, size: 22),
                     onPressed: () {},
                   ),
                 );

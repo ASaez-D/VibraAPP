@@ -52,7 +52,7 @@ class _AnimatedIconButtonState extends State<AnimatedIconButton> with SingleTick
   }
 
   void _handleTap() {
-    // 1. Feedback táctil (Vibración sutil) ¡IMPORTANTE PARA SENSACIÓN PREMIUM!
+    // 1. Feedback táctil (Vibración sutil)
     HapticFeedback.lightImpact();
 
     // 2. Ejecutar la lógica principal (cambiar estado en la app)
@@ -64,11 +64,13 @@ class _AnimatedIconButtonState extends State<AnimatedIconButton> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    // Usamos el mismo diseño de contenedor que tenías antes
+    // Definimos el color actual basado en la selección
     final Color currentColor = widget.isSelected ? widget.colorSelected : Colors.white;
+    
+    // --- CAMBIO AQUÍ: Uso de withValues en lugar de withOpacity ---
     final Color currentFill = widget.isSelected 
-        ? (widget.fillColorSelected ?? widget.colorSelected.withOpacity(0.2))
-        : Colors.white.withOpacity(0.15);
+        ? (widget.fillColorSelected ?? widget.colorSelected.withValues(alpha: 0.2))
+        : Colors.white.withValues(alpha: 0.15);
 
     return GestureDetector(
       onTap: _handleTap,
@@ -82,7 +84,8 @@ class _AnimatedIconButtonState extends State<AnimatedIconButton> with SingleTick
             shape: BoxShape.circle,
             color: currentFill,
             border: Border.all(
-              color: currentColor.withOpacity(widget.isSelected ? 1.0 : 0.5),
+              // --- CAMBIO AQUÍ: Uso de withValues para el borde ---
+              color: currentColor.withValues(alpha: widget.isSelected ? 1.0 : 0.5),
               width: 1
             ),
           ),
