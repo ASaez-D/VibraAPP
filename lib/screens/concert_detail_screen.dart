@@ -106,7 +106,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
   void _shareEvent(AppLocalizations l10n) {
     final dateStr = DateFormat('d MMM yyyy').format(widget.concert.date);
-    // Corregido según sugerencia del linter: usar la clase Share del paquete share_plus correctamente
+    // Corregido según sugerencia del linter: usar la clase Share del paquete share_plus correctamente   
     // ignore: deprecated_member_use
     Share.share('¡Mira este planazo en Vibra! 🎸\n${widget.concert.name}\n📅 $dateStr\n📍 ${widget.concert.venue}\n${widget.concert.ticketUrl}');
   }
