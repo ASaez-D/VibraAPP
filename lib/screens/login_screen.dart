@@ -14,198 +14,38 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isLoadingSpotify = false;
-  bool _isLoadingGoogle = false;
+  // Principio: Nombres descriptivos
+  bool _isProcessingSpotify = false;
+  bool _isProcessingGoogle = false;
+
+  // Instancias de servicios (Dependency Inversion / Single Responsibility)
+  final _userDataService = UserDataService();
 
   @override
   Widget build(BuildContext context) {
-    // 2. Acceso corto a las traducciones
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0E0E0E),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView( // Mejora de usabilidad para pantallas pequeñas
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo Vibra
-              SizedBox(
-                height: 110,
-                width: 110,
-                child: Image.asset('assets/vibraLogo.png', fit: BoxFit.cover),
-              ),
-
+              _buildLogo(),
               const SizedBox(height: 24),
-
-              Text(
-                l10n.appTitle, // "Vibra"
-                style: const TextStyle( // El estilo sí puede ser const
-                  color: Colors.white,
-                  fontSize: 42,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Montserrat',
-                  letterSpacing: 1.5,
-                ),
-              ),
-
+              _buildTitle(l10n.appTitle),
               const SizedBox(height: 50),
-
-              // --- BOTÓN SPOTIFY ---
-              _buildLoginButton(
-                gradientColors: [
-                  Colors.greenAccent.shade700,
-                  Colors.greenAccent.shade400,
-                ],
-                iconPath: 'assets/spotifyLogo.png',
-                // Texto dinámico: Cargando... o Iniciar con...
-                text: _isLoadingSpotify ? l10n.loginLoading : l10n.loginSpotify,
-                textColor: Colors.black,
-                onPressed: _isLoadingSpotify
-                    ? null
-                    : () async {
-                        setState(() => _isLoadingSpotify = true);
-                        final spotify = SpotifyAuth();
-
-                        try {
-                          final profile = await spotify.login();
-                          if (profile == null) throw 'No profile data';
-
-                          final String? accessToken = profile['access_token']; 
-                          String? photoUrl;
-                          final images = profile['images'];
-                          if (images is List && images.isNotEmpty) {
-                            photoUrl = images[0]['url'] as String?;
-                          }
-
-                          final Map<String, dynamic> userProfile = {
-                            'id': profile['id'],
-                            'displayName': profile['display_name'] ?? 'Usuario',
-                            'email': profile['email'],
-                            'photoURL': photoUrl,
-                            'profileUrl': profile['external_urls']?['spotify'],
-                          };
-
-                          await UserDataService().saveUserFromMap(userProfile);
-
-                          if (!mounted) return;
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HomeScreen(
-                                userProfile: userProfile,
-                                authSource: 'spotify',
-                                spotifyAccessToken: accessToken,
-                              ),
-                            ),
-                          );
-                          
-                        } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              // "Error al iniciar sesión: {error}"
-                              SnackBar(content: Text(l10n.loginError(e.toString()))),
-                            );
-                          }
-                        } finally {
-                          if (mounted) setState(() => _isLoadingSpotify = false);
-                        }
-                      },
-              ),
-
+              
+              _buildSpotifyButton(l10n),
               const SizedBox(height: 25),
-
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: Colors.white24, thickness: 1, endIndent: 10)),
-                  Text('o', style: TextStyle(color: Colors.white54, fontSize: 14)),
-                  Expanded(child: Divider(color: Colors.white24, thickness: 1, indent: 10)),
-                ],
-              ),
-
+              _buildDivider(),
               const SizedBox(height: 25),
-
-              // --- BOTÓN GOOGLE ---
-              _buildLoginButton(
-                gradientColors: [
-                  Colors.blueAccent.shade700,
-                  Colors.blueAccent.shade400,
-                ],
-                iconPath: 'assets/googleLogo.png',
-                // Texto dinámico
-                text: _isLoadingGoogle ? l10n.loginLoading : l10n.loginGoogle,
-                textColor: Colors.white,
-                isGoogle: true,
-                onPressed: _isLoadingGoogle
-                    ? null
-                    : () async {
-                        setState(() => _isLoadingGoogle = true);
-
-                        try {
-                          final googleAuth = GoogleAuth();
-                          final profile = await googleAuth.login();
-
-                          if (profile == null) throw 'No profile data';
-
-                          final Map<String, dynamic> userProfile = {
-                            'displayName': profile['displayName'] ?? 'Usuario',
-                            'email': profile['email'],
-                            'photoURL': profile['photoURL'],
-                            'uid': profile['uid'],
-                          };
-
-                          await UserDataService().saveUserFromMap(userProfile);
-
-                          final prefs = await UserDataService().getUserPreferences();
-                          final bool hasPreferences = prefs != null && prefs['preferencesSet'] == true;
-
-                          if (!mounted) return;
-
-                          if (hasPreferences) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => HomeScreen(
-                                  userProfile: userProfile,
-                                  authSource: 'google',
-                                ),
-                              ),
-                            );
-                          } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MusicPreferencesScreen(
-                                  userProfile: userProfile,
-                                  authSource: 'google',
-                                ),
-                              ),
-                            );
-                          }
-
-                        } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              // "Error al iniciar sesión: {error}"
-                              SnackBar(content: Text(l10n.loginError(e.toString()))),
-                            );
-                          }
-                        } finally {
-                          if (mounted) setState(() => _isLoadingGoogle = false);
-                        }
-                      },
-              ),
-
+              _buildGoogleButton(l10n),
+              
               const SizedBox(height: 40),
-
-              // Términos y condiciones
-              Text(
-                l10n.loginTerms, 
-                style: const TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
-                textAlign: TextAlign.center,
-              ),
+              _buildTermsText(l10n.loginTerms),
             ],
           ),
         ),
@@ -213,15 +53,194 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ---- REUSABLE BUTTON ----
-  Widget _buildLoginButton({
-    required List<Color> gradientColors,
-    required String iconPath,
-    required String text,
-    required VoidCallback? onPressed,
-    Color textColor = Colors.white,
-    bool isGoogle = false,
-  }) {
+  // --- MÉTODOS DE UI (Con una sola responsabilidad) ---
+
+  Widget _buildLogo() {
+    return SizedBox(
+      height: 110,
+      width: 110,
+      child: Image.asset('assets/vibraLogo.png', fit: BoxFit.cover),
+    );
+  }
+
+  Widget _buildTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 42,
+        fontWeight: FontWeight.w800,
+        fontFamily: 'Montserrat',
+        letterSpacing: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Row(
+      children: const [
+        Expanded(child: Divider(color: Colors.white24, thickness: 1, endIndent: 10)),
+        Text('o', style: TextStyle(color: Colors.white54, fontSize: 14)),
+        Expanded(child: Divider(color: Colors.white24, thickness: 1, indent: 10)),
+      ],
+    );
+  }
+
+  Widget _buildTermsText(String terms) {
+    return Text(
+      terms,
+      style: const TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  // --- LÓGICA DE NEGOCIO  ---
+
+  Future<void> _handleSpotifyLogin(AppLocalizations l10n) async {
+    setState(() => _isProcessingSpotify = true);
+    try {
+      final profile = await SpotifyAuth().login();
+      if (profile == null) return;
+
+      final userMap = _mapSpotifyToUser(profile);
+      await _userDataService.saveUserFromMap(userMap);
+
+      if (!mounted) return;
+      _navigateToHome(userMap, 'spotify', profile['access_token']);
+      
+    } catch (e) {
+      _showErrorSnackBar(l10n.loginError(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isProcessingSpotify = false);
+    }
+  }
+
+  Future<void> _handleGoogleLogin(AppLocalizations l10n) async {
+    setState(() => _isProcessingGoogle = true);
+    try {
+      final profile = await GoogleAuth().login();
+      if (profile == null) return;
+
+      final userMap = _mapGoogleToUser(profile);
+      await _userDataService.saveUserFromMap(userMap);
+
+      final prefs = await _userDataService.getUserPreferences();
+      final bool hasPreferences = prefs != null && prefs['preferencesSet'] == true;
+
+      if (!mounted) return;
+      
+      if (hasPreferences) {
+        _navigateToHome(userMap, 'google');
+      } else {
+        _navigateToPreferences(userMap);
+      }
+    } catch (e) {
+      _showErrorSnackBar(l10n.loginError(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isProcessingGoogle = false);
+    }
+  }
+
+  // --- MAPPERS (Evitan bloques gigantes de código en los botones) ---
+
+  Map<String, dynamic> _mapSpotifyToUser(Map<String, dynamic> profile) {
+    String? photoUrl;
+    if (profile['images'] is List && (profile['images'] as List).isNotEmpty) {
+      photoUrl = profile['images'][0]['url'];
+    }
+    return {
+      'id': profile['id'],
+      'displayName': profile['display_name'] ?? 'Usuario',
+      'email': profile['email'],
+      'photoURL': photoUrl,
+      'profileUrl': profile['external_urls']?['spotify'],
+    };
+  }
+
+  Map<String, dynamic> _mapGoogleToUser(Map<String, dynamic> profile) {
+    return {
+      'displayName': profile['displayName'] ?? 'Usuario',
+      'email': profile['email'],
+      'photoURL': profile['photoURL'],
+      'uid': profile['uid'],
+    };
+  }
+
+  // --- NAVEGACIÓN Y UTILS ---
+
+  void _navigateToHome(Map<String, dynamic> profile, String source, [String? token]) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomeScreen(
+          userProfile: profile,
+          authSource: source,
+          spotifyAccessToken: token,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPreferences(Map<String, dynamic> profile) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MusicPreferencesScreen(
+          userProfile: profile,
+          authSource: 'google',
+        ),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // --- BOTONES COMPUESTOS ---
+
+  Widget _buildSpotifyButton(AppLocalizations l10n) {
+    return _LoginButton(
+      text: _isProcessingSpotify ? l10n.loginLoading : l10n.loginSpotify,
+      iconPath: 'assets/spotifyLogo.png',
+      gradientColors: [Colors.greenAccent.shade700, Colors.greenAccent.shade400],
+      textColor: Colors.black,
+      onPressed: _isProcessingSpotify ? null : () => _handleSpotifyLogin(l10n),
+    );
+  }
+
+  Widget _buildGoogleButton(AppLocalizations l10n) {
+    return _LoginButton(
+      text: _isProcessingGoogle ? l10n.loginLoading : l10n.loginGoogle,
+      iconPath: 'assets/googleLogo.png',
+      gradientColors: [Colors.blueAccent.shade700, Colors.blueAccent.shade400],
+      isGoogle: true,
+      onPressed: _isProcessingGoogle ? null : () => _handleGoogleLogin(l10n),
+    );
+  }
+}
+
+// --- COMPONENTE REUTILIZABLE ---
+
+class _LoginButton extends StatelessWidget {
+  final String text;
+  final String iconPath;
+  final List<Color> gradientColors;
+  final VoidCallback? onPressed;
+  final Color textColor;
+  final bool isGoogle;
+
+  const _LoginButton({
+    required this.text,
+    required this.iconPath,
+    required this.gradientColors,
+    this.onPressed,
+    this.textColor = Colors.white,
+    this.isGoogle = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: gradientColors),
@@ -235,28 +254,13 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
         onPressed: onPressed,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 26,
-              height: 26,
-              decoration: isGoogle
-                  ? const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    )
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: Image.asset(iconPath, fit: BoxFit.contain),
-              ),
-            ),
+            _buildIcon(),
             const SizedBox(width: 12),
             Text(
               text,
@@ -269,6 +273,18 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildIcon() {
+    return Container(
+      width: 26,
+      height: 26,
+      decoration: isGoogle ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle) : null,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Image.asset(iconPath, fit: BoxFit.contain),
       ),
     );
   }

@@ -14,7 +14,7 @@ import '../providers/language_provider.dart';
 // IMPORTS PANTALLAS
 import 'login_screen.dart';
 import 'settings_screen.dart';
-import 'customizeProfile_screen.dart';
+import 'customize_profile_screen.dart';
 import 'calendar_screen.dart';
 import 'ticket_screen.dart';
 import 'social_screen.dart';

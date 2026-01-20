@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; 
 import 'package:intl/intl.dart';
@@ -86,7 +85,9 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
   // --- FUNCIONES ---
 
   void _launchURL(String url) async {
-    if (url.isEmpty) return;
+    if (url.isEmpty) {
+      return;
+    }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -105,7 +106,8 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
 
   void _shareEvent(AppLocalizations l10n) {
     final dateStr = DateFormat('d MMM yyyy').format(widget.concert.date);
-    // Usamos texto traducido o dejamos este si es muy específico
+    // Corregido según sugerencia del linter: usar la clase Share del paquete share_plus correctamente   
+    // ignore: deprecated_member_use
     Share.share('¡Mira este planazo en Vibra! 🎸\n${widget.concert.name}\n📅 $dateStr\n📍 ${widget.concert.venue}\n${widget.concert.ticketUrl}');
   }
 
@@ -170,14 +172,13 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
       'primaryText': isDarkMode ? Colors.white : Colors.black87,
       'secondaryText': isDarkMode ? Colors.white54 : Colors.grey[600]!,
       'iconBg': isDarkMode ? Colors.grey[900]! : Colors.grey[200]!,
-      'borderColor': isDarkMode ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.2),
-      'shadowColor': isDarkMode ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.1),
+      'borderColor': isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
+      'shadowColor': isDarkMode ? Colors.black.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.1),
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    // 2. Traducciones
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = Localizations.localeOf(context).languageCode;
 
@@ -190,13 +191,15 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
     final borderColor = colors['borderColor']!;
     final shadowColor = colors['shadowColor']!;
     
-    // Fecha automática según idioma
     final String formattedDate = DateFormat('EEE d MMM, HH:mm', currentLocale).format(widget.concert.date);
     
-    // Precios: "Ver precios" se traduce si es ese string exacto, si no, se muestra tal cual
     String mainPrice = widget.concert.priceRange; 
-    if (mainPrice == "Ver precios") mainPrice = l10n.detailCheckPrices; 
-    else if (mainPrice == "GRATIS") mainPrice = l10n.detailFree;
+    // Corregido: Envolviendo en bloques con llaves
+    if (mainPrice == "Ver precios") {
+      mainPrice = l10n.detailCheckPrices;
+    } else if (mainPrice == "GRATIS") {
+      mainPrice = l10n.detailFree;
+    }
 
     final String heroTagToUse = widget.heroTag ?? widget.concert.name + widget.concert.date.toString();
 
@@ -206,7 +209,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         backgroundColor: scaffoldBg,
         elevation: 0,
         centerTitle: true,
-        title: Text(l10n.detailEventTitle, style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.bold)), // "Evento"
+        title: Text(l10n.detailEventTitle, style: TextStyle(color: primaryText, fontSize: 16, fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: primaryText, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -248,7 +251,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.broken_image, size: 50, color: secondaryText)),
                             )
-                          : Center(child: Icon(Icons.music_note, size: 50, color: secondaryText.withOpacity(0.5))),
+                          : Center(child: Icon(Icons.music_note, size: 50, color: secondaryText.withValues(alpha: 0.5))),
                     ),
                   ),
                 ),
@@ -278,30 +281,30 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 children: [
                   _buildAnimatedActionButton(
                     icon: isSaved ? Icons.bookmark : Icons.bookmark_border_rounded, 
-                    label: isSaved ? l10n.detailBtnSaved : l10n.detailBtnSave, // "Guardado" / "Guardar"
+                    label: isSaved ? l10n.detailBtnSaved : l10n.detailBtnSave,
                     iconColor: isSaved ? accentColor : primaryText,
                     textColor: secondaryText,
-                    buttonBg: primaryText.withOpacity(0.08),
-                    borderColor: isSaved ? accentColor.withOpacity(0.7) : borderColor,
+                    buttonBg: primaryText.withValues(alpha: 0.08),
+                    borderColor: isSaved ? accentColor.withValues(alpha: 0.7) : borderColor,
                     onTap: () => _toggleSave(l10n),
                     animation: _saveAnimation,
                   ),
                   _buildAnimatedActionButton(
                     icon: Icons.ios_share_rounded, 
-                    label: l10n.detailBtnShare, // "Compartir"
+                    label: l10n.detailBtnShare,
                     iconColor: primaryText,
                     textColor: secondaryText,
-                    buttonBg: primaryText.withOpacity(0.08),
+                    buttonBg: primaryText.withValues(alpha: 0.08),
                     borderColor: borderColor,
                     onTap: () => _shareEvent(l10n),
                   ),
                   _buildAnimatedActionButton(
                     icon: isLiked ? Icons.favorite : Icons.thumb_up_off_alt_rounded, 
-                    label: l10n.detailBtnLike, // "Me gusta"
+                    label: l10n.detailBtnLike,
                     iconColor: isLiked ? Colors.redAccent : primaryText, 
                     textColor: secondaryText,
-                    buttonBg: primaryText.withOpacity(0.08),
-                    borderColor: isLiked ? Colors.redAccent.withOpacity(0.7) : borderColor,
+                    buttonBg: primaryText.withValues(alpha: 0.08),
+                    borderColor: isLiked ? Colors.redAccent.withValues(alpha: 0.7) : borderColor,
                     onTap: _toggleLike,
                     animation: _likeAnimation,
                   ),
@@ -309,10 +312,10 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               ),
 
               const SizedBox(height: 32),
-              Divider(color: primaryText.withOpacity(0.1)),
+              Divider(color: primaryText.withValues(alpha: 0.1)),
               const SizedBox(height: 32),
 
-              _buildSectionTitle(l10n.detailInfoTitle, primaryText), // "Información"
+              _buildSectionTitle(l10n.detailInfoTitle, primaryText),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -323,19 +326,19 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                 ),
                 child: Column(
                   children: [
-                    _buildInfoRow(Icons.info_outline_rounded, l10n.detailAgeRestricted, secondaryText, primaryText), // "Mayores de 18..."
+                    _buildInfoRow(Icons.info_outline_rounded, l10n.detailAgeRestricted, secondaryText, primaryText),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Divider(color: primaryText.withOpacity(0.1)),
+                      child: Divider(color: primaryText.withValues(alpha: 0.1)),
                     ),
-                    _buildInfoRow(Icons.campaign_outlined, l10n.detailOrganizedBy(widget.concert.venue), secondaryText, primaryText), // "Organizado por..."
+                    _buildInfoRow(Icons.campaign_outlined, l10n.detailOrganizedBy(widget.concert.venue), secondaryText, primaryText),
                   ],
                 ),
               ),
               
               const SizedBox(height: 32),
               
-              _buildSectionTitle(l10n.detailLocationTitle, primaryText), // "Ubicación"
+              _buildSectionTitle(l10n.detailLocationTitle, primaryText),
               const SizedBox(height: 16),
               
               Container(
@@ -401,7 +404,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                   errorBuilder: (context, error, stackTrace) => Container(color: iconBg),
                                 ),
                               ),
-                              Container(color: primaryText.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.6)),
+                              Container(color: primaryText.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.6)),
                               Icon(Icons.location_on, color: accentColor, size: 48),
                               Positioned(
                                 bottom: 12,
@@ -409,14 +412,14 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: primaryText.withOpacity(0.1),
+                                    color: primaryText.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(color: borderColor)
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(l10n.detailViewMap, style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.bold)), // "Ver mapa"
+                                      Text(l10n.detailViewMap, style: TextStyle(color: primaryText, fontSize: 12, fontWeight: FontWeight.bold)),
                                       const SizedBox(width: 6),
                                       Icon(Icons.open_in_new, color: primaryText, size: 14),
                                     ],
@@ -435,7 +438,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
               const SizedBox(height: 32),
 
               if (!_isLoadingRelated && _relatedConcerts.isNotEmpty) ...[
-                _buildSectionTitle(l10n.detailRelatedEvents, primaryText), // "Otras fechas / Gira"
+                _buildSectionTitle(l10n.detailRelatedEvents, primaryText),
                 const SizedBox(height: 16),
                 SizedBox(
                   height: 130, 
@@ -477,7 +480,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                                   ],
                                 ),
                               ),
-                              Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 14),
+                              Icon(Icons.arrow_forward_ios, color: secondaryText.withValues(alpha: 0.5), size: 14),
                             ],
                           ),
                         ),
@@ -498,7 +501,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         decoration: BoxDecoration(
           color: scaffoldBg,
-          border: Border(top: BorderSide(color: primaryText.withOpacity(0.1))),
+          border: Border(top: BorderSide(color: primaryText.withValues(alpha: 0.1))),
         ),
         child: SafeArea(
           top: false, 
@@ -518,7 +521,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                   ),
                   if (mainPrice != l10n.detailCheckPrices && mainPrice != l10n.detailFree)
                     Text(
-                      l10n.detailCheckWeb, // "Consulta en web"
+                      l10n.detailCheckWeb,
                       style: TextStyle(color: secondaryText, fontSize: 11),
                     )
                 ],
@@ -535,7 +538,7 @@ class _ConcertDetailScreenState extends State<ConcertDetailScreen> with TickerPr
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    child: Text(l10n.detailBtnBuy, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.5)), // "COMPRAR ENTRADAS"
+                    child: Text(l10n.detailBtnBuy, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
                   ),
                 ),
               ),

@@ -94,7 +94,7 @@ class HelpScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: cardColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200),
+              border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade200),
             ),
             child: Column(
               children: [
@@ -145,7 +145,7 @@ class HelpScreen extends StatelessWidget {
           Center(
             child: Text(
               "Vibra App v1.0.0",
-              style: TextStyle(color: subTextColor.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
+              style: TextStyle(color: subTextColor.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ),
           const SizedBox(height: 20),
@@ -234,14 +234,14 @@ class _SupportButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: textColor.withOpacity(0.05)),
+          border: Border.all(color: textColor.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.1),
+                color: accentColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: accentColor, size: 24),
@@ -263,14 +263,14 @@ class _SupportButton extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: textColor.withOpacity(0.5),
+                      color: textColor.withValues(alpha: 0.5),
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: textColor.withOpacity(0.3), size: 14),
+            Icon(Icons.arrow_forward_ios, color: textColor.withValues(alpha: 0.3), size: 14),
           ],
         ),
       ),
