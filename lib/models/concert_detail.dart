@@ -51,23 +51,22 @@ class ConcertDetail {
         }
       }
     } catch (e) {
-      // Si falla el venue, seguimos adelante
+      // Ignorar error de venue: se mantienen valores por defecto
     }
 
-    // 2. IMAGEN (Buscamos la de mejor calidad > 600px de ancho)
+    // 2. IMAGEN (Mejor calidad > 600px)
     String finalImageUrl = "";
     try {
       final images = json["images"];
       if (images is List && images.isNotEmpty) {
-        // Intentamos encontrar una imagen grande (apaisada)
         final highQualityImg = images.firstWhere(
           (img) => (img["width"] ?? 0) > 600, 
-          orElse: () => images[0] // Si no, cogemos la primera
+          orElse: () => images[0],
         );
         finalImageUrl = highQualityImg["url"] ?? "";
       }
     } catch (e) {
-      // Sin imagen
+      // Sin imagen disponible
     }
 
     // 3. GÉNERO
@@ -77,10 +76,12 @@ class ConcertDetail {
       if (classifications is List && classifications.isNotEmpty) {
         finalGenre = classifications[0]["genre"]?["name"] ?? "";
       }
-    } catch (e) {}
+    } catch (e) {
+      // Género no especificado
+    }
 
     // 4. PRECIO INTELIGENTE
-    String finalPrice = "Ver precios"; // Texto por defecto elegante
+    String finalPrice = "Ver precios"; 
     
     try {
       final prices = json["priceRanges"];
@@ -91,18 +92,20 @@ class ConcertDetail {
         String currency = priceData["currency"] ?? "EUR";
 
         // Convertimos códigos de moneda a símbolos
-        if (currency == "EUR") currency = "€";
-        else if (currency == "USD") currency = "\$";
-        else if (currency == "GBP") currency = "£";
+        if (currency == "EUR") {
+          currency = "€";
+        } else if (currency == "USD") {
+          currency = "\$";
+        } else if (currency == "GBP") {
+          currency = "£";
+        }
 
         if (min != null) {
           if (min == 0) {
             finalPrice = "GRATIS";
           } else {
-            // Quitamos decimales si es número entero (ej: 30.0 -> 30)
             String priceStr = min.toStringAsFixed(min.truncateToDouble() == min ? 0 : 2);
             
-            // Si hay un rango (el mínimo es distinto al máximo), ponemos "Desde"
             if (max != null && max > min) {
               finalPrice = "Desde $priceStr $currency";
             } else {
@@ -112,7 +115,7 @@ class ConcertDetail {
         }
       }
     } catch (e) {
-      // Si falla la lectura del precio, se queda en "Ver precios"
+      // Mantiene "Ver precios" si hay error
     }
 
     // 5. FECHA
