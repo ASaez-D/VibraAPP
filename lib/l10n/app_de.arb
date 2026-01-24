@@ -3,32 +3,72 @@
     "appTitle": "Vibra",
     "loginSpotify": "Mit Spotify anmelden",
     "loginGoogle": "Mit Google anmelden",
-    "loginLoading": "Laden...",
-    "loginTerms": "Indem Sie fortfahren, akzeptieren Sie unsere Bedingungen und Datenschutzrichtlinien.",
-    "loginError": "Fehler beim Anmelden: {error}",
+    "loginLoading": "Lädt...",
+    "loginTerms": "Wenn du fortfährst, akzeptierst du unsere AGB und Datenschutzrichtlinie.",
+    "loginError": "Anmeldefehler: {error}",
+    "@loginError": {
+        "placeholders": {
+            "error": { "type": "String" }
+        }
+    },
     "homeSearchHint": "Suche in {country}...",
+    "@homeSearchHint": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeGreeting": "Hallo, {name}",
+    "@homeGreeting": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "homeVibeTitle": "Entdecke {vibe}",
+    "@homeVibeTitle": {
+        "placeholders": {
+            "vibe": { "type": "String" }
+        }
+    },
     "vibeBest": "das Beste",
     "homeSectionArtists": "DEINE KÜNSTLER",
     "homeSectionArtistsSub": "Basierend auf deinem Hörverlauf",
     "homeSectionForYou": "NUR FÜR DICH",
     "homeSectionForYouSub": "Weil du {artist} hörst...",
+    "@homeSectionForYouSub": {
+        "placeholders": {
+            "artist": { "type": "String" }
+        }
+    },
     "homeSectionTrends": "TRENDS IN {country}",
+    "@homeSectionTrends": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeSectionTrendsSub": "Das Beliebteste der Woche",
     "homeSectionWeekend": "ENDLICH WOCHENENDE!",
     "homeSectionWeekendSub": "Pläne für dieses Wochenende",
-    "homeSectionDiscover": "MEHR ENTDECKEN",
+    "homeSectionDiscover": "ENTDECKE MEHR",
     "homeSectionDiscoverSub": "Erkunde neue Genres",
     "homeSectionCollections": "VIBES ERKUNDEN",
-    "homeSectionCollectionsSub": "Finde deinen idealen Plan",
+    "homeSectionCollectionsSub": "Finde deinen perfekten Plan",
     "homeBtnShowMore": "Mehr Events anzeigen",
     "homeBtnViewAll": "Alle Events ansehen",
     "homeTextNoMore": "Keine weiteren Events für {keyword}",
-    "homeTextEnd": "Du hast das Ende erreicht!",
+    "@homeTextNoMore": {
+        "placeholders": {
+            "keyword": { "type": "String" }
+        }
+    },
+    "homeTextEnd": "Du bist am Ende angekommen!",
     "homeErrorNoEvents": "Keine Events in {country} gefunden",
+    "@homeErrorNoEvents": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeBtnRetryCountry": "Events in Spanien ansehen",
-    "homeSearchNoResults": "Wir haben nichts gefunden",
+    "homeSearchNoResults": "Wir konnten nichts finden",
     "homeSearchClear": "Suche löschen",
     "menuAccount": "Mein Konto",
     "menuSaved": "Gespeicherte Events",
@@ -37,16 +77,26 @@
     "menuLogout": "Abmelden",
     "menuEditProfile": "Profil bearbeiten",
     "prefsTitle": "Hi, {name}! 🎧",
+    "@prefsTitle": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "prefsSubtitle": "Personalisiere deinen Feed. Was bewegt dich?",
     "prefsSearchHint": "Künstler suchen (z.B. Bad Bunny)...",
     "prefsYourArtists": "Deine Künstler:",
-    "prefsGenres": "Genres & Stile:",
-    "prefsBtnStart": "Los geht's",
+    "prefsGenres": "Genres und Stile:",
+    "prefsBtnStart": "Loslegen",
     "accountTitle": "Mein Konto",
     "accountConnection": "AKTIVE VERBINDUNG",
     "accountLinked": "Konto erfolgreich verknüpft",
     "accountOpenProfile": "Profil in {service} öffnen",
-    "calendarTitle": "Wann möchtest du ausgehen?",
+    "@accountOpenProfile": {
+        "placeholders": {
+            "service": { "type": "String" }
+        }
+    },
+    "calendarTitle": "Wann willst du ausgehen?",
     "calendarToday": "Heute",
     "calendarTomorrow": "Morgen",
     "calendarWeek": "Diese Woche",
@@ -58,16 +108,21 @@
     "detailBtnSave": "Speichern",
     "detailBtnSaved": "Gespeichert",
     "detailBtnShare": "Teilen",
-    "detailInfoTitle": "Informationen",
+    "detailInfoTitle": "Information",
     "detailAgeRestricted": "Ab 18 Jahren (Ausweis erforderlich).",
     "detailOrganizedBy": "Organisiert von {venue}",
-    "detailLocationTitle": "Standort",
+    "@detailOrganizedBy": {
+        "placeholders": {
+            "venue": { "type": "String" }
+        }
+    },
+    "detailLocationTitle": "Ort",
     "detailDoorsOpen": "Einlass",
-    "detailViewMap": "Karte anzeigen",
+    "detailViewMap": "Karte ansehen",
     "detailRelatedEvents": "Andere Termine / Tour",
     "detailCheckPrices": "Preise prüfen",
     "detailFree": "GRATIS",
-    "detailCheckWeb": "Auf Website prüfen",
+    "detailCheckWeb": "Auf Webseite prüfen",
     "detailBtnBuy": "TICKETS KAUFEN",
     "editProfileChangePhoto": "Foto ändern",
     "editProfileName": "Name",
@@ -75,31 +130,31 @@
     "editProfileSave": "Speichern",
     "editProfileCancel": "Abbrechen",
     "editProfileSuccess": "Profil erfolgreich aktualisiert",
-    "editProfileImageNotImplemented": "Bild-Upload-Funktion nicht implementiert",
+    "editProfileImageNotImplemented": "Bild-Upload noch nicht implementiert",
     "helpSearchHint": "Hilfe suchen...",
     "helpMainSubtitle": "Wie können wir dir heute helfen?",
-    "helpSectionFaq": "HÄUFIG GESTELLTE FRAGEN",
-    "helpSectionTutorials": "KURZANLEITUNGEN",
+    "helpSectionFaq": "HÄUFIGE FRAGEN",
+    "helpSectionTutorials": "SCHNELLSTART",
     "helpSectionSupport": "SUPPORT & RECHTLICHES",
     "helpFaq1Q": "Wie kaufe ich ein Ticket?",
-    "helpFaq1A": "Gehe zum gewünschten Konzert und klicke auf „Ticket kaufen“. Wähle eine Zahlungsmethode und bestätige.",
+    "helpFaq1A": "Gehe zum Konzert und tippe auf „Ticket kaufen“. Wähle die Zahlungsart und bestätige.",
     "helpFaq2Q": "Wie verwalte ich meine Benachrichtigungen?",
-    "helpFaq2A": "Unter „Benachrichtigungen“ kannst du Hinweise für Konzerte, Künstler und Empfehlungen aktivieren.",
+    "helpFaq2A": "Im Bereich Benachrichtigungen kannst du Alarme für Konzerte und Künstler aktivieren.",
     "helpFaq3Q": "Freunde einladen",
-    "helpFaq3A": "Klicke auf der Event-Seite auf „Freunde einladen“, um ihnen eine direkte Nachricht zu senden.",
+    "helpFaq3A": "Tippe auf der Eventseite auf „Freunde einladen“, um eine direkte Benachrichtigung zu senden.",
     "helpTut1": "Kaufanleitung",
-    "helpTut2": "Tickets entwerten",
+    "helpTut2": "Tickets nutzen",
     "helpTut3": "Kalender synchronisieren",
     "helpSupportContact": "Support kontaktieren",
     "helpSupportReport": "Problem melden",
-    "helpSupportTerms": "AGB",
+    "helpSupportTerms": "Allgemeine Geschäftsbedingungen",
     "savedEmptyTitle": "Du hast keine gespeicherten Konzerte",
-    "savedEmptySub": "Klicke auf das Speichern-Symbol auf dem Home-Bildschirm!",
+    "savedEmptySub": "Tippe auf das Speicher-Icon auf der Startseite!",
     "savedPriceInfo": "Mehr sehen",
     "settingsLanguage": "Sprache",
     "settingsHeaderNotifications": "Benachrichtigungen",
     "settingsGeneralNotifications": "Allgemeine Benachrichtigungen",
-    "settingsEventReminders": "Erinnerungen",
+    "settingsEventReminders": "Event-Erinnerungen",
     "settingsTicketReleases": "Ticket-Veröffentlichungen",
     "settingsHeaderPrivacy": "Datenschutz",
     "settingsLocationPermissions": "Standortberechtigungen",
@@ -112,18 +167,16 @@
     "settingsDialogAjustes": "Einstellungen",
     "commonError": "Ein Fehler ist aufgetreten",
     "commonSuccess": "Erfolgreich gespeichert",
-    
     "privacyTransparencyTitle": "Datentransparenz",
-    "privacyTransparencyDesc": "Bei Vibra schätzen wir Ihre Privatsphäre. Hier ist, was wir teilen und warum.",
+    "privacyTransparencyDesc": "Bei Vibra schätzen wir deine Privatsphäre. Hier siehst du, welche Daten geteilt werden.",
     "privacyProfile": "Öffentliches Profil",
     "privacyProfileDesc": "Dein Name und Foto sind sichtbar, wenn du Events teilst.",
     "privacyLocation": "Standort",
-    "privacyLocationDesc": "Wird nur verwendet, um dir Konzerte in der Nähe anzuzeigen.",
-    "privacyAnalytics": "Analytik",
+    "privacyLocationDesc": "Wird nur verwendet, um Konzerte in der Nähe anzuzeigen.",
+    "privacyAnalytics": "Analysen",
     "privacyAnalyticsDesc": "Anonyme Nutzungsdaten zur Verbesserung der App.",
-    
     "dialogDeleteTitle": "Konto löschen?",
-    "dialogDeleteBody": "Diese Aktion ist unwiderruflich. Alle deine Daten und Tickets werden gelöscht.",
+    "dialogDeleteBody": "Diese Aktion ist unwiderruflich. Alle Daten und Tickets werden gelöscht.",
     "dialogDeleteBtn": "Löschen",
     "dialogCancel": "Abbrechen",
     "dialogGenerating": "Datei wird erstellt...",
@@ -131,20 +184,45 @@
     "snackDeleteSuccess": "Dein Konto wurde gelöscht.",
     "snackDeleteReauth": "Aus Sicherheitsgründen bitte abmelden und erneut anmelden, um das Konto zu löschen.",
     "shareDataText": "Hier sind deine exportierten Daten von Vibra.",
-
     "dialogPermissionTitle": "Berechtigungen erforderlich",
-    "dialogPermissionContent": "Um diese Benachrichtigungen zu aktivieren, müssen Sie die Erlaubnis in den Einstellungen erteilen.",
+    "dialogPermissionContent": "Um diese Benachrichtigungen zu aktivieren, musst du die Erlaubnis in den Systemeinstellungen geben.",
     "dialogSettingsBtn": "Einstellungen",
     "notifPreviewTitle": "Benachrichtigungsvorschau",
-    "notifPreviewBody": "So sehen die Warnungen auf Ihrem Sperrbildschirm aus:",
+    "notifPreviewBody": "So sehen Alarme auf deinem Sperrbildschirm aus:",
     "btnActivate": "Aktivieren",
-    "notifGeneralTitle": "Neuigkeiten Vibra",
-    "notifGeneralBody": "Die App wurde aktualisiert! Entdecken Sie den neuen Dunkelmodus.",
+    "notifGeneralTitle": "Neuigkeiten bei Vibra",
+    "notifGeneralBody": "Die App wurde aktualisiert! Entdecke den neuen Dunkelmodus und Verbesserungen.",
     "notifReminderTitle": "📅 Es ist morgen!",
-    "notifReminderBody": "Dein gespeichertes Event 'Bad Bunny' ist morgen. Hast du deine Tickets?",
+    "notifReminderBody": "Dein gespeichertes Event 'Bad Bunny - World Tour' ist morgen. Hast du deine Tickets?",
     "notifTicketsTitle": "🎟️ Tickets verfügbar",
-    "notifTicketsBody": "Lauf! Neue Tickets für 'Taylor Swift' sind verfügbar.",
+    "notifTicketsBody": "Beeil dich! Neue Tickets für 'Taylor Swift' sind verfügbar. Verpasse sie nicht!",
     "timeNow": "Jetzt",
-    "time5min": "Vor 5 Min",
-    "time1min": "Vor 1 Min"
+    "time5min": "Vor 5 Min.",
+    "time1min": "Vor 1 Min.",
+
+    "regionTitle": "Wähle deine Region",
+    "regionSearchHint": "Land suchen...",
+    "regionExplore": "Entdecke {name}",
+    "@regionExplore": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionDialogCityBody": "Suchst du Konzerte in einer bestimmten Stadt?",
+    "regionDialogCityHint": "Bsp: Berlin, München...",
+    "regionBtnWholeCountry": "Ganzes Land ansehen",
+    "regionBtnApply": "Anwenden",
+    "regionOptionWholeCountry": "Ganzes Land",
+    "regionOptionWholeCountrySub": "Konzerte in ganz {name} ansehen",
+    "@regionOptionWholeCountrySub": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionHeaderPopular": "BELIEBTE STÄDTE",
+    "regionHeaderOther": "ANDERER ORT",
+    "regionOptionManual": "Andere Stadt eingeben...",
+    "regionManualTitle": "Stadt eingeben",
+    "regionManualHint": "Bsp: Stuttgart",
+    "regionManualSearch": "Suchen"
 }

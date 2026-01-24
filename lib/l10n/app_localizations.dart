@@ -969,6 +969,96 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hace 1 min'**
   String get time1min;
+
+  /// No description provided for @regionTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona tu Región'**
+  String get regionTitle;
+
+  /// No description provided for @regionSearchHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar país...'**
+  String get regionSearchHint;
+
+  /// No description provided for @regionExplore.
+  ///
+  /// In es, this message translates to:
+  /// **'Explora {name}'**
+  String regionExplore(String name);
+
+  /// No description provided for @regionDialogCityBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Buscas conciertos en una ciudad específica?'**
+  String get regionDialogCityBody;
+
+  /// No description provided for @regionDialogCityHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej: Madrid, Barcelona...'**
+  String get regionDialogCityHint;
+
+  /// No description provided for @regionBtnWholeCountry.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver todo el país'**
+  String get regionBtnWholeCountry;
+
+  /// No description provided for @regionBtnApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get regionBtnApply;
+
+  /// No description provided for @regionOptionWholeCountry.
+  ///
+  /// In es, this message translates to:
+  /// **'Todo el país'**
+  String get regionOptionWholeCountry;
+
+  /// No description provided for @regionOptionWholeCountrySub.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver conciertos en todo {name}'**
+  String regionOptionWholeCountrySub(String name);
+
+  /// No description provided for @regionHeaderPopular.
+  ///
+  /// In es, this message translates to:
+  /// **'CIUDADES POPULARES'**
+  String get regionHeaderPopular;
+
+  /// No description provided for @regionHeaderOther.
+  ///
+  /// In es, this message translates to:
+  /// **'OTRA UBICACIÓN'**
+  String get regionHeaderOther;
+
+  /// No description provided for @regionOptionManual.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribir otra ciudad...'**
+  String get regionOptionManual;
+
+  /// No description provided for @regionManualTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Escriure ciutat'**
+  String get regionManualTitle;
+
+  /// No description provided for @regionManualHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej: Benidorm'**
+  String get regionManualHint;
+
+  /// No description provided for @regionManualSearch.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar'**
+  String get regionManualSearch;
 }
 
 class _AppLocalizationsDelegate

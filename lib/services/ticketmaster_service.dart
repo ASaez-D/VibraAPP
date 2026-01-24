@@ -1,121 +1,167 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
+
+import 'package:flutter/foundation.dart';
+
 import 'package:http/http.dart' as http;
+
 import '../models/concert_detail.dart';
 
+
+
 class TicketmasterService {
-  // ⚠️ RECUERDA: Mantén tu API Key segura. 
-  final String apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6';
 
-  String _formatDate(DateTime date) {
-    final utcDate = date.toUtc();
-    final isoString = utcDate.toIso8601String();
-    return "${isoString.split('.')[0]}Z";
-  }
+  // ⚠️ Asegúrate de que esta sea tu API Key correcta
 
-  // --- 1. OBTENER CONCIERTOS (FEED PRINCIPAL Y SECCIONES) ---
+  final String _apiKey = 'hy4R9jYjmpBU2aKeNbwR1UMGEXw3Wdb6'; 
+
+  final String _baseUrl = 'https://app.ticketmaster.com/discovery/v2/events.json';
+
+
+
   Future<List<ConcertDetail>> getConcerts(
-    DateTime start, 
-    DateTime end, {
-    String? classificationId,
-    String countryCode = 'ES', 
-    String? keyword,           
-    int page = 0,              
-    int size = 50, 
+
+    DateTime startDate,
+
+    DateTime endDate, {
+
+    String? countryCode,
+
+    String? city,             // Filtro por Ciudad
+
+    String? keyword,          // Filtro por Palabra clave
+
+    String? classificationId, // <--- NUEVO: Filtro por Categoría/Género (Soluciona tu error)
+
+    int page = 0,
+
+    int size = 20,
+
   }) async {
-    final startStr = _formatDate(start);
-    final endStr = _formatDate(end);
 
-    // URL Base
-    String baseUrl = 'https://app.ticketmaster.com/discovery/v2/events.json?'
-        'apikey=$apiKey'
-        '&startDateTime=$startStr'
-        '&endDateTime=$endStr'
-        '&countryCode=$countryCode'
-        '&size=$size'     
-        '&page=$page'     
-        '&sort=date,asc';
     
-    // Lógica de Filtros
+
+    // Formatear fechas a ISO 8601
+
+    final startStr = startDate.toIso8601String().split('.')[0] + 'Z';
+
+    final endStr = endDate.toIso8601String().split('.')[0] + 'Z';
+
+
+
+    // Construcción base de la URL
+
+    String url =
+
+        '$_baseUrl?apikey=$_apiKey&startDateTime=$startStr&endDateTime=$endStr&size=$size&page=$page&sort=date,asc&segmentName=Music';
+
+
+
+    // 1. Filtro por País
+
+    if (countryCode != null && countryCode.isNotEmpty) {
+
+      url += '&countryCode=$countryCode';
+
+    }
+
+
+
+    // 2. Filtro por Ciudad
+
+    if (city != null && city.isNotEmpty) {
+
+      url += '&city=${Uri.encodeComponent(city)}';
+
+    }
+
+
+
+    // 3. Filtro por Palabra Clave
+
     if (keyword != null && keyword.isNotEmpty) {
-      baseUrl += '&keyword=${Uri.encodeComponent(keyword)}';
-    } else if (classificationId != null && classificationId.isNotEmpty) {
-      baseUrl += '&classificationId=$classificationId';
-    } else {
-      baseUrl += '&segmentName=Music';
+
+      url += '&keyword=${Uri.encodeComponent(keyword)}';
+
     }
 
-    final url = Uri.parse(baseUrl);
+
+
+    // 4. Filtro por ID de Clasificación (Género/Estilo)
+
+    // Esto es lo que necesita FilteredEventsScreen
+
+    if (classificationId != null && classificationId.isNotEmpty) {
+
+      url += '&classificationId=$classificationId';
+
+    }
+
+
 
     try {
-      final response = await http.get(url);
+
+      debugPrint('API Call: $url'); 
+
+      final response = await http.get(Uri.parse(url));
+
+
 
       if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes));
+
+        final data = json.decode(response.body);
+
+
 
         if (data['_embedded'] != null && data['_embedded']['events'] != null) {
-          final events = data['_embedded']['events'] as List<dynamic>;
-          return events.map((e) => ConcertDetail.fromJson(e)).toList();
+
+          final List<dynamic> eventsJson = data['_embedded']['events'];
+
+          return eventsJson.map((json) => ConcertDetail.fromJson(json)).toList();
+
         } else {
+
           return [];
+
         }
+
       } else {
-        // Reemplazado print por developer.log
-        developer.log(
-          'Error en respuesta de Ticketmaster',
-          name: 'ticketmaster.service',
-          error: 'Status: ${response.statusCode}, Body: ${response.body}',
-        );
+
+        debugPrint('Error Ticketmaster API: ${response.statusCode}');
+
         return [];
+
       }
-    } catch (e, stackTrace) {
-      // Reemplazado print por developer.log incluyendo el stackTrace para mejor depuración
-      developer.log(
-        'Excepción en servicio TM',
-        name: 'ticketmaster.service',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      return []; 
-    }
-  }
 
-  // --- 2. BUSCAR EVENTOS ESPECÍFICOS (Para "Solo para ti") ---
-  Future<List<ConcertDetail>> searchEventsByKeyword(String artistName, String countryCode) async {
-    final url = Uri.parse(
-        'https://app.ticketmaster.com/discovery/v2/events.json?'
-        'apikey=$apiKey'
-        '&keyword=${Uri.encodeComponent(artistName)}'
-        '&segmentName=Music'
-        '&countryCode=$countryCode'
-        '&size=5' 
-        '&sort=date,asc');
-
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes));
-
-        if (data['_embedded'] != null && data['_embedded']['events'] != null) {
-          final events = data['_embedded']['events'] as List<dynamic>;
-          return events.map((e) => ConcertDetail.fromJson(e)).toList();
-        }
-      } else {
-        developer.log(
-          'Error en búsqueda por keyword',
-          name: 'ticketmaster.service',
-          error: 'Status: ${response.statusCode}',
-        );
-      }
-      return [];
     } catch (e) {
-      developer.log(
-        'Excepción en búsqueda por keyword',
-        name: 'ticketmaster.service',
-        error: e,
-      );
+
+      debugPrint('Error de conexión: $e');
+
       return [];
+
     }
+
   }
+
+
+
+  // Método auxiliar para búsquedas rápidas
+
+  Future<List<ConcertDetail>> searchEventsByKeyword(String keyword, String countryCode) async {
+
+    return getConcerts(
+
+      DateTime.now(),
+
+      DateTime.now().add(const Duration(days: 365)),
+
+      countryCode: countryCode,
+
+      keyword: keyword,
+
+      size: 5,
+
+    );
+
+  }
+
 }

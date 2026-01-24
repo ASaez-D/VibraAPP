@@ -1,32 +1,72 @@
 {
     "@@locale": "ca",
     "appTitle": "Vibra",
-    "loginSpotify": "Iniciar amb Spotify",
-    "loginGoogle": "Iniciar amb Google",
+    "loginSpotify": "Inicia amb Spotify",
+    "loginGoogle": "Inicia amb Google",
     "loginLoading": "Carregant...",
     "loginTerms": "En continuar, acceptes els nostres Termes i Política de privadesa.",
-    "loginError": "Error en iniciar la sessió: {error}",
-    "homeSearchHint": "Cercar a {country}...",
+    "loginError": "Error en iniciar sessió: {error}",
+    "@loginError": {
+        "placeholders": {
+            "error": { "type": "String" }
+        }
+    },
+    "homeSearchHint": "Cerca a {country}...",
+    "@homeSearchHint": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeGreeting": "Hola, {name}",
+    "@homeGreeting": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "homeVibeTitle": "Explora {vibe}",
+    "@homeVibeTitle": {
+        "placeholders": {
+            "vibe": { "type": "String" }
+        }
+    },
     "vibeBest": "el millor",
     "homeSectionArtists": "ELS TEUS ARTISTES",
     "homeSectionArtistsSub": "Basat en el que més escoltes",
     "homeSectionForYou": "NOMÉS PER A TU",
-    "homeSectionForYouSub": "Perquè escoltes {artist}...",
+    "homeSectionForYouSub": "Perquè escoltes a {artist}...",
+    "@homeSectionForYouSub": {
+        "placeholders": {
+            "artist": { "type": "String" }
+        }
+    },
     "homeSectionTrends": "TENDÈNCIES A {country}",
+    "@homeSectionTrends": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeSectionTrendsSub": "El més popular de la setmana",
-    "homeSectionWeekend": "JA ÉS CAP DE SETMANA!",
+    "homeSectionWeekend": "JA ÉS FINDE!",
     "homeSectionWeekendSub": "Plans per a aquest cap de setmana",
     "homeSectionDiscover": "DESCOBREIX MÉS",
     "homeSectionDiscoverSub": "Explora nous gèneres",
-    "homeSectionCollections": "EXPLORA VIBRES",
+    "homeSectionCollections": "EXPLORA VIBRAS",
     "homeSectionCollectionsSub": "Troba el teu pla ideal",
     "homeBtnShowMore": "Mostrar més esdeveniments",
     "homeBtnViewAll": "Veure tots els esdeveniments",
     "homeTextNoMore": "No hi ha més esdeveniments de {keyword}",
+    "@homeTextNoMore": {
+        "placeholders": {
+            "keyword": { "type": "String" }
+        }
+    },
     "homeTextEnd": "Has arribat al final!",
     "homeErrorNoEvents": "No hi ha esdeveniments a {country}",
+    "@homeErrorNoEvents": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeBtnRetryCountry": "Veure esdeveniments a Espanya",
     "homeSearchNoResults": "No hem trobat res",
     "homeSearchClear": "Esborrar cerca",
@@ -37,8 +77,13 @@
     "menuLogout": "Tancar sessió",
     "menuEditProfile": "Editar perfil",
     "prefsTitle": "Hola, {name}! 🎧",
+    "@prefsTitle": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "prefsSubtitle": "Personalitza el teu feed. Què et mou?",
-    "prefsSearchHint": "Cercar artista (ex: Bad Bunny)...",
+    "prefsSearchHint": "Cerca artista (ex: Bad Bunny)...",
     "prefsYourArtists": "Els teus Artistes:",
     "prefsGenres": "Gèneres i Estils:",
     "prefsBtnStart": "Començar",
@@ -46,12 +91,17 @@
     "accountConnection": "CONNEXIÓ ACTIVA",
     "accountLinked": "Compte vinculat correctament",
     "accountOpenProfile": "Obrir perfil a {service}",
+    "@accountOpenProfile": {
+        "placeholders": {
+            "service": { "type": "String" }
+        }
+    },
     "calendarTitle": "Quan vols sortir?",
     "calendarToday": "Avui",
     "calendarTomorrow": "Demà",
     "calendarWeek": "Aquesta setmana",
     "calendarMonth": "Propers 30 dies",
-    "calendarBtnSelect": "TRIAR DATA",
+    "calendarBtnSelect": "ESCOLLIR DATA",
     "rangeTitle": "ESDEVENIMENTS DISPONIBLES",
     "detailEventTitle": "Esdeveniment",
     "detailBtnLike": "M'agrada",
@@ -61,8 +111,13 @@
     "detailInfoTitle": "Informació",
     "detailAgeRestricted": "Majors de 18 anys (DNI requerit).",
     "detailOrganizedBy": "Organitzat per {venue}",
+    "@detailOrganizedBy": {
+        "placeholders": {
+            "venue": { "type": "String" }
+        }
+    },
     "detailLocationTitle": "Ubicació",
-    "detailDoorsOpen": "Obertura de portes",
+    "detailDoorsOpen": "Obertura portes",
     "detailViewMap": "Veure mapa",
     "detailRelatedEvents": "Altres dates / Gira",
     "detailCheckPrices": "Veure preus",
@@ -82,16 +137,16 @@
     "helpSectionTutorials": "TUTORIALS RÀPIDS",
     "helpSectionSupport": "SUPORT I LEGAL",
     "helpFaq1Q": "Com compro una entrada?",
-    "helpFaq1A": "Vés al concert que t'interessi i prem a “Comprar entrada”. Podràs triar el mètode de pagament i confirmar.",
+    "helpFaq1A": "Ves al concert que t'interessi i prem “Comprar entrada”. Podràs triar el mètode de pagament i confirmar.",
     "helpFaq2Q": "Com gestiono les meves notificacions?",
     "helpFaq2A": "A l'apartat Notificacions podràs habilitar avisos de concerts, artistes i recomanacions.",
     "helpFaq3Q": "Convidar amics",
     "helpFaq3A": "A la pàgina de l'esdeveniment, prem “Convidar amics” per enviar-los una notificació directa.",
     "helpTut1": "Guia de compra",
-    "helpTut2": "Usar els teus tiquets",
+    "helpTut2": "Utilitzar les teves entrades",
     "helpTut3": "Sincronitzar calendari",
-    "helpSupportContact": "Contactar amb Suport",
-    "helpSupportReport": "Informar d'un problema",
+    "helpSupportContact": "Contactar Suport",
+    "helpSupportReport": "Reportar Problema",
     "helpSupportTerms": "Termes i condicions",
     "savedEmptyTitle": "No tens concerts desats",
     "savedEmptySub": "Prem la icona de desar a la Home!",
@@ -109,10 +164,9 @@
     "settingsHeaderPrefs": "Preferències",
     "settingsThemeMode": "Mode fosc",
     "settingsLargeText": "Text gran",
-    "settingsDialogAjustes": "Configuració",
-    "commonError": "S'ha produït un error",
+    "settingsDialogAjustes": "Ajustos",
+    "commonError": "Hi ha hagut un error",
     "commonSuccess": "Desat amb èxit",
-    
     "privacyTransparencyTitle": "Transparència de Dades",
     "privacyTransparencyDesc": "A Vibra, valorem la teva privadesa. Aquí et mostrem quina informació es comparteix i amb quina finalitat.",
     "privacyProfile": "Perfil Públic",
@@ -121,19 +175,17 @@
     "privacyLocationDesc": "Només s'utilitza per mostrar-te concerts propers.",
     "privacyAnalytics": "Analítiques",
     "privacyAnalyticsDesc": "Dades anònimes d'ús per millorar l'app.",
-    
     "dialogDeleteTitle": "Eliminar compte?",
     "dialogDeleteBody": "Aquesta acció és irreversible. S'esborraran totes les teves dades i entrades.",
     "dialogDeleteBtn": "Eliminar",
     "dialogCancel": "Cancel·lar",
-    "dialogGenerating": "Generant fitxer...",
-    "dialogError": "S'ha produït un error inesperat.",
+    "dialogGenerating": "Generant arxiu...",
+    "dialogError": "Ha ocorregut un error inesperat.",
     "snackDeleteSuccess": "El teu compte ha estat eliminat.",
-    "snackDeleteReauth": "Per seguretat, tanca la sessió i torna a entrar per eliminar el compte.",
+    "snackDeleteReauth": "Per seguretat, tanca sessió i torna a entrar per eliminar el compte.",
     "shareDataText": "Aquí tens les teves dades exportades de Vibra.",
-
     "dialogPermissionTitle": "Permisos necessaris",
-    "dialogPermissionContent": "Per activar aquestes notificacions, cal donar permís als ajustos del sistema.",
+    "dialogPermissionContent": "Per activar aquestes notificacions, necessites donar permís als ajustos del sistema.",
     "dialogSettingsBtn": "Ajustos",
     "notifPreviewTitle": "Vista prèvia de notificació",
     "notifPreviewBody": "Així és com veuràs les alertes a la teva pantalla de bloqueig:",
@@ -141,10 +193,36 @@
     "notifGeneralTitle": "Novetats Vibra",
     "notifGeneralBody": "L'app s'ha actualitzat! Descobreix el nou mode fosc i millores.",
     "notifReminderTitle": "📅 És demà!",
-    "notifReminderBody": "El teu esdeveniment desat 'Bad Bunny - World Tour' és demà. Tens les entrades?",
+    "notifReminderBody": "El teu esdeveniment desat 'Bad Bunny - World Tour' és demà. Tens les teves entrades?",
     "notifTicketsTitle": "🎟️ Entrades Disponibles",
-    "notifTicketsBody": "Corre! Han sortit noves entrades per a 'Taylor Swift'. No et quedis sense!",
+    "notifTicketsBody": "Corre! Han sortit noves entrades per 'Taylor Swift'. No te les perdis!",
     "timeNow": "Ara",
     "time5min": "Fa 5 min",
-    "time1min": "Fa 1 min"
+    "time1min": "Fa 1 min",
+
+    "regionTitle": "Selecciona la teva Regió",
+    "regionSearchHint": "Cerca país...",
+    "regionExplore": "Explora {name}",
+    "@regionExplore": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionDialogCityBody": "Busques concerts en una ciutat específica?",
+    "regionDialogCityHint": "Ex: Madrid, Barcelona...",
+    "regionBtnWholeCountry": "Veure tot el país",
+    "regionBtnApply": "Aplicar",
+    "regionOptionWholeCountry": "Tot el país",
+    "regionOptionWholeCountrySub": "Veure concerts a tot {name}",
+    "@regionOptionWholeCountrySub": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionHeaderPopular": "CIUTATS POPULARS",
+    "regionHeaderOther": "ALTRA UBICACIÓ",
+    "regionOptionManual": "Escriure una altra ciutat...",
+    "regionManualTitle": "Escriure ciutat",
+    "regionManualHint": "Ex: Benidorm",
+    "regionManualSearch": "Cercar"
 }

@@ -23,6 +23,7 @@ import 'filtered_events_screen.dart';
 import 'saved_events_screen.dart';
 import 'account_screen.dart';
 import 'help_screen.dart';
+import 'region_screen.dart'; // <--- IMPRESCINDIBLE: Tu nueva pantalla de región
 
 // SERVICIOS
 import '../services/ticketmaster_service.dart';
@@ -68,8 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
 
+  // ESTADO DE REGIÓN
   String _userCountryCode = 'ES';
-  String _currentVibe = "lo mejor"; // Clave interna
+  String? _userCity; // <--- Variable para la ciudad (puede ser null)
+  
+  String _currentVibe = "lo mejor"; 
   String _secondaryVibeTitle = "";
   String _topArtistName = "";
 
@@ -209,13 +213,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // --- MÉTODOS DE CARGA ACTUALIZADOS CON 'city' ---
+
   void _loadWeekendPlans() {
     DateTime now = DateTime.now();
     int daysUntilFriday = (DateTime.friday - now.weekday + 7) % 7;
     DateTime nextFriday = now.add(Duration(days: daysUntilFriday));
     DateTime nextSunday = nextFriday.add(const Duration(days: 2));
 
-    _ticketmasterService.getConcerts(nextFriday, nextSunday, countryCode: _userCountryCode, size: 10).then((events) {
+    _ticketmasterService.getConcerts(
+      nextFriday, 
+      nextSunday, 
+      countryCode: _userCountryCode, 
+      city: _userCity, // <--- FILTRO CIUDAD
+      size: 10
+    ).then((events) {
       if (mounted) setState(() => _weekendConcerts = _filterDuplicates(events));
     });
   }
@@ -224,7 +236,14 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _secondaryVibeTitle = keyword;
     });
-    _ticketmasterService.getConcerts(DateTime.now(), DateTime.now().add(const Duration(days: 90)), countryCode: _userCountryCode, keyword: keyword, size: 10).then((events) {
+    _ticketmasterService.getConcerts(
+      DateTime.now(), 
+      DateTime.now().add(const Duration(days: 90)), 
+      countryCode: _userCountryCode, 
+      city: _userCity, // <--- FILTRO CIUDAD
+      keyword: keyword, 
+      size: 10
+    ).then((events) {
       if (mounted) setState(() => _secondaryVibeConcerts = _filterDuplicates(events));
     });
   }
@@ -240,7 +259,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       if (!refresh) _isLoadingMore = true;
-      _concertsFuture = _ticketmasterService.getConcerts(DateTime.now(), DateTime.now().add(const Duration(days: 90)), countryCode: _userCountryCode, keyword: _currentKeyword, page: _currentPage, size: 20).then((events) {
+      _concertsFuture = _ticketmasterService.getConcerts(
+        DateTime.now(), 
+        DateTime.now().add(const Duration(days: 90)), 
+        countryCode: _userCountryCode, 
+        city: _userCity, // <--- FILTRO CIUDAD
+        keyword: _currentKeyword, 
+        page: _currentPage, 
+        size: 20
+      ).then((events) {
         if (events.isEmpty) {
           if (_currentKeyword != null && _currentPage == 0) {
             Future.microtask(() {
@@ -277,6 +304,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
+
+  // ----------------------------------------------------
 
   Future<void> _loadSpecificRecommendations(List<String> artistNames) async {
     if (artistNames.isEmpty) return;
@@ -342,29 +371,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onTabTapped(int index) {
-  if (index != 0) {
-    switch (index) {
-      case 1:
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
-        break;
-      case 2:
-        // Ahora se abre "Eventos guardados"
-        Navigator.push(context, MaterialPageRoute(
-          builder: (_) => SavedEventsScreen(
-            savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),
-          ),
-        ));
-        break;
-      case 3:
-        // Ahora se abre "Tus entradas"
-        Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)));
-        break;
+    if (index != 0) {
+      switch (index) {
+        case 1:
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
+          break;
+        case 2:
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => SavedEventsScreen(
+              savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList(),
+            ),
+          ));
+          break;
+        case 3:
+          Navigator.push(context, MaterialPageRoute(builder: (_) => TickerScreen(tickets: myTickets)));
+          break;
+      }
     }
+    setState(() => _currentIndex = index);
   }
-  setState(() => _currentIndex = index);
-}
-
-   
 
   void _shareConcert(ConcertDetail concert) {
     final dateStr = DateFormat('d MMM yyyy').format(concert.date);
@@ -467,22 +492,21 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _isSearching ? _buildSearchResults(l10n, primaryText, secondaryText, cardBg) : _buildHomeContent(l10n, primaryText, secondaryText, accentColor, cardBg, displayName),
       bottomNavigationBar: BottomNavigationBar(
-  backgroundColor: scaffoldBg,
-  selectedItemColor: accentColor,
-  unselectedItemColor: secondaryText,
-  type: BottomNavigationBarType.fixed,
-  currentIndex: _currentIndex,
-  onTap: _onTabTapped,
-  showSelectedLabels: false,
-  showUnselectedLabels: false,
-  items: const [
-    BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''),
-    BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: ''),
-    BottomNavigationBarItem(icon: Icon(Icons.bookmark_outline), label: ''), // Ahora "Eventos guardados"
-    BottomNavigationBarItem(icon: Icon(Icons.confirmation_number_outlined), label: ''), // Ahora "Tus entradas"
-  ],
-),
-
+        backgroundColor: scaffoldBg,
+        selectedItemColor: accentColor,
+        unselectedItemColor: secondaryText,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.bookmark_outline), label: ''), 
+          BottomNavigationBarItem(icon: Icon(Icons.confirmation_number_outlined), label: ''), 
+        ],
+      ),
       endDrawer: _buildDrawer(context, l10n, primaryText, accentColor, scaffoldBg, dividerColor, displayName, photoUrl, isLinked, serviceColor, fallbackIcon),
     );
   }
@@ -505,7 +529,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final concerts = _cachedConcerts;
-        // CORRECCIÓN "LO MEJOR": Forzamos la traducción si la vibe es la predeterminada
         String displayVibe = (_currentVibe.toLowerCase() == "lo mejor") ? l10n.vibeBest : _currentVibe;
 
         return CustomScrollView(
@@ -656,16 +679,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
-    // CORRECCIÓN FECHAS (JAN/ENE)
     final String dayNum = DateFormat('d').format(concert.date);
     final String monthName = DateFormat('MMM', Localizations.localeOf(context).languageCode).format(concert.date).toUpperCase().replaceAll('.', '');
     
-    // CORRECCIÓN PRECIOS: Si viene el texto hardcodeado "Ver precios" o "Info", usamos la traducción
     String rawPrice = concert.priceRange;
     String priceLabel;
     
     if (rawPrice.isEmpty || rawPrice == "Ver precios" || rawPrice == "Info") {
-      priceLabel = l10n.detailCheckPrices; // "Check prices" / "Ver precios"
+      priceLabel = l10n.detailCheckPrices; 
     } else {
       priceLabel = rawPrice;
     }
@@ -712,12 +733,110 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: concert))), child: Container(height: 100, decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.shade300)), child: Row(children: [ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)), child: Image.network(concert.imageUrl, width: 100, height: 100, fit: BoxFit.cover, cacheWidth: 200)), Expanded(child: Padding(padding: const EdgeInsets.all(12.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(concert.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 13)), const SizedBox(height: 6), Text(day, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold))]))), Padding(padding: const EdgeInsets.only(right: 16), child: Icon(Icons.arrow_forward_ios, color: secondaryText.withOpacity(0.5), size: 16))])));
   }
 
+  // --- DRAWER ACTUALIZADO CON BOTÓN DE REGIÓN + CIUDAD ---
   Widget _buildDrawer(BuildContext context, AppLocalizations l10n, Color primaryText, Color accentColor, Color scaffoldBg, Color dividerColor, String displayName, String photoUrl, bool isLinked, Color serviceColor, IconData fallbackIcon) {
-    return Drawer(backgroundColor: scaffoldBg, child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Padding(padding: const EdgeInsets.only(right: 10), child: CircleAvatar(radius: 18, backgroundColor: serviceColor, backgroundImage: isLinked ? NetworkImage(photoUrl) : null, child: !isLinked ? Icon(fallbackIcon, color: primaryText, size: 20) : null)), Text(displayName, style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.bold))]), const SizedBox(height: 4), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), child: Text(l10n.menuEditProfile, style: TextStyle(color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500)))]),), const Divider(color: Colors.white24), _menuItem(context, l10n.menuAccount, Icons.account_circle, AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)),
-// _menuItem(context, l10n.menuSaved, Icons.bookmark_outline, SavedEventsScreen(savedConcerts: _cachedConcerts.where((c) => _savedIds.contains(c.name)).toList())),
-_menuItem(context, l10n.menuSettings, Icons.settings, const SettingsScreen()),
-_menuItem(context, l10n.menuHelp, Icons.help_outline, const HelpScreen()),
- const Spacer(), Divider(color: dividerColor), ListTile(leading: const Icon(Icons.logout, color: Colors.redAccent), title: Text(l10n.menuLogout, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), onTap: () { Navigator.of(context).pop(); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }),])));
+    return Drawer(
+      backgroundColor: scaffoldBg,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: CircleAvatar(
+                        radius: 18, 
+                        backgroundColor: serviceColor, 
+                        backgroundImage: isLinked ? NetworkImage(photoUrl) : null, 
+                        child: !isLinked ? Icon(fallbackIcon, color: primaryText, size: 20) : null
+                      )
+                    ), 
+                    Text(displayName, style: TextStyle(color: primaryText, fontSize: 20, fontWeight: FontWeight.bold))
+                  ]), 
+                  const SizedBox(height: 4), 
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomizeProfileScreen())), 
+                    child: Text(l10n.menuEditProfile, style: TextStyle(color: primaryText.withOpacity(0.7), fontWeight: FontWeight.w500))
+                  )
+                ]
+              ),
+            ), 
+            const Divider(color: Colors.white24), 
+            
+            _menuItem(context, l10n.menuAccount, Icons.account_circle, AccountScreen(userProfile: widget.userProfile, authSource: widget.authSource)),
+            
+            // --- NUEVO BOTÓN DE REGIÓN (IMPLEMENTACIÓN COMPLETA) ---
+            ListTile(
+              leading: Icon(Icons.public, color: primaryText.withOpacity(0.8)),
+              title: Text("Región", style: TextStyle(color: primaryText)), 
+              // Mostramos País y Ciudad (si existe)
+              trailing: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: Text(
+                  _userCity != null ? "$_userCountryCode - $_userCity" : _userCountryCode,
+                  style: TextStyle(color: accentColor, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              onTap: () async {
+                Navigator.of(context).pop(); // Cerramos el drawer primero
+                
+                // Navegamos a RegionScreen esperando un resultado
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RegionScreen(currentCountryCode: _userCountryCode),
+                  ),
+                );
+
+                // Procesamos el resultado
+                if (result != null && result is Map) {
+                  final newCode = result['code'];
+                  final newCity = result['city'];
+
+                  // Si se seleccionó un país o ciudad distintos, recargamos
+                  if (newCode != _userCountryCode || newCity != _userCity) {
+                    setState(() {
+                      _userCountryCode = newCode;
+                      _userCity = newCity;
+                      // Limpiamos la caché para forzar la recarga
+                      _cachedConcerts.clear();
+                      _hasMore = true;
+                      _currentPage = 0;
+                      // Limpiamos listas anteriores para evitar mezcla visual
+                      _recommendedConcerts.clear();
+                      _weekendConcerts.clear();
+                      _secondaryVibeConcerts.clear();
+                    });
+                    _reloadAllData(); 
+                  }
+                }
+              },
+            ),
+            // --------------------------------------------------------
+
+            _menuItem(context, l10n.menuSettings, Icons.settings, const SettingsScreen()),
+            _menuItem(context, l10n.menuHelp, Icons.help_outline, const HelpScreen()),
+            
+            const Spacer(), 
+            Divider(color: dividerColor), 
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent), 
+              title: Text(l10n.menuLogout, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)), 
+              onTap: () { 
+                Navigator.of(context).pop(); 
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); 
+              }
+            ),
+          ]
+        )
+      )
+    );
   }
 
   Widget _menuItem(BuildContext context, String title, IconData icon, Widget screen) {

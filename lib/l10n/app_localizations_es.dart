@@ -477,4 +477,54 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get time1min => 'Hace 1 min';
+
+  @override
+  String get regionTitle => 'Selecciona tu Región';
+
+  @override
+  String get regionSearchHint => 'Buscar país...';
+
+  @override
+  String regionExplore(String name) {
+    return 'Explora $name';
+  }
+
+  @override
+  String get regionDialogCityBody =>
+      '¿Buscas conciertos en una ciudad específica?';
+
+  @override
+  String get regionDialogCityHint => 'Ej: Madrid, Barcelona...';
+
+  @override
+  String get regionBtnWholeCountry => 'Ver todo el país';
+
+  @override
+  String get regionBtnApply => 'Aplicar';
+
+  @override
+  String get regionOptionWholeCountry => 'Todo el país';
+
+  @override
+  String regionOptionWholeCountrySub(String name) {
+    return 'Ver conciertos en todo $name';
+  }
+
+  @override
+  String get regionHeaderPopular => 'CIUDADES POPULARES';
+
+  @override
+  String get regionHeaderOther => 'OTRA UBICACIÓN';
+
+  @override
+  String get regionOptionManual => 'Escribir otra ciudad...';
+
+  @override
+  String get regionManualTitle => 'Escriure ciutat';
+
+  @override
+  String get regionManualHint => 'Ej: Benidorm';
+
+  @override
+  String get regionManualSearch => 'Buscar';
 }

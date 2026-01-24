@@ -18,11 +18,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginGoogle => 'Entrar com Google';
 
   @override
-  String get loginLoading => 'Carregando...';
+  String get loginLoading => 'A carregar...';
 
   @override
   String get loginTerms =>
-      'Ao continuar, você aceita nossos Termos e Política de Privacidade.';
+      'Ao continuar, aceitas os nossos Termos e Política de Privacidade.';
 
   @override
   String loginError(String error) {
@@ -31,7 +31,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String homeSearchHint(String country) {
-    return 'Buscar em $country...';
+    return 'Pesquisar em $country...';
   }
 
   @override
@@ -41,24 +41,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String homeVibeTitle(String vibe) {
-    return 'Explore $vibe';
+    return 'Explora $vibe';
   }
 
   @override
   String get vibeBest => 'o melhor';
 
   @override
-  String get homeSectionArtists => 'SEUS ARTISTAS';
+  String get homeSectionArtists => 'OS TEUS ARTISTAS';
 
   @override
-  String get homeSectionArtistsSub => 'Baseado no que você mais ouve';
+  String get homeSectionArtistsSub => 'Com base no que mais ouves';
 
   @override
-  String get homeSectionForYou => 'SÓ PARA VOCÊ';
+  String get homeSectionForYou => 'SÓ PARA TI';
 
   @override
   String homeSectionForYouSub(String artist) {
-    return 'Porque você ouve $artist...';
+    return 'Porque ouves $artist...';
   }
 
   @override
@@ -70,22 +70,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get homeSectionTrendsSub => 'O mais popular da semana';
 
   @override
-  String get homeSectionWeekend => 'FINAL DE SEMANA!';
+  String get homeSectionWeekend => 'CHEGOU O FIM DE SEMANA!';
 
   @override
   String get homeSectionWeekendSub => 'Planos para este fim de semana';
 
   @override
-  String get homeSectionDiscover => 'DESCUBRA MAIS';
+  String get homeSectionDiscover => 'DESCOBRE MAIS';
 
   @override
-  String get homeSectionDiscoverSub => 'Explore novos gêneros';
+  String get homeSectionDiscoverSub => 'Explora novos géneros';
 
   @override
-  String get homeSectionCollections => 'EXPLORE VIBES';
+  String get homeSectionCollections => 'EXPLORA VIBES';
 
   @override
-  String get homeSectionCollectionsSub => 'Encontre seu plano ideal';
+  String get homeSectionCollectionsSub => 'Encontra o teu plano ideal';
 
   @override
   String get homeBtnShowMore => 'Mostrar mais eventos';
@@ -99,7 +99,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get homeTextEnd => 'Você chegou ao fim!';
+  String get homeTextEnd => 'Chegaste ao fim!';
 
   @override
   String homeErrorNoEvents(String country) {
@@ -107,28 +107,28 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get homeBtnRetryCountry => 'Ver eventos na Espanha';
+  String get homeBtnRetryCountry => 'Ver eventos em Espanha';
 
   @override
-  String get homeSearchNoResults => 'Não encontramos nada';
+  String get homeSearchNoResults => 'Não encontrámos nada';
 
   @override
-  String get homeSearchClear => 'Limpar busca';
+  String get homeSearchClear => 'Limpar pesquisa';
 
   @override
-  String get menuAccount => 'Minha Conta';
+  String get menuAccount => 'A minha Conta';
 
   @override
-  String get menuSaved => 'Eventos salvos';
+  String get menuSaved => 'Eventos guardados';
 
   @override
-  String get menuSettings => 'Configurações';
+  String get menuSettings => 'Definições';
 
   @override
   String get menuHelp => 'Ajuda';
 
   @override
-  String get menuLogout => 'Sair';
+  String get menuLogout => 'Terminar sessão';
 
   @override
   String get menuEditProfile => 'Editar perfil';
@@ -139,28 +139,28 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get prefsSubtitle => 'Personalize seu feed. O que te move?';
+  String get prefsSubtitle => 'Personaliza o teu feed. O que te move?';
 
   @override
-  String get prefsSearchHint => 'Buscar artista (ex: Bad Bunny)...';
+  String get prefsSearchHint => 'Pesquisar artista (ex: Bad Bunny)...';
 
   @override
-  String get prefsYourArtists => 'Seus Artistas:';
+  String get prefsYourArtists => 'Os teus Artistas:';
 
   @override
-  String get prefsGenres => 'Gêneros e Estilos:';
+  String get prefsGenres => 'Géneros e Estilos:';
 
   @override
   String get prefsBtnStart => 'Começar';
 
   @override
-  String get accountTitle => 'Minha Conta';
+  String get accountTitle => 'A minha Conta';
 
   @override
-  String get accountConnection => 'CONEXÃO ATIVA';
+  String get accountConnection => 'LIGAÇÃO ATIVA';
 
   @override
-  String get accountLinked => 'Conta vinculada com sucesso';
+  String get accountLinked => 'Conta associada com sucesso';
 
   @override
   String accountOpenProfile(String service) {
@@ -168,7 +168,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get calendarTitle => 'Quando você quer sair?';
+  String get calendarTitle => 'Quando queres sair?';
 
   @override
   String get calendarToday => 'Hoje';
@@ -192,22 +192,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get detailEventTitle => 'Evento';
 
   @override
-  String get detailBtnLike => 'Curtir';
+  String get detailBtnLike => 'Gosto';
 
   @override
-  String get detailBtnSave => 'Salvar';
+  String get detailBtnSave => 'Guardar';
 
   @override
-  String get detailBtnSaved => 'Salvo';
+  String get detailBtnSaved => 'Guardado';
 
   @override
-  String get detailBtnShare => 'Compartilhar';
+  String get detailBtnShare => 'Partilhar';
 
   @override
   String get detailInfoTitle => 'Informação';
 
   @override
-  String get detailAgeRestricted => 'Maiores de 18 anos (RG necessário).';
+  String get detailAgeRestricted => 'Maiores de 18 anos (ID necessário).';
 
   @override
   String detailOrganizedBy(String venue) {
@@ -218,13 +218,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get detailLocationTitle => 'Localização';
 
   @override
-  String get detailDoorsOpen => 'Abertura dos portões';
+  String get detailDoorsOpen => 'Abertura de portas';
 
   @override
   String get detailViewMap => 'Ver mapa';
 
   @override
-  String get detailRelatedEvents => 'Outras datas / Turnê';
+  String get detailRelatedEvents => 'Outras datas / Tour';
 
   @override
   String get detailCheckPrices => 'Ver preços';
@@ -233,10 +233,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get detailFree => 'GRÁTIS';
 
   @override
-  String get detailCheckWeb => 'Consultar no site';
+  String get detailCheckWeb => 'Consultar na web';
 
   @override
-  String get detailBtnBuy => 'COMPRAR INGRESSOS';
+  String get detailBtnBuy => 'COMPRAR BILHETES';
 
   @override
   String get editProfileChangePhoto => 'Alterar foto';
@@ -245,10 +245,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get editProfileName => 'Nome';
 
   @override
-  String get editProfileNickname => 'Apelido';
+  String get editProfileNickname => 'Alcunha';
 
   @override
-  String get editProfileSave => 'Salvar';
+  String get editProfileSave => 'Guardar';
 
   @override
   String get editProfileCancel => 'Cancelar';
@@ -258,13 +258,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get editProfileImageNotImplemented =>
-      'Funcionalidade de upload de imagem não implementada';
+      'Funcionalidade de carregar imagem não implementada';
 
   @override
-  String get helpSearchHint => 'Buscar ajuda...';
+  String get helpSearchHint => 'Pesquisar ajuda...';
 
   @override
-  String get helpMainSubtitle => 'Como podemos ajudar hoje?';
+  String get helpMainSubtitle => 'Em que podemos ajudar hoje?';
 
   @override
   String get helpSectionFaq => 'PERGUNTAS FREQUENTES';
@@ -276,37 +276,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get helpSectionSupport => 'SUPORTE E LEGAL';
 
   @override
-  String get helpFaq1Q => 'Como compro um ingresso?';
+  String get helpFaq1Q => 'Como compro um bilhete?';
 
   @override
   String get helpFaq1A =>
-      'Vá ao show que te interessa e clique em \'Comprar ingresso\'. Você poderá escolher o método de pagamento e confirmar.';
+      'Vai ao concerto que te interessa e toca em \'Comprar bilhete\'. Poderás escolher o método de pagamento e confirmar.';
 
   @override
-  String get helpFaq2Q => 'Como gerencio minhas notificações?';
+  String get helpFaq2Q => 'Como giro as minhas notificações?';
 
   @override
   String get helpFaq2A =>
-      'Na seção Notificações, você pode ativar avisos de shows, artistas e recomendações.';
+      'Na secção Notificações podes ativar avisos de concertos, artistas e recomendações.';
 
   @override
   String get helpFaq3Q => 'Convidar amigos';
 
   @override
   String get helpFaq3A =>
-      'Na página do evento, clique em \'Convidar amigos\' para enviar uma notificação direta.';
+      'Na página do evento, toca em \'Convidar amigos\' para enviar-lhes uma notificação direta.';
 
   @override
   String get helpTut1 => 'Guia de compra';
 
   @override
-  String get helpTut2 => 'Usar seus ingressos';
+  String get helpTut2 => 'Usar os teus bilhetes';
 
   @override
   String get helpTut3 => 'Sincronizar calendário';
 
   @override
-  String get helpSupportContact => 'Contatar Suporte';
+  String get helpSupportContact => 'Contactar Suporte';
 
   @override
   String get helpSupportReport => 'Reportar Problema';
@@ -315,10 +315,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get helpSupportTerms => 'Termos e condições';
 
   @override
-  String get savedEmptyTitle => 'Você não tem shows salvos';
+  String get savedEmptyTitle => 'Não tens concertos guardados';
 
   @override
-  String get savedEmptySub => 'Clique no ícone de salvar na Home!';
+  String get savedEmptySub => 'Toca no ícone de guardar na Home!';
 
   @override
   String get savedPriceInfo => 'Ver mais';
@@ -336,7 +336,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsEventReminders => 'Lembretes de eventos';
 
   @override
-  String get settingsTicketReleases => 'Lançamento de ingressos';
+  String get settingsTicketReleases => 'Lançamento de bilhetes';
 
   @override
   String get settingsHeaderPrivacy => 'Privacidade';
@@ -345,13 +345,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsLocationPermissions => 'Permissões de localização';
 
   @override
-  String get settingsSharedData => 'Dados compartilhados';
+  String get settingsSharedData => 'Dados partilhados';
 
   @override
-  String get settingsDownloadData => 'Baixar meus dados';
+  String get settingsDownloadData => 'Descarregar os meus dados';
 
   @override
-  String get settingsDeleteAccount => 'Excluir conta';
+  String get settingsDeleteAccount => 'Eliminar conta';
 
   @override
   String get settingsHeaderPrefs => 'Preferências';
@@ -363,87 +363,87 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsLargeText => 'Texto grande';
 
   @override
-  String get settingsDialogAjustes => 'Configurações';
+  String get settingsDialogAjustes => 'Definições';
 
   @override
   String get commonError => 'Ocorreu um erro';
 
   @override
-  String get commonSuccess => 'Salvo com sucesso';
+  String get commonSuccess => 'Guardado com sucesso';
 
   @override
   String get privacyTransparencyTitle => 'Transparência de Dados';
 
   @override
   String get privacyTransparencyDesc =>
-      'Na Vibra, valorizamos sua privacidade. Aqui mostramos quais informações são compartilhadas e por quê.';
+      'Na Vibra, valorizamos a tua privacidade. Aqui mostramos que informações são partilhadas e com que fim.';
 
   @override
   String get privacyProfile => 'Perfil Público';
 
   @override
   String get privacyProfileDesc =>
-      'Seu nome e foto ficam visíveis se você compartilhar eventos.';
+      'O teu nome e foto são visíveis se partilhares eventos.';
 
   @override
   String get privacyLocation => 'Localização';
 
   @override
   String get privacyLocationDesc =>
-      'Usado apenas para mostrar shows próximos a você.';
+      'Usado apenas para mostrar concertos próximos.';
 
   @override
-  String get privacyAnalytics => 'Análise';
+  String get privacyAnalytics => 'Analítica';
 
   @override
   String get privacyAnalyticsDesc =>
-      'Dados anônimos de uso para melhorar o aplicativo.';
+      'Dados anónimos de uso para melhorar a app.';
 
   @override
-  String get dialogDeleteTitle => 'Excluir conta?';
+  String get dialogDeleteTitle => 'Eliminar conta?';
 
   @override
   String get dialogDeleteBody =>
-      'Esta ação é irreversível. Todos os seus dados e ingressos serão excluídos.';
+      'Esta ação é irreversível. Todos os teus dados e bilhetes serão apagados.';
 
   @override
-  String get dialogDeleteBtn => 'Excluir';
+  String get dialogDeleteBtn => 'Eliminar';
 
   @override
   String get dialogCancel => 'Cancelar';
 
   @override
-  String get dialogGenerating => 'Gerando arquivo...';
+  String get dialogGenerating => 'A gerar ficheiro...';
 
   @override
   String get dialogError => 'Ocorreu um erro inesperado.';
 
   @override
-  String get snackDeleteSuccess => 'Sua conta foi excluída.';
+  String get snackDeleteSuccess => 'A tua conta foi eliminada.';
 
   @override
   String get snackDeleteReauth =>
-      'Por segurança, faça logout e login novamente para excluir sua conta.';
+      'Por segurança, termina sessão e volta a entrar para eliminar a conta.';
 
   @override
-  String get shareDataText => 'Aqui estão seus dados exportados do Vibra.';
+  String get shareDataText => 'Aqui tens os teus dados exportados da Vibra.';
 
   @override
   String get dialogPermissionTitle => 'Permissões necessárias';
 
   @override
   String get dialogPermissionContent =>
-      'Para ativar essas notificações, você precisa dar permissão nas configurações do sistema.';
+      'Para ativar estas notificações, precisas de dar permissão nas definições do sistema.';
 
   @override
-  String get dialogSettingsBtn => 'Configurações';
+  String get dialogSettingsBtn => 'Definições';
 
   @override
-  String get notifPreviewTitle => 'Pré-visualização da notificação';
+  String get notifPreviewTitle => 'Pré-visualização de notificação';
 
   @override
   String get notifPreviewBody =>
-      'É assim que você verá os alertas na tela de bloqueio:';
+      'É assim que verás os alertas no teu ecrã de bloqueio:';
 
   @override
   String get btnActivate => 'Ativar';
@@ -453,21 +453,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notifGeneralBody =>
-      'O aplicativo foi atualizado! Descubra o novo modo escuro e melhorias.';
+      'A app foi atualizada! Descobre o novo modo escuro e melhorias.';
 
   @override
   String get notifReminderTitle => '📅 É amanhã!';
 
   @override
   String get notifReminderBody =>
-      'Seu evento salvo \'Bad Bunny - World Tour\' é amanhã. Você tem seus ingressos?';
+      'O teu evento guardado \'Bad Bunny - World Tour\' é amanhã. Tens os teus bilhetes?';
 
   @override
-  String get notifTicketsTitle => '🎟️ Ingressos Disponíveis';
+  String get notifTicketsTitle => '🎟️ Bilhetes Disponíveis';
 
   @override
   String get notifTicketsBody =>
-      'Corre! Novos ingressos para \'Taylor Swift\' foram lançados. Não perca!';
+      'Corre! Saíram novos bilhetes para \'Taylor Swift\'. Não fiques sem eles!';
 
   @override
   String get timeNow => 'Agora';
@@ -477,4 +477,54 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get time1min => 'Há 1 min';
+
+  @override
+  String get regionTitle => 'Selecione a sua Região';
+
+  @override
+  String get regionSearchHint => 'Pesquisar país...';
+
+  @override
+  String regionExplore(String name) {
+    return 'Explora $name';
+  }
+
+  @override
+  String get regionDialogCityBody =>
+      'Procura concertos numa cidade específica?';
+
+  @override
+  String get regionDialogCityHint => 'Ex: Lisboa, Porto...';
+
+  @override
+  String get regionBtnWholeCountry => 'Ver todo o país';
+
+  @override
+  String get regionBtnApply => 'Aplicar';
+
+  @override
+  String get regionOptionWholeCountry => 'Todo o país';
+
+  @override
+  String regionOptionWholeCountrySub(String name) {
+    return 'Ver concertos em todo $name';
+  }
+
+  @override
+  String get regionHeaderPopular => 'CIDADES POPULARES';
+
+  @override
+  String get regionHeaderOther => 'OUTRA LOCALIZAÇÃO';
+
+  @override
+  String get regionOptionManual => 'Escrever outra cidade...';
+
+  @override
+  String get regionManualTitle => 'Escrever cidade';
+
+  @override
+  String get regionManualHint => 'Ex: Braga';
+
+  @override
+  String get regionManualSearch => 'Pesquisar';
 }

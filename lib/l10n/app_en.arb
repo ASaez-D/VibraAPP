@@ -4,19 +4,49 @@
     "loginSpotify": "Login with Spotify",
     "loginGoogle": "Login with Google",
     "loginLoading": "Loading...",
-    "loginTerms": "By continuing, you agree to our Terms and Privacy Policy.",
+    "loginTerms": "By continuing, you accept our Terms and Privacy Policy.",
     "loginError": "Login error: {error}",
+    "@loginError": {
+        "placeholders": {
+            "error": { "type": "String" }
+        }
+    },
     "homeSearchHint": "Search in {country}...",
+    "@homeSearchHint": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeGreeting": "Hello, {name}",
+    "@homeGreeting": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "homeVibeTitle": "Explore {vibe}",
+    "@homeVibeTitle": {
+        "placeholders": {
+            "vibe": { "type": "String" }
+        }
+    },
     "vibeBest": "the best",
     "homeSectionArtists": "YOUR ARTISTS",
     "homeSectionArtistsSub": "Based on your listening history",
     "homeSectionForYou": "JUST FOR YOU",
     "homeSectionForYouSub": "Because you listen to {artist}...",
+    "@homeSectionForYouSub": {
+        "placeholders": {
+            "artist": { "type": "String" }
+        }
+    },
     "homeSectionTrends": "TRENDING IN {country}",
-    "homeSectionTrendsSub": "Most popular this week",
-    "homeSectionWeekend": "IT'S WEEKEND!",
+    "@homeSectionTrends": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
+    "homeSectionTrendsSub": "This week's most popular",
+    "homeSectionWeekend": "IT'S THE WEEKEND!",
     "homeSectionWeekendSub": "Plans for this weekend",
     "homeSectionDiscover": "DISCOVER MORE",
     "homeSectionDiscoverSub": "Explore new genres",
@@ -25,27 +55,47 @@
     "homeBtnShowMore": "Show more events",
     "homeBtnViewAll": "View all events",
     "homeTextNoMore": "No more events for {keyword}",
+    "@homeTextNoMore": {
+        "placeholders": {
+            "keyword": { "type": "String" }
+        }
+    },
     "homeTextEnd": "You've reached the end!",
-    "homeErrorNoEvents": "No events in {country}",
+    "homeErrorNoEvents": "No events found in {country}",
+    "@homeErrorNoEvents": {
+        "placeholders": {
+            "country": { "type": "String" }
+        }
+    },
     "homeBtnRetryCountry": "See events in Spain",
     "homeSearchNoResults": "We couldn't find anything",
     "homeSearchClear": "Clear search",
     "menuAccount": "My Account",
-    "menuSaved": "Saved Events",
+    "menuSaved": "Saved events",
     "menuSettings": "Settings",
     "menuHelp": "Help",
-    "menuLogout": "Log Out",
-    "menuEditProfile": "Edit Profile",
+    "menuLogout": "Log out",
+    "menuEditProfile": "Edit profile",
     "prefsTitle": "Hi, {name}! 🎧",
+    "@prefsTitle": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
     "prefsSubtitle": "Customize your feed. What moves you?",
     "prefsSearchHint": "Search artist (e.g. Bad Bunny)...",
     "prefsYourArtists": "Your Artists:",
-    "prefsGenres": "Genres & Styles:",
+    "prefsGenres": "Genres and Styles:",
     "prefsBtnStart": "Get Started",
     "accountTitle": "My Account",
     "accountConnection": "ACTIVE CONNECTION",
     "accountLinked": "Account linked successfully",
     "accountOpenProfile": "Open profile in {service}",
+    "@accountOpenProfile": {
+        "placeholders": {
+            "service": { "type": "String" }
+        }
+    },
     "calendarTitle": "When do you want to go out?",
     "calendarToday": "Today",
     "calendarTomorrow": "Tomorrow",
@@ -61,6 +111,11 @@
     "detailInfoTitle": "Information",
     "detailAgeRestricted": "18+ only (ID required).",
     "detailOrganizedBy": "Organized by {venue}",
+    "@detailOrganizedBy": {
+        "placeholders": {
+            "venue": { "type": "String" }
+        }
+    },
     "detailLocationTitle": "Location",
     "detailDoorsOpen": "Doors open",
     "detailViewMap": "View map",
@@ -75,14 +130,14 @@
     "editProfileSave": "Save",
     "editProfileCancel": "Cancel",
     "editProfileSuccess": "Profile updated successfully",
-    "editProfileImageNotImplemented": "Image upload feature not implemented",
-    "helpSearchHint": "Search for help...",
+    "editProfileImageNotImplemented": "Image upload functionality not implemented",
+    "helpSearchHint": "Search help...",
     "helpMainSubtitle": "How can we help you today?",
-    "helpSectionFaq": "FREQUENTLY ASKED QUESTIONS",
+    "helpSectionFaq": "FAQ",
     "helpSectionTutorials": "QUICK TUTORIALS",
     "helpSectionSupport": "SUPPORT & LEGAL",
     "helpFaq1Q": "How do I buy a ticket?",
-    "helpFaq1A": "Go to the concert you are interested in and tap on 'Buy ticket'. You can then choose your payment method and confirm.",
+    "helpFaq1A": "Go to the concert you're interested in and tap 'Buy Ticket'. You can choose the payment method and confirm.",
     "helpFaq2Q": "How do I manage my notifications?",
     "helpFaq2A": "In the Notifications section, you can enable alerts for concerts, artists, and recommendations.",
     "helpFaq3Q": "Invite friends",
@@ -91,19 +146,19 @@
     "helpTut2": "Using your tickets",
     "helpTut3": "Sync calendar",
     "helpSupportContact": "Contact Support",
-    "helpSupportReport": "Report an Issue",
+    "helpSupportReport": "Report Issue",
     "helpSupportTerms": "Terms and conditions",
     "savedEmptyTitle": "You have no saved concerts",
-    "savedEmptySub": "Tap the save icon on the Home screen!",
+    "savedEmptySub": "Hit the save icon on the Home screen!",
     "savedPriceInfo": "See more",
     "settingsLanguage": "Language",
     "settingsHeaderNotifications": "Notifications",
-    "settingsGeneralNotifications": "General Notifications",
-    "settingsEventReminders": "Event Reminders",
-    "settingsTicketReleases": "Ticket Releases",
+    "settingsGeneralNotifications": "General notifications",
+    "settingsEventReminders": "Event reminders",
+    "settingsTicketReleases": "Ticket releases",
     "settingsHeaderPrivacy": "Privacy",
-    "settingsLocationPermissions": "Location Permissions",
-    "settingsSharedData": "Shared Data",
+    "settingsLocationPermissions": "Location permissions",
+    "settingsSharedData": "Shared data",
     "settingsDownloadData": "Download my data",
     "settingsDeleteAccount": "Delete account",
     "settingsHeaderPrefs": "Preferences",
@@ -112,16 +167,14 @@
     "settingsDialogAjustes": "Settings",
     "commonError": "An error occurred",
     "commonSuccess": "Saved successfully",
-    
     "privacyTransparencyTitle": "Data Transparency",
-    "privacyTransparencyDesc": "At Vibra, we value your privacy. Here is what we share and why.",
+    "privacyTransparencyDesc": "At Vibra, we value your privacy. Here is what information is shared and why.",
     "privacyProfile": "Public Profile",
     "privacyProfileDesc": "Your name and photo are visible if you share events.",
     "privacyLocation": "Location",
-    "privacyLocationDesc": "Used only to show you nearby concerts.",
+    "privacyLocationDesc": "Only used to show you nearby concerts.",
     "privacyAnalytics": "Analytics",
     "privacyAnalyticsDesc": "Anonymous usage data to improve the app.",
-    
     "dialogDeleteTitle": "Delete account?",
     "dialogDeleteBody": "This action is irreversible. All your data and tickets will be deleted.",
     "dialogDeleteBtn": "Delete",
@@ -129,22 +182,48 @@
     "dialogGenerating": "Generating file...",
     "dialogError": "An unexpected error occurred.",
     "snackDeleteSuccess": "Your account has been deleted.",
-    "snackDeleteReauth": "For security, please log out and log in again to delete your account.",
+    "snackDeleteReauth": "For security, log out and log back in to delete the account.",
     "shareDataText": "Here is your exported data from Vibra.",
-
     "dialogPermissionTitle": "Permissions needed",
     "dialogPermissionContent": "To enable these notifications, you need to grant permission in system settings.",
     "dialogSettingsBtn": "Settings",
-    "notifPreviewTitle": "Notification Preview",
-    "notifPreviewBody": "Here is how alerts will look on your lock screen:",
+    "notifPreviewTitle": "Notification preview",
+    "notifPreviewBody": "This is how alerts will look on your lock screen:",
     "btnActivate": "Activate",
-    "notifGeneralTitle": "Vibra News",
-    "notifGeneralBody": "App updated! Discover the new dark mode and improvements.",
+    "notifGeneralTitle": "What's new in Vibra",
+    "notifGeneralBody": "The app has been updated! Discover the new dark mode and improvements.",
     "notifReminderTitle": "📅 It's tomorrow!",
-    "notifReminderBody": "Your saved event 'Bad Bunny - World Tour' is tomorrow. Got your tickets?",
+    "notifReminderBody": "Your saved event 'Bad Bunny - World Tour' is tomorrow. Do you have your tickets?",
     "notifTicketsTitle": "🎟️ Tickets Available",
-    "notifTicketsBody": "Run! New tickets released for 'Taylor Swift'. Don't miss out!",
+    "notifTicketsBody": "Hurry! New tickets for 'Taylor Swift' have been released. Don't miss out!",
     "timeNow": "Now",
     "time5min": "5 min ago",
-    "time1min": "1 min ago"
+    "time1min": "1 min ago",
+
+    "regionTitle": "Select your Region",
+    "regionSearchHint": "Search country...",
+    "regionExplore": "Explore {name}",
+    "@regionExplore": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionDialogCityBody": "Looking for concerts in a specific city?",
+    "regionDialogCityHint": "Ex: Madrid, Barcelona...",
+    "regionBtnWholeCountry": "See whole country",
+    "regionBtnApply": "Apply",
+    "regionOptionWholeCountry": "Whole country",
+    "regionOptionWholeCountrySub": "See concerts in all of {name}",
+    "@regionOptionWholeCountrySub": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionHeaderPopular": "POPULAR CITIES",
+    "regionHeaderOther": "OTHER LOCATION",
+    "regionOptionManual": "Type another city...",
+    "regionManualTitle": "Type city",
+    "regionManualHint": "Ex: Benidorm",
+    "regionManualSearch": "Search"
 }
+

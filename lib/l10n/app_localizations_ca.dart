@@ -12,10 +12,10 @@ class AppLocalizationsCa extends AppLocalizations {
   String get appTitle => 'Vibra';
 
   @override
-  String get loginSpotify => 'Iniciar amb Spotify';
+  String get loginSpotify => 'Inicia amb Spotify';
 
   @override
-  String get loginGoogle => 'Iniciar amb Google';
+  String get loginGoogle => 'Inicia amb Google';
 
   @override
   String get loginLoading => 'Carregant...';
@@ -26,12 +26,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String loginError(String error) {
-    return 'Error en iniciar la sessió: $error';
+    return 'Error en iniciar sessió: $error';
   }
 
   @override
   String homeSearchHint(String country) {
-    return 'Cercar a $country...';
+    return 'Cerca a $country...';
   }
 
   @override
@@ -58,7 +58,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String homeSectionForYouSub(String artist) {
-    return 'Perquè escoltes $artist...';
+    return 'Perquè escoltes a $artist...';
   }
 
   @override
@@ -70,7 +70,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get homeSectionTrendsSub => 'El més popular de la setmana';
 
   @override
-  String get homeSectionWeekend => 'JA ÉS CAP DE SETMANA!';
+  String get homeSectionWeekend => 'JA ÉS FINDE!';
 
   @override
   String get homeSectionWeekendSub => 'Plans per a aquest cap de setmana';
@@ -82,7 +82,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get homeSectionDiscoverSub => 'Explora nous gèneres';
 
   @override
-  String get homeSectionCollections => 'EXPLORA VIBRES';
+  String get homeSectionCollections => 'EXPLORA VIBRAS';
 
   @override
   String get homeSectionCollectionsSub => 'Troba el teu pla ideal';
@@ -142,7 +142,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get prefsSubtitle => 'Personalitza el teu feed. Què et mou?';
 
   @override
-  String get prefsSearchHint => 'Cercar artista (ex: Bad Bunny)...';
+  String get prefsSearchHint => 'Cerca artista (ex: Bad Bunny)...';
 
   @override
   String get prefsYourArtists => 'Els teus Artistes:';
@@ -183,7 +183,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get calendarMonth => 'Propers 30 dies';
 
   @override
-  String get calendarBtnSelect => 'TRIAR DATA';
+  String get calendarBtnSelect => 'ESCOLLIR DATA';
 
   @override
   String get rangeTitle => 'ESDEVENIMENTS DISPONIBLES';
@@ -218,7 +218,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get detailLocationTitle => 'Ubicació';
 
   @override
-  String get detailDoorsOpen => 'Obertura de portes';
+  String get detailDoorsOpen => 'Obertura portes';
 
   @override
   String get detailViewMap => 'Veure mapa';
@@ -280,7 +280,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get helpFaq1A =>
-      'Vés al concert que t\'interessi i prem a “Comprar entrada”. Podràs triar el mètode de pagament i confirmar.';
+      'Ves al concert que t\'interessi i prem “Comprar entrada”. Podràs triar el mètode de pagament i confirmar.';
 
   @override
   String get helpFaq2Q => 'Com gestiono les meves notificacions?';
@@ -300,16 +300,16 @@ class AppLocalizationsCa extends AppLocalizations {
   String get helpTut1 => 'Guia de compra';
 
   @override
-  String get helpTut2 => 'Usar els teus tiquets';
+  String get helpTut2 => 'Utilitzar les teves entrades';
 
   @override
   String get helpTut3 => 'Sincronitzar calendari';
 
   @override
-  String get helpSupportContact => 'Contactar amb Suport';
+  String get helpSupportContact => 'Contactar Suport';
 
   @override
-  String get helpSupportReport => 'Informar d\'un problema';
+  String get helpSupportReport => 'Reportar Problema';
 
   @override
   String get helpSupportTerms => 'Termes i condicions';
@@ -363,10 +363,10 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsLargeText => 'Text gran';
 
   @override
-  String get settingsDialogAjustes => 'Configuració';
+  String get settingsDialogAjustes => 'Ajustos';
 
   @override
-  String get commonError => 'S\'ha produït un error';
+  String get commonError => 'Hi ha hagut un error';
 
   @override
   String get commonSuccess => 'Desat amb èxit';
@@ -413,17 +413,17 @@ class AppLocalizationsCa extends AppLocalizations {
   String get dialogCancel => 'Cancel·lar';
 
   @override
-  String get dialogGenerating => 'Generant fitxer...';
+  String get dialogGenerating => 'Generant arxiu...';
 
   @override
-  String get dialogError => 'S\'ha produït un error inesperat.';
+  String get dialogError => 'Ha ocorregut un error inesperat.';
 
   @override
   String get snackDeleteSuccess => 'El teu compte ha estat eliminat.';
 
   @override
   String get snackDeleteReauth =>
-      'Per seguretat, tanca la sessió i torna a entrar per eliminar el compte.';
+      'Per seguretat, tanca sessió i torna a entrar per eliminar el compte.';
 
   @override
   String get shareDataText => 'Aquí tens les teves dades exportades de Vibra.';
@@ -433,7 +433,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get dialogPermissionContent =>
-      'Per activar aquestes notificacions, cal donar permís als ajustos del sistema.';
+      'Per activar aquestes notificacions, necessites donar permís als ajustos del sistema.';
 
   @override
   String get dialogSettingsBtn => 'Ajustos';
@@ -460,14 +460,14 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get notifReminderBody =>
-      'El teu esdeveniment desat \'Bad Bunny - World Tour\' és demà. Tens les entrades?';
+      'El teu esdeveniment desat \'Bad Bunny - World Tour\' és demà. Tens les teves entrades?';
 
   @override
   String get notifTicketsTitle => '🎟️ Entrades Disponibles';
 
   @override
   String get notifTicketsBody =>
-      'Corre! Han sortit noves entrades per a \'Taylor Swift\'. No et quedis sense!';
+      'Corre! Han sortit noves entrades per \'Taylor Swift\'. No te les perdis!';
 
   @override
   String get timeNow => 'Ara';
@@ -477,4 +477,54 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get time1min => 'Fa 1 min';
+
+  @override
+  String get regionTitle => 'Selecciona la teva Regió';
+
+  @override
+  String get regionSearchHint => 'Cerca país...';
+
+  @override
+  String regionExplore(String name) {
+    return 'Explora $name';
+  }
+
+  @override
+  String get regionDialogCityBody =>
+      'Busques concerts en una ciutat específica?';
+
+  @override
+  String get regionDialogCityHint => 'Ex: Madrid, Barcelona...';
+
+  @override
+  String get regionBtnWholeCountry => 'Veure tot el país';
+
+  @override
+  String get regionBtnApply => 'Aplicar';
+
+  @override
+  String get regionOptionWholeCountry => 'Tot el país';
+
+  @override
+  String regionOptionWholeCountrySub(String name) {
+    return 'Veure concerts a tot $name';
+  }
+
+  @override
+  String get regionHeaderPopular => 'CIUTATS POPULARS';
+
+  @override
+  String get regionHeaderOther => 'ALTRA UBICACIÓ';
+
+  @override
+  String get regionOptionManual => 'Escriure una altra ciutat...';
+
+  @override
+  String get regionManualTitle => 'Escriure ciutat';
+
+  @override
+  String get regionManualHint => 'Ex: Benidorm';
+
+  @override
+  String get regionManualSearch => 'Cercar';
 }

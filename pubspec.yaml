@@ -30,6 +30,7 @@ dependencies:
   logger: ^2.3.0
   flutter_localizations:
     sdk: flutter
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -44,6 +45,7 @@ flutter:
     - assets/googleLogo.png
     - assets/spotifyLogo.png
     - assets/vibraLogo.png
+    - .env
   fonts:
     - family: Montserrat
       fonts:

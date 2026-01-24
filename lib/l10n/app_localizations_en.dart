@@ -22,7 +22,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginTerms =>
-      'By continuing, you agree to our Terms and Privacy Policy.';
+      'By continuing, you accept our Terms and Privacy Policy.';
 
   @override
   String loginError(String error) {
@@ -67,10 +67,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeSectionTrendsSub => 'Most popular this week';
+  String get homeSectionTrendsSub => 'This week\'s most popular';
 
   @override
-  String get homeSectionWeekend => 'IT\'S WEEKEND!';
+  String get homeSectionWeekend => 'IT\'S THE WEEKEND!';
 
   @override
   String get homeSectionWeekendSub => 'Plans for this weekend';
@@ -103,7 +103,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeErrorNoEvents(String country) {
-    return 'No events in $country';
+    return 'No events found in $country';
   }
 
   @override
@@ -119,7 +119,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuAccount => 'My Account';
 
   @override
-  String get menuSaved => 'Saved Events';
+  String get menuSaved => 'Saved events';
 
   @override
   String get menuSettings => 'Settings';
@@ -128,10 +128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuHelp => 'Help';
 
   @override
-  String get menuLogout => 'Log Out';
+  String get menuLogout => 'Log out';
 
   @override
-  String get menuEditProfile => 'Edit Profile';
+  String get menuEditProfile => 'Edit profile';
 
   @override
   String prefsTitle(String name) {
@@ -148,7 +148,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prefsYourArtists => 'Your Artists:';
 
   @override
-  String get prefsGenres => 'Genres & Styles:';
+  String get prefsGenres => 'Genres and Styles:';
 
   @override
   String get prefsBtnStart => 'Get Started';
@@ -258,16 +258,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editProfileImageNotImplemented =>
-      'Image upload feature not implemented';
+      'Image upload functionality not implemented';
 
   @override
-  String get helpSearchHint => 'Search for help...';
+  String get helpSearchHint => 'Search help...';
 
   @override
   String get helpMainSubtitle => 'How can we help you today?';
 
   @override
-  String get helpSectionFaq => 'FREQUENTLY ASKED QUESTIONS';
+  String get helpSectionFaq => 'FAQ';
 
   @override
   String get helpSectionTutorials => 'QUICK TUTORIALS';
@@ -280,7 +280,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpFaq1A =>
-      'Go to the concert you are interested in and tap on \'Buy ticket\'. You can then choose your payment method and confirm.';
+      'Go to the concert you\'re interested in and tap \'Buy Ticket\'. You can choose the payment method and confirm.';
 
   @override
   String get helpFaq2Q => 'How do I manage my notifications?';
@@ -309,7 +309,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpSupportContact => 'Contact Support';
 
   @override
-  String get helpSupportReport => 'Report an Issue';
+  String get helpSupportReport => 'Report Issue';
 
   @override
   String get helpSupportTerms => 'Terms and conditions';
@@ -318,7 +318,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedEmptyTitle => 'You have no saved concerts';
 
   @override
-  String get savedEmptySub => 'Tap the save icon on the Home screen!';
+  String get savedEmptySub => 'Hit the save icon on the Home screen!';
 
   @override
   String get savedPriceInfo => 'See more';
@@ -330,22 +330,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsHeaderNotifications => 'Notifications';
 
   @override
-  String get settingsGeneralNotifications => 'General Notifications';
+  String get settingsGeneralNotifications => 'General notifications';
 
   @override
-  String get settingsEventReminders => 'Event Reminders';
+  String get settingsEventReminders => 'Event reminders';
 
   @override
-  String get settingsTicketReleases => 'Ticket Releases';
+  String get settingsTicketReleases => 'Ticket releases';
 
   @override
   String get settingsHeaderPrivacy => 'Privacy';
 
   @override
-  String get settingsLocationPermissions => 'Location Permissions';
+  String get settingsLocationPermissions => 'Location permissions';
 
   @override
-  String get settingsSharedData => 'Shared Data';
+  String get settingsSharedData => 'Shared data';
 
   @override
   String get settingsDownloadData => 'Download my data';
@@ -376,7 +376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyTransparencyDesc =>
-      'At Vibra, we value your privacy. Here is what we share and why.';
+      'At Vibra, we value your privacy. Here is what information is shared and why.';
 
   @override
   String get privacyProfile => 'Public Profile';
@@ -389,7 +389,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyLocation => 'Location';
 
   @override
-  String get privacyLocationDesc => 'Used only to show you nearby concerts.';
+  String get privacyLocationDesc => 'Only used to show you nearby concerts.';
 
   @override
   String get privacyAnalytics => 'Analytics';
@@ -421,7 +421,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get snackDeleteReauth =>
-      'For security, please log out and log in again to delete your account.';
+      'For security, log out and log back in to delete the account.';
 
   @override
   String get shareDataText => 'Here is your exported data from Vibra.';
@@ -437,35 +437,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialogSettingsBtn => 'Settings';
 
   @override
-  String get notifPreviewTitle => 'Notification Preview';
+  String get notifPreviewTitle => 'Notification preview';
 
   @override
   String get notifPreviewBody =>
-      'Here is how alerts will look on your lock screen:';
+      'This is how alerts will look on your lock screen:';
 
   @override
   String get btnActivate => 'Activate';
 
   @override
-  String get notifGeneralTitle => 'Vibra News';
+  String get notifGeneralTitle => 'What\'s new in Vibra';
 
   @override
   String get notifGeneralBody =>
-      'App updated! Discover the new dark mode and improvements.';
+      'The app has been updated! Discover the new dark mode and improvements.';
 
   @override
   String get notifReminderTitle => '📅 It\'s tomorrow!';
 
   @override
   String get notifReminderBody =>
-      'Your saved event \'Bad Bunny - World Tour\' is tomorrow. Got your tickets?';
+      'Your saved event \'Bad Bunny - World Tour\' is tomorrow. Do you have your tickets?';
 
   @override
   String get notifTicketsTitle => '🎟️ Tickets Available';
 
   @override
   String get notifTicketsBody =>
-      'Run! New tickets released for \'Taylor Swift\'. Don\'t miss out!';
+      'Hurry! New tickets for \'Taylor Swift\' have been released. Don\'t miss out!';
 
   @override
   String get timeNow => 'Now';
@@ -475,4 +475,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get time1min => '1 min ago';
+
+  @override
+  String get regionTitle => 'Select your Region';
+
+  @override
+  String get regionSearchHint => 'Search country...';
+
+  @override
+  String regionExplore(String name) {
+    return 'Explore $name';
+  }
+
+  @override
+  String get regionDialogCityBody => 'Looking for concerts in a specific city?';
+
+  @override
+  String get regionDialogCityHint => 'Ex: Madrid, Barcelona...';
+
+  @override
+  String get regionBtnWholeCountry => 'See whole country';
+
+  @override
+  String get regionBtnApply => 'Apply';
+
+  @override
+  String get regionOptionWholeCountry => 'Whole country';
+
+  @override
+  String regionOptionWholeCountrySub(String name) {
+    return 'See concerts in all of $name';
+  }
+
+  @override
+  String get regionHeaderPopular => 'POPULAR CITIES';
+
+  @override
+  String get regionHeaderOther => 'OTHER LOCATION';
+
+  @override
+  String get regionOptionManual => 'Type another city...';
+
+  @override
+  String get regionManualTitle => 'Type city';
+
+  @override
+  String get regionManualHint => 'Ex: Benidorm';
+
+  @override
+  String get regionManualSearch => 'Search';
 }

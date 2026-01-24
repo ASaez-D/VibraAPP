@@ -167,7 +167,6 @@
     "settingsDialogAjustes": "Ajustes",
     "commonError": "Ha ocurrido un error",
     "commonSuccess": "Guardado con éxito",
-    
     "privacyTransparencyTitle": "Transparencia de Datos",
     "privacyTransparencyDesc": "En Vibra, valoramos tu privacidad. Aquí te mostramos qué información se comparte y con qué fin.",
     "privacyProfile": "Perfil Público",
@@ -176,7 +175,6 @@
     "privacyLocationDesc": "Solo se usa para mostrarte conciertos cercanos.",
     "privacyAnalytics": "Analíticas",
     "privacyAnalyticsDesc": "Datos anónimos de uso para mejorar la app.",
-    
     "dialogDeleteTitle": "¿Eliminar cuenta?",
     "dialogDeleteBody": "Esta acción es irreversible. Se borrarán todos tus datos y entradas.",
     "dialogDeleteBtn": "Eliminar",
@@ -186,7 +184,6 @@
     "snackDeleteSuccess": "Tu cuenta ha sido eliminada.",
     "snackDeleteReauth": "Por seguridad, cierra sesión y vuelve a entrar para eliminar la cuenta.",
     "shareDataText": "Aquí tienes tus datos exportados de Vibra.",
-
     "dialogPermissionTitle": "Permisos necesarios",
     "dialogPermissionContent": "Para activar estas notificaciones, necesitas dar permiso en los ajustes del sistema.",
     "dialogSettingsBtn": "Ajustes",
@@ -201,5 +198,31 @@
     "notifTicketsBody": "¡Corre! Han salido nuevas entradas para 'Taylor Swift'. ¡No te quedes sin ellas!",
     "timeNow": "Ahora",
     "time5min": "Hace 5 min",
-    "time1min": "Hace 1 min"
+    "time1min": "Hace 1 min",
+
+    "regionTitle": "Selecciona tu Región",
+    "regionSearchHint": "Buscar país...",
+    "regionExplore": "Explora {name}",
+    "@regionExplore": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionDialogCityBody": "¿Buscas conciertos en una ciudad específica?",
+    "regionDialogCityHint": "Ej: Madrid, Barcelona...",
+    "regionBtnWholeCountry": "Ver todo el país",
+    "regionBtnApply": "Aplicar",
+    "regionOptionWholeCountry": "Todo el país",
+    "regionOptionWholeCountrySub": "Ver conciertos en todo {name}",
+    "@regionOptionWholeCountrySub": {
+        "placeholders": {
+            "name": { "type": "String" }
+        }
+    },
+    "regionHeaderPopular": "CIUDADES POPULARES",
+    "regionHeaderOther": "OTRA UBICACIÓN",
+    "regionOptionManual": "Escribir otra ciudad...",
+    "regionManualTitle": "Escriure ciutat",
+    "regionManualHint": "Ej: Benidorm",
+    "regionManualSearch": "Buscar"
 }
