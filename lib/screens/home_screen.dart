@@ -23,7 +23,7 @@ import 'filtered_events_screen.dart';
 import 'saved_events_screen.dart';
 import 'account_screen.dart';
 import 'help_screen.dart';
-import 'region_screen.dart'; // <--- IMPRESCINDIBLE: Tu nueva pantalla de región
+import 'region_screen.dart';
 
 // SERVICIOS
 import '../services/ticketmaster_service.dart';
@@ -55,8 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // DATOS
   Future<List<ConcertDetail>>? _concertsFuture;
-  late Future<List<Map<String, String>>> _artistsFuture;
-
+  
   List<ConcertDetail> _recommendedConcerts = [];
   List<ConcertDetail> _weekendConcerts = [];
   List<ConcertDetail> _secondaryVibeConcerts = [];
@@ -71,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ESTADO DE REGIÓN
   String _userCountryCode = 'ES';
-  String? _userCity; // <--- Variable para la ciudad (puede ser null)
+  String? _userCity; 
   
   String _currentVibe = "lo mejor"; 
   String _secondaryVibeTitle = "";
@@ -83,8 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasMore = true;
   String? _currentKeyword;
 
-  final List<String> _targetArtists = ["Bad Bunny", "Rosalía", "Quevedo", "Aitana", "Feid", "C. Tangana"];
-
   final List<Ticket> myTickets = [
     Ticket(eventName: "Concierto de Kassandra", eventDate: DateTime(2025, 12, 20), location: "Auditorio Nacional", status: "Activa"),
     Ticket(eventName: "Festival de Música", eventDate: DateTime(2026, 1, 15), location: "Estadio Central", status: "Usada"),
@@ -93,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _artistsFuture = Future.value([]);
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -160,8 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           if (artists.isNotEmpty) {
             _loadSpecificRecommendations(artists);
-          } else {
-            _loadGenericArtistsImages();
           }
           _loadData(keyword: primaryGenre, refresh: true);
           if (secondaryGenre != null) _loadSecondaryVibe(secondaryGenre);
@@ -172,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (!hasPreferences) {
-      _loadGenericArtistsImages();
       _loadData(keyword: null, refresh: true);
     }
   }
@@ -203,17 +196,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _currentVibe = dominantKeyword ?? "lo mejor";
         _loadSpecificRecommendations(topArtistsData.map((e) => e['name'] as String).toList());
         if (secondaryKeyword != null) _loadSecondaryVibe(secondaryKeyword);
-      } else {
-        _loadGenericArtistsImages();
       }
       _loadData(keyword: dominantKeyword, refresh: true);
     } catch (e) {
-      _loadGenericArtistsImages();
       _loadData(keyword: null, refresh: true);
     }
   }
-
-  // --- MÉTODOS DE CARGA ACTUALIZADOS CON 'city' ---
 
   void _loadWeekendPlans() {
     DateTime now = DateTime.now();
@@ -225,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
       nextFriday, 
       nextSunday, 
       countryCode: _userCountryCode, 
-      city: _userCity, // <--- FILTRO CIUDAD
+      city: _userCity,
       size: 10
     ).then((events) {
       if (mounted) setState(() => _weekendConcerts = _filterDuplicates(events));
@@ -240,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DateTime.now(), 
       DateTime.now().add(const Duration(days: 90)), 
       countryCode: _userCountryCode, 
-      city: _userCity, // <--- FILTRO CIUDAD
+      city: _userCity,
       keyword: keyword, 
       size: 10
     ).then((events) {
@@ -263,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
         DateTime.now(), 
         DateTime.now().add(const Duration(days: 90)), 
         countryCode: _userCountryCode, 
-        city: _userCity, // <--- FILTRO CIUDAD
+        city: _userCity,
         keyword: _currentKeyword, 
         page: _currentPage, 
         size: 20
@@ -305,8 +293,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // ----------------------------------------------------
-
   Future<void> _loadSpecificRecommendations(List<String> artistNames) async {
     if (artistNames.isEmpty) return;
     _topArtistName = artistNames.first;
@@ -316,8 +302,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _recommendedConcerts = _filterDuplicates(foundEvents);
-        _artistsFuture = Future.value(artistNames.map((name) => {"name": name, "image": ""}).toList());
-        _loadArtistsImages(artistNames);
       });
     }
   }
@@ -330,26 +314,6 @@ class _HomeScreenState extends State<HomeScreen> {
       seen.add(clean);
       return true;
     }).toList();
-  }
-
-  void _loadArtistsImages(List<String> names) {
-    _artistsFuture = Future.wait(names.map((name) async {
-      try {
-        final results = await _spotifyService.searchArtists(name);
-        if (results.isNotEmpty) return results.first;
-      } catch (e) {}
-      return {"name": name, "image": ""};
-    }));
-  }
-
-  void _loadGenericArtistsImages() {
-    _artistsFuture = Future.wait(_targetArtists.map((name) async {
-      try {
-        final results = await _spotifyService.searchArtists(name);
-        if (results.isNotEmpty) return results.first;
-      } catch (e) {}
-      return {"name": name, "image": ""};
-    })).then((list) => list.where((item) => item["image"] != "").toList());
   }
 
   void _onSearchChanged() {
@@ -374,7 +338,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (index != 0) {
       switch (index) {
         case 1:
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const CalendarScreen()));
+          // --- AQUÍ ESTÁ EL CAMBIO PARA EL CALENDARIO ---
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CalendarScreen(
+              countryCode: _userCountryCode,
+              city: _userCity
+            )
+          ));
           break;
         case 2:
           Navigator.push(context, MaterialPageRoute(
@@ -549,37 +519,40 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  if (index == 2) return _buildArtistsCarousel(l10n, primaryText, secondaryText, accentColor, cardBg);
-
-                  if (index == 3) {
+                  // --- SECCIÓN 1: TENDENCIAS / RECOMENDACIONES (ÍNDICE 2) ---
+                  if (index == 2) {
                     final displayList = _recommendedConcerts.isNotEmpty ? _recommendedConcerts : concerts.take(8).toList();
                     final title = _recommendedConcerts.isNotEmpty ? l10n.homeSectionForYou : l10n.homeSectionTrends(_userCountryCode);
                     final sub = _recommendedConcerts.isNotEmpty ? l10n.homeSectionForYouSub(_topArtistName) : l10n.homeSectionTrendsSub;
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, accentColor, cardBg) : const SizedBox.shrink();
                   }
 
-                  if (index == 6) {
+                  // --- SECCIÓN 2: FIN DE SEMANA (ÍNDICE 5) ---
+                  if (index == 5) {
                     final displayList = _weekendConcerts.isNotEmpty ? _weekendConcerts : concerts.skip(5).take(8).toList();
                     final title = l10n.homeSectionWeekend;
                     final sub = l10n.homeSectionWeekendSub;
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.orangeAccent, cardBg) : const SizedBox.shrink();
                   }
 
-                  if (index == 9) {
+                  // --- SECCIÓN 3: SEGUNDA VIBRA (ÍNDICE 8) ---
+                  if (index == 8) {
                     final displayList = _secondaryVibeConcerts.isNotEmpty ? _secondaryVibeConcerts : concerts.reversed.take(8).toList();
                     final title = _secondaryVibeConcerts.isNotEmpty ? l10n.homeVibeTitle(_secondaryVibeTitle) : l10n.homeSectionDiscover;
                     final sub = _secondaryVibeConcerts.isNotEmpty ? l10n.homeSectionDiscoverSub : l10n.homeSectionDiscoverSub;
                     return displayList.isNotEmpty ? _buildHorizontalSection(title, sub, displayList, primaryText, secondaryText, Colors.purpleAccent, cardBg) : const SizedBox.shrink();
                   }
 
-                  if (index == 12) return _buildCollectionsCarousel(l10n, primaryText, secondaryText, accentColor);
+                  // --- SECCIÓN 4: COLECCIONES (ÍNDICE 11) ---
+                  if (index == 11) return _buildCollectionsCarousel(l10n, primaryText, secondaryText, accentColor);
 
+                  // --- LÓGICA DE ÍNDICES PARA EL FEED PRINCIPAL ---
                   int concertIndex = index;
-                  if (index > 2) concertIndex--;
-                  if (index > 3) concertIndex--;
-                  if (index > 6) concertIndex--;
-                  if (index > 9) concertIndex--;
-                  if (index > 12) concertIndex--;
+                  if (index > 2) concertIndex--; // Ajuste por Tendencias
+                  if (index > 5) concertIndex--; // Ajuste por Finde
+                  if (index > 8) concertIndex--; // Ajuste por Segunda Vibra
+                  if (index > 11) concertIndex--; // Ajuste por Colecciones
+                  
                   if (concertIndex >= concerts.length) return null;
 
                   return Padding(
@@ -587,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildDiceCard(context, concerts[concertIndex], primaryText, secondaryText, accentColor, cardBg),
                   );
                 },
-                childCount: concerts.length + 5,
+                childCount: concerts.length + 4, 
               ),
             ),
             SliverToBoxAdapter(
@@ -665,14 +638,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(padding: const EdgeInsets.fromLTRB(20, 30, 20, 16), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(color: primaryText, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5, height: 1.1)), const SizedBox(height: 4), Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))), const SizedBox(height: 6), Text(subtitle, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500))]), if (onMoreTap != null) GestureDetector(onTap: onMoreTap, child: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12)), child: Icon(Icons.arrow_forward, color: primaryText, size: 18)))]));
   }
 
-  Widget _buildArtistsCarousel(AppLocalizations l10n, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildSectionHeader(title: l10n.homeSectionArtists, subtitle: l10n.homeSectionArtistsSub, primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg), SizedBox(height: 110, child: FutureBuilder<List<Map<String, String>>>(future: _artistsFuture, builder: (context, snapshot) { if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator(color: accentColor)); if (!snapshot.hasData) return const SizedBox.shrink(); final artists = snapshot.data!; return ListView.builder(scrollDirection: Axis.horizontal, padding: const EdgeInsets.only(left: 16), itemCount: artists.length, itemBuilder: (context, index) { return Container(margin: const EdgeInsets.only(right: 20), child: Column(children: [Container(padding: const EdgeInsets.all(3), decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [Colors.greenAccent, Colors.blueAccent])), child: CircleAvatar(radius: 32, backgroundColor: cardBg, backgroundImage: (artists[index]['image'] != null && artists[index]['image']!.isNotEmpty) ? NetworkImage(artists[index]['image']!) : null, child: (artists[index]['image'] == null || artists[index]['image']!.isEmpty) ? Icon(Icons.music_note, color: secondaryText) : null)), const SizedBox(height: 8), SizedBox(width: 80, child: Text(artists[index]['name']!, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 12))) ])); }); })), const SizedBox(height: 20)]);
-  }
-
   Widget _buildCollectionsCarousel(AppLocalizations l10n, Color primaryText, Color secondaryText, Color accentColor) {
     final collections = [{"name": "Esta noche", "id": "tonight", "color": Colors.purpleAccent, "img": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400&auto=format&fit=crop"}, {"name": "Urbano & Latino", "id": "KnvZfZ7vAj6", "color": const Color(0xFFFF4500), "img": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=400&auto=format&fit=crop"}, {"name": "Electrónica", "id": "KnvZfZ7vAvF", "color": Colors.blueAccent, "img": "https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=400&auto=format&fit=crop"}, {"name": "Rock & Indie", "id": "KnvZfZ7vAeA", "color": const Color(0xFF8B0000), "img": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=400&auto=format&fit=crop"}, {"name": "Pop & Hits", "id": "KnvZfZ7vAev", "color": Colors.pinkAccent, "img": "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=400&auto=format&fit=crop"}, {"name": "Jazz & Blues", "id": "KnvZfZ7vAvE", "color": Colors.amber, "img": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?q=80&w=400&auto=format&fit=crop"}];
     final Color cardBg = Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1C1E) : Colors.white;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildSectionHeader(title: l10n.homeSectionCollections, subtitle: l10n.homeSectionCollectionsSub, primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg), SizedBox(height: 110, child: ListView.builder(scrollDirection: Axis.horizontal, physics: const BouncingScrollPhysics(), padding: const EdgeInsets.only(left: 16, right: 16), itemCount: collections.length, itemBuilder: (context, index) { final col = collections[index]; final color = col["color"] as Color; return GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => FilteredEventsScreen(categoryName: col["name"] as String, categoryId: col["id"] as String, accentColor: color))), child: Container(width: 180, margin: const EdgeInsets.only(right: 12), child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Stack(fit: StackFit.expand, children: [Image.network(col["img"] as String, fit: BoxFit.cover, cacheWidth: 400, color: Colors.black.withOpacity(0.3), colorBlendMode: BlendMode.darken), Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color.withOpacity(0.9), color.withOpacity(0.2), Colors.black.withOpacity(0.8)], stops: const [0.0, 0.5, 1.0]))), Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.6), width: 1.5))), Positioned(bottom: 12, left: 14, child: Row(children: [Container(height: 20, width: 4, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2))), const SizedBox(width: 8), Text(col["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5))]))])))); })), const SizedBox(height: 30)]);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildSectionHeader(title: l10n.homeSectionCollections, subtitle: l10n.homeSectionCollectionsSub, primaryText: primaryText, secondaryText: secondaryText, accentColor: accentColor, cardBg: cardBg), SizedBox(height: 110, child: ListView.builder(scrollDirection: Axis.horizontal, physics: const BouncingScrollPhysics(), padding: const EdgeInsets.only(left: 16, right: 16), itemCount: collections.length, itemBuilder: (context, index) { final col = collections[index]; final color = col["color"] as Color; 
+    
+    // --- CAMBIO AQUÍ: PASAR COUNTRY Y CITY ---
+    return GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => FilteredEventsScreen(
+      categoryName: col["name"] as String, 
+      categoryId: col["id"] as String, 
+      accentColor: color,
+      countryCode: _userCountryCode, // PASAR REGIÓN
+      city: _userCity // PASAR CIUDAD
+    ))), child: Container(width: 180, margin: const EdgeInsets.only(right: 12), child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Stack(fit: StackFit.expand, children: [Image.network(col["img"] as String, fit: BoxFit.cover, cacheWidth: 400, color: Colors.black.withOpacity(0.3), colorBlendMode: BlendMode.darken), Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color.withOpacity(0.9), color.withOpacity(0.2), Colors.black.withOpacity(0.8)], stops: const [0.0, 0.5, 1.0]))), Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.6), width: 1.5))), Positioned(bottom: 12, left: 14, child: Row(children: [Container(height: 20, width: 4, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2))), const SizedBox(width: 8), Text(col["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5))]))])))); })), const SizedBox(height: 30)]);
   }
 
   Widget _buildDiceCard(BuildContext context, ConcertDetail concert, Color primaryText, Color secondaryText, Color accentColor, Color cardBg) {

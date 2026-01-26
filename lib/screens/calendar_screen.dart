@@ -5,7 +5,14 @@ import '../l10n/app_localizations.dart';
 import 'concerts_in_range_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  final String countryCode;
+  final String? city;
+
+  const CalendarScreen({
+    super.key,
+    this.countryCode = 'ES', // Valor por defecto si no llega nada
+    this.city,
+  });
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -71,6 +78,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = _CalendarTheme(Theme.of(context));
+    // Generamos 12 meses a futuro
     final monthsList = List.generate(12, (i) => DateTime(currentDate.year, currentDate.month + i));
 
     return Scaffold(
@@ -104,7 +112,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(l10n.calendarTitle, style: TextStyle(color: theme.primaryText, fontWeight: FontWeight.bold, fontSize: 22)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.calendarTitle, style: TextStyle(color: theme.primaryText, fontWeight: FontWeight.bold, fontSize: 22)),
+                    // Mostramos la región seleccionada como referencia
+                    if (widget.city != null)
+                      Text("Buscando en ${widget.city}", style: TextStyle(color: theme.accentColor, fontSize: 12))
+                    else 
+                      Text("Buscando en ${widget.countryCode}", style: TextStyle(color: theme.secondaryText, fontSize: 12)),
+                  ],
+                ),
               ),
             ],
           ),
@@ -155,6 +173,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final monthName = DateFormat('MMMM yyyy', locale).format(month);
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
 
+    // Calcular el día de la semana en que empieza el mes (1 = Lunes, 7 = Domingo)
+    final firstWeekday = DateTime(month.year, month.month, 1).weekday;
+    // Offset para cuadrar con GridView (Lunes es index 0 en UI, pero DateTime.weekday 1)
+    final offset = firstWeekday - 1; 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -167,8 +190,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, crossAxisSpacing: 8, mainAxisSpacing: 8),
-          itemCount: daysInMonth,
-          itemBuilder: (context, index) => _buildDayTile(DateTime(month.year, month.month, index + 1), theme),
+          itemCount: daysInMonth + offset, // Añadimos espacios vacíos al principio
+          itemBuilder: (context, index) {
+            if (index < offset) return const SizedBox(); // Espacio vacío
+            final day = index - offset + 1;
+            return _buildDayTile(DateTime(month.year, month.month, day), theme);
+          },
         ),
       ],
     );
@@ -249,7 +276,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ConcertsInRangeScreen(startDate: startDate ?? endDate!, endDate: endDate ?? startDate!),
+        builder: (_) => ConcertsInRangeScreen(
+          startDate: startDate ?? endDate!,
+          endDate: endDate ?? startDate!,
+          // --- AQUÍ PASAMOS LOS DATOS DE REGIÓN ---
+          countryCode: widget.countryCode,
+          city: widget.city,
+        ),
       ),
     );
   }
@@ -274,11 +307,11 @@ class _CalendarTheme {
         primaryText = theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF222222),
         secondaryText = theme.brightness == Brightness.dark ? Colors.white54 : Colors.grey.shade600,
         accentColor = Colors.greenAccent,
-        // Cambio: withOpacity -> withValues
-        rangeColor = Colors.greenAccent.withValues(alpha: 0.2),
+        // Usamos withOpacity para mayor compatibilidad
+        rangeColor = Colors.greenAccent.withOpacity(0.2),
         pastDateColor = theme.brightness == Brightness.dark ? Colors.white38 : Colors.grey.shade400,
         inactiveChipColor = theme.brightness == Brightness.dark 
-            ? Colors.greenAccent.withValues(alpha: 0.2) 
+            ? Colors.greenAccent.withOpacity(0.2) 
             : Colors.grey.shade300,
         disabledColor = theme.brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade300;
 }

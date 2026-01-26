@@ -9,12 +9,17 @@ class FilteredEventsScreen extends StatefulWidget {
   final String categoryName;
   final String categoryId;
   final Color accentColor;
+  // Nuevos parámetros para filtrar por región
+  final String countryCode;
+  final String? city;
 
   const FilteredEventsScreen({
     super.key,
     required this.categoryName,
     required this.categoryId,
     required this.accentColor,
+    this.countryCode = 'ES', // Valor por defecto
+    this.city,
   });
 
   @override
@@ -28,16 +33,18 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
   @override
   void initState() {
     super.initState();
+    // AHORA SÍ FILTRAMOS POR PAÍS Y CIUDAD
     _eventsFuture = _service.getConcerts(
       DateTime.now(),
       DateTime.now().add(const Duration(days: 90)),
       classificationId: widget.categoryId,
+      countryCode: widget.countryCode, // <--- USO DEL PAÍS
+      city: widget.city,               // <--- USO DE LA CIUDAD
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // 1. Obtenemos las traducciones actuales
     final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final String currentLocale = Localizations.localeOf(context).languageCode;
@@ -54,9 +61,8 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
         ),
         title: Column(
           children: [
-            // 2. Usamos la clave traducida en mayúsculas
             Text(
-              l10n.rangeTitle.toUpperCase(), // Debería mostrar "AVAILABLE EVENTS"
+              l10n.rangeTitle.toUpperCase(),
               style: TextStyle(
                 color: isDarkMode ? Colors.white : Colors.black,
                 fontSize: 14,
@@ -65,7 +71,10 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
               ),
             ),
             Text(
-              widget.categoryName,
+              // Mostramos también la ubicación en el título para que el usuario sepa qué está viendo
+              widget.city != null 
+                  ? "${widget.categoryName} (${widget.city})"
+                  : widget.categoryName,
               style: TextStyle(
                 color: widget.accentColor,
                 fontSize: 11,
@@ -84,9 +93,24 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
 
           if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
-              child: Text(
-                l10n.homeSearchNoResults,
-                style: const TextStyle(color: Colors.grey),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.event_busy, size: 50, color: Colors.grey.withOpacity(0.5)),
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.homeSearchNoResults,
+                    style: const TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                  if (widget.city != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "No hay eventos de '${widget.categoryName}' en ${widget.city}",
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ),
+                ],
               ),
             );
           }
@@ -125,7 +149,7 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withOpacity(0.1), // Corregido: withValues -> withOpacity para compatibilidad
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
@@ -193,7 +217,7 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                        color: isDarkMode ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(

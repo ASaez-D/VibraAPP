@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// import 'package:intl/date_symbol_data_local.dart'; // Ya no es necesario aquí si está en main
 import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart';
-import 'concert_detail_screen.dart'; 
+import 'concert_detail_screen.dart';
 
 class ConcertsInRangeScreen extends StatefulWidget {
   final DateTime startDate;
   final DateTime endDate;
+  final String countryCode;
+  final String? city;
 
   const ConcertsInRangeScreen({
     super.key,
     required this.startDate,
     required this.endDate,
+    this.countryCode = 'ES', // Valor por defecto
+    this.city,
   });
 
   @override
@@ -27,12 +30,17 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
   @override
   void initState() {
     super.initState();
-    // initializeDateFormatting('es_ES', null); // Se hace globalmente
     
     DateTime start = widget.startDate;
     DateTime end = DateTime(widget.endDate.year, widget.endDate.month, widget.endDate.day, 23, 59, 59);
 
-    concertsFuture = service.getConcerts(start, end);
+    // --- AHORA PASAMOS LA REGIÓN AL SERVICIO ---
+    concertsFuture = service.getConcerts(
+      start, 
+      end,
+      countryCode: widget.countryCode,
+      city: widget.city
+    );
   }
 
   @override
@@ -60,10 +68,17 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         title: Column(
           children: [
             const Text(
-              "EVENTOS DISPONIBLES", // Puedes añadir "eventsAvailable" al ARB si quieres traducirlo
+              "EVENTOS DISPONIBLES",
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: 14),
             ),
-            Text(titleDate, style: const TextStyle(color: Colors.greenAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(titleDate, style: const TextStyle(color: Colors.greenAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                if (widget.city != null)
+                  Text(" • ${widget.city}", style: const TextStyle(color: Colors.grey, fontSize: 10)),
+              ],
+            ),
           ],
         ),
       ),
@@ -75,9 +90,10 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
           } else if (snapshot.hasError) {
             return _buildErrorState(snapshot.error.toString());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return _buildEmptyState(l10n); // Pasamos l10n
+            return _buildEmptyState(l10n);
           } else {
             final allConcerts = snapshot.data!;
+            // Filtro adicional de seguridad por fecha exacta
             final validConcerts = allConcerts.where((c) {
               return c.date.isAfter(widget.startDate.subtract(const Duration(seconds: 1))) && 
                      c.date.isBefore(widget.endDate.add(const Duration(days: 1))); 
@@ -107,7 +123,6 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     final String time = DateFormat('HH:mm', locale).format(concert.date);
 
     String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
-    // "Ver más" -> Podrías añadirlo al ARB como "seeMore"
     if (priceLabel.length > 8) priceLabel = "Ver más"; 
 
     return GestureDetector(
@@ -122,14 +137,14 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
             colors: [Color(0xFF252525), Color(0xFF151515)],
           ),
           borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.4), 
-          blurRadius: 15, 
-          offset: const Offset(0, 8)
-        )
-      ],
+          border: Border.all(color: Colors.white.withOpacity(0.08)), // withValues -> withOpacity para compatibilidad
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4), 
+              blurRadius: 15, 
+              offset: const Offset(0, 8)
+            )
+          ],
         ),
         child: Row(
           children: [
@@ -194,9 +209,12 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
         children: [
           Icon(Icons.event_busy_rounded, size: 60, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(l10n.homeErrorNoEvents(''), style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)), // "No hay eventos"
+          Text(l10n.homeErrorNoEvents(widget.countryCode), style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text('Prueba con otras fechas', style: TextStyle(color: Colors.grey[800], fontSize: 14)), // Podrías añadir esto al ARB también
+          if (widget.city != null)
+             Text('No encontramos eventos en ${widget.city}', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
+          const SizedBox(height: 4),
+          Text('Prueba con otras fechas', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
         ],
       ),
     );
