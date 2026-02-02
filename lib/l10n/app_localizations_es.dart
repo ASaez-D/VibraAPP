@@ -116,7 +116,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeSearchClear => 'Borrar búsqueda';
 
   @override
-  String get menuAccount => 'Mi Cuenta';
+  String get menuAccount => 'Mi cuenta';
 
   @override
   String get menuSaved => 'Eventos guardados';
@@ -135,7 +135,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String prefsTitle(String name) {
-    return '¡Hola, $name! 🎧';
+    return '¡Hola, $name!';
   }
 
   @override
