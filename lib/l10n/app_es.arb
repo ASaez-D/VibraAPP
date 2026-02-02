@@ -70,14 +70,15 @@
     "homeBtnRetryCountry": "Ver eventos en España",
     "homeSearchNoResults": "No hemos encontrado nada",
     "homeSearchClear": "Borrar búsqueda",
-    "menuAccount": "Mi Cuenta",
+    "menuAccount": "Mi cuenta",
     "menuSaved": "Eventos guardados",
     "menuSettings": "Configuración",
     "menuHelp": "Ayuda",
     "menuLogout": "Cerrar sesión",
     "menuEditProfile": "Editar perfil",
-    "prefsTitle": "¡Hola, {name}! 🎧",
+    "prefsTitle": "¡Hola, {name}!",
     "@prefsTitle": {
+        "description": "Título de bienvenida en la pantalla de preferencias",
         "placeholders": {
             "name": { "type": "String" }
         }

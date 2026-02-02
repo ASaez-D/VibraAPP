@@ -289,7 +289,7 @@ abstract class AppLocalizations {
   /// No description provided for @menuAccount.
   ///
   /// In es, this message translates to:
-  /// **'Mi Cuenta'**
+  /// **'Mi cuenta'**
   String get menuAccount;
 
   /// No description provided for @menuSaved.
@@ -322,10 +322,10 @@ abstract class AppLocalizations {
   /// **'Editar perfil'**
   String get menuEditProfile;
 
-  /// No description provided for @prefsTitle.
+  /// Título de bienvenida en la pantalla de preferencias
   ///
   /// In es, this message translates to:
-  /// **'¡Hola, {name}! 🎧'**
+  /// **'¡Hola, {name}!'**
   String prefsTitle(String name);
 
   /// No description provided for @prefsSubtitle.

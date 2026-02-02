@@ -51,7 +51,6 @@ class FileLoggerOutput extends LogOutput {
     }
   }
 
-  // Corregido con async/try-catch
   Future<void> _writeTo(File? file, String text) async {
     if (file == null) return;
     try {
