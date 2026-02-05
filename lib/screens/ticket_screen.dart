@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../utils/app_constants.dart';
+
 class Ticket {
   final String eventName;
   final DateTime eventDate;
@@ -15,27 +17,27 @@ class Ticket {
   });
 }
 
-class TickerScreen extends StatelessWidget {
+class TicketScreen extends StatelessWidget {
   final List<Ticket> tickets;
 
-  const TickerScreen({super.key, required this.tickets});
+  const TicketScreen({super.key, required this.tickets});
 
   @override
   Widget build(BuildContext context) {
     // 1. Obtener el estado del tema y los colores dinámicos
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : Colors.black;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final secondaryTextColor = isDarkMode ? Colors.white70 : Colors.black54;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
-      
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor, 
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         title: Text(
           "Mis Entradas",
           style: TextStyle(
-            color: textColor,
+            color: primaryTextColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -50,7 +52,7 @@ class TickerScreen extends StatelessWidget {
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               itemCount: tickets.length,
               itemBuilder: (context, index) {
                 final ticket = tickets[index];
@@ -61,16 +63,15 @@ class TickerScreen extends StatelessWidget {
   }
 
   Widget _buildTicketCard(BuildContext context, Ticket ticket) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1C1C1C) : Colors.white; 
-    final mainTextColor = isDark ? Colors.white : Colors.black;
-    final subtitleColor = isDark ? Colors.white70 : Colors.black54;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDarkMode ? const Color(0xFF1C1C1C) : Colors.white;
+    final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final secondaryTextColor = isDarkMode ? Colors.white70 : Colors.black54;
 
-    // --- CAMBIO AQUÍ: Uso de withValues en lugar de withOpacity ---
-    final shadowColor = isDark 
-        ? Colors.greenAccent.withValues(alpha: 0.2) 
-        : Colors.black.withValues(alpha: 0.1); 
-    
+    final shadowColor = isDarkMode
+        ? Colors.greenAccent.withValues(alpha: 0.2)
+        : Colors.black.withValues(alpha: 0.1);
+
     Color statusColor;
     switch (ticket.status) {
       case "Activa":
@@ -83,19 +84,20 @@ class TickerScreen extends StatelessWidget {
         statusColor = Colors.redAccent;
         break;
       default:
-        statusColor = mainTextColor;
+        statusColor = primaryTextColor;
     }
-    
-    final statusTextColor = (ticket.status == "Activa" || ticket.status == "Usada") 
-        ? Colors.black 
+
+    final statusTextColor =
+        (ticket.status == "Activa" || ticket.status == "Usada")
+        ? Colors.black
         : Colors.white;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: cardColor, 
-        borderRadius: BorderRadius.circular(20),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
         boxShadow: [
           BoxShadow(
             color: shadowColor,
@@ -110,37 +112,46 @@ class TickerScreen extends StatelessWidget {
           Text(
             ticket.eventName,
             style: TextStyle(
-              color: mainTextColor,
-              fontSize: 20,
+              color: primaryTextColor,
+              fontSize: AppTypography.fontSizeLarge,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             // Corregido: Eliminada la interpolación innecesaria '${...}'
             DateFormat('d MMMM yyyy', 'es_ES').format(ticket.eventDate),
-            style: TextStyle(color: subtitleColor, fontSize: 14),
+            style: TextStyle(
+              color: secondaryTextColor,
+              fontSize: AppTypography.fontSizeMedium,
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             ticket.location,
-            style: TextStyle(color: subtitleColor, fontSize: 14),
+            style: TextStyle(
+              color: secondaryTextColor,
+              fontSize: AppTypography.fontSizeMedium,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: statusColor,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(AppBorders.radiusLarge),
               ),
               child: Text(
                 ticket.status.toUpperCase(),
                 style: TextStyle(
                   color: statusTextColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: AppTypography.fontSizeSmall,
                 ),
               ),
             ),

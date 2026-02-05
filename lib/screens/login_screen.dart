@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
 import '../services/user_data_service.dart';
+import '../utils/app_constants.dart';
 import 'home_screen.dart';
 import 'music_preferences_screen.dart';
 
@@ -26,24 +28,25 @@ class _LoginScreenState extends State<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E),
+      backgroundColor: AppColors.darkScaffoldBackground,
       body: Center(
-        child: SingleChildScrollView( // Mejora de usabilidad para pantallas pequeñas
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: SingleChildScrollView(
+          // Mejora de usabilidad para pantallas pequeñas
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildLogo(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xl),
               _buildTitle(l10n.appTitle),
               const SizedBox(height: 50),
-              
+
               _buildSpotifyButton(l10n),
               const SizedBox(height: 25),
               _buildDivider(),
               const SizedBox(height: 25),
               _buildGoogleButton(l10n),
-              
+
               const SizedBox(height: 40),
               _buildTermsText(l10n.loginTerms),
             ],
@@ -69,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
       style: const TextStyle(
         color: Colors.white,
         fontSize: 42,
-        fontWeight: FontWeight.w800,
+        fontWeight: AppTypography.fontWeightBlack,
         fontFamily: 'Montserrat',
         letterSpacing: 1.5,
       ),
@@ -79,9 +82,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildDivider() {
     return Row(
       children: const [
-        Expanded(child: Divider(color: Colors.white24, thickness: 1, endIndent: 10)),
+        Expanded(
+          child: Divider(color: Colors.white24, thickness: 1, endIndent: 10),
+        ),
         Text('o', style: TextStyle(color: Colors.white54, fontSize: 14)),
-        Expanded(child: Divider(color: Colors.white24, thickness: 1, indent: 10)),
+        Expanded(
+          child: Divider(color: Colors.white24, thickness: 1, indent: 10),
+        ),
       ],
     );
   }
@@ -107,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
       _navigateToHome(userMap, 'spotify', profile['access_token']);
-      
     } catch (e) {
       _showErrorSnackBar(l10n.loginError(e.toString()));
     } finally {
@@ -125,10 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
       await _userDataService.saveUserFromMap(userMap);
 
       final prefs = await _userDataService.getUserPreferences();
-      final bool hasPreferences = prefs != null && prefs['preferencesSet'] == true;
+      final bool hasPreferences =
+          prefs != null && prefs['preferencesSet'] == true;
 
       if (!mounted) return;
-      
+
       if (hasPreferences) {
         _navigateToHome(userMap, 'google');
       } else {
@@ -168,7 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // --- NAVEGACIÓN Y UTILS ---
 
-  void _navigateToHome(Map<String, dynamic> profile, String source, [String? token]) {
+  void _navigateToHome(
+    Map<String, dynamic> profile,
+    String source, [
+    String? token,
+  ]) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -185,16 +196,16 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => MusicPreferencesScreen(
-          userProfile: profile,
-          authSource: 'google',
-        ),
+        builder: (_) =>
+            MusicPreferencesScreen(userProfile: profile, authSource: 'google'),
       ),
     );
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   // --- BOTONES COMPUESTOS ---
@@ -203,7 +214,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return _LoginButton(
       text: _isProcessingSpotify ? l10n.loginLoading : l10n.loginSpotify,
       iconPath: 'assets/spotifyLogo.png',
-      gradientColors: [Colors.greenAccent.shade700, Colors.greenAccent.shade400],
+      gradientColors: [
+        Colors.greenAccent.shade700,
+        Colors.greenAccent.shade400,
+      ],
       textColor: Colors.black,
       onPressed: _isProcessingSpotify ? null : () => _handleSpotifyLogin(l10n),
     );
@@ -244,7 +258,7 @@ class _LoginButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: gradientColors),
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
         boxShadow: const [
           BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 4)),
         ],
@@ -253,21 +267,26 @@ class _LoginButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: 14,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
+          ),
         ),
         onPressed: onPressed,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildIcon(),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Text(
               text,
               style: TextStyle(
                 color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontWeight: AppTypography.fontWeightBold,
+                fontSize: AppTypography.fontSizeRegular,
                 letterSpacing: 0.5,
               ),
             ),
@@ -281,7 +300,9 @@ class _LoginButton extends StatelessWidget {
     return Container(
       width: 26,
       height: 26,
-      decoration: isGoogle ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle) : null,
+      decoration: isGoogle
+          ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle)
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Image.asset(iconPath, fit: BoxFit.contain),

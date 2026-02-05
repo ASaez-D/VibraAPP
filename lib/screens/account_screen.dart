@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../l10n/app_localizations.dart';
 import 'login_screen.dart';
 import '../models/user_account.dart';
+import '../utils/app_constants.dart';
+import '../utils/app_theme.dart';
+import '../utils/app_logger.dart';
+import '../utils/text_constants.dart';
 
 class AccountScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile;
@@ -22,7 +27,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   late UserAccount _user;
-  
+
   @override
   void initState() {
     super.initState();
@@ -31,58 +36,68 @@ class _AccountScreenState extends State<AccountScreen> {
 
   // --- LÓGICA ---
 
+  /// Abre el perfil externo del usuario (Spotify o Google)
   Future<void> _handleLaunchUrl() async {
     if (_user.profileUrl == null) return;
+
     final uri = Uri.parse(_user.profileUrl!);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      if (mounted) _showErrorSnackBar(AppLocalizations.of(context)!.commonError);
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw Exception(AppTextConstants.errorFailedToLaunchUrl);
+      }
+    } catch (error, stackTrace) {
+      AppLogger.error('Failed to launch profile URL', error, stackTrace);
+      if (mounted)
+        _showErrorSnackBar(AppLocalizations.of(context)!.commonError);
     }
   }
 
+  /// Cierra sesión y navega a la pantalla de login
   Future<void> _handleLogout() async {
     try {
       await FirebaseAuth.instance.signOut();
       if (!mounted) return;
+
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
-    } catch (e) {
-      debugPrint("Error saliendo: $e");
+    } catch (error, stackTrace) {
+      AppLogger.error('Error during logout', error, stackTrace);
     }
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   // --- BUILD ---
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    final theme = _AccountScreenTheme(isDark);
-    final source = _AuthSourceInfo(widget.authSource);
+    final localizations = AppLocalizations.of(context)!;
+    final theme = AppTheme(context);
+    final authSourceInfo = _AuthSourceInfo(widget.authSource);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBg,
-      appBar: _buildAppBar(l10n, theme),
+      backgroundColor: theme.scaffoldBackground,
+      appBar: _buildAppBar(localizations, theme),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
         child: Column(
           children: [
-            const SizedBox(height: 30),
-            _buildAvatar(source.color, theme.cardBg, theme.secondaryText),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xxxl),
+            _buildAvatar(authSourceInfo.color, theme),
+            const SizedBox(height: AppSpacing.xl),
             _buildUserInfo(theme),
-            const SizedBox(height: 40),
-            _buildConnectionCard(l10n, theme, source),
-            const SizedBox(height: 50),
-            _buildLogoutButton(l10n),
-            const SizedBox(height: 30),
+            const SizedBox(height: AppSpacing.huge),
+            _buildConnectionCard(localizations, theme, authSourceInfo),
+            const SizedBox(height: AppSpacing.huge + AppSpacing.md),
+            _buildLogoutButton(localizations),
+            const SizedBox(height: AppSpacing.xxxl),
           ],
         ),
       ),
@@ -91,146 +106,236 @@ class _AccountScreenState extends State<AccountScreen> {
 
   // --- COMPONENTES ---
 
-  PreferredSizeWidget _buildAppBar(AppLocalizations l10n, _AccountScreenTheme theme) {
+  PreferredSizeWidget _buildAppBar(
+    AppLocalizations localizations,
+    AppTheme theme,
+  ) {
     return AppBar(
-      backgroundColor: theme.scaffoldBg,
+      backgroundColor: theme.scaffoldBackground,
       elevation: 0,
       centerTitle: true,
-      title: Text(l10n.accountTitle, 
-        style: GoogleFonts.montserrat(color: theme.textColor, fontWeight: FontWeight.w700, fontSize: 17)),
+      title: Text(
+        localizations.accountTitle,
+        style: GoogleFonts.montserrat(
+          color: theme.primaryText,
+          fontWeight: AppTypography.fontWeightBold,
+          fontSize: 17,
+        ),
+      ),
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new, color: theme.textColor, size: 20),
+        icon: Icon(
+          Icons.arrow_back_ios_new,
+          color: theme.primaryText,
+          size: AppSizes.iconSizeMedium,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
     );
   }
 
-  Widget _buildAvatar(Color accentColor, Color bg, Color iconColor) {
+  Widget _buildAvatar(Color accentColor, AppTheme theme) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        // Cambio: withOpacity -> withValues
-        border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 2),
+        border: Border.all(
+          color: accentColor.withValues(alpha: AppColors.opacityHigh + 0.1),
+          width: AppBorders.borderWidthThick,
+        ),
       ),
       child: CircleAvatar(
-        radius: 55,
-        backgroundColor: bg,
-        backgroundImage: _user.imageUrl != null ? NetworkImage(_user.imageUrl!) : null,
-        child: _user.imageUrl == null 
-          ? Icon(Icons.person, size: 50, color: iconColor) 
-          : null,
+        radius: AppSizes.avatarSizeMedium,
+        backgroundColor: theme.cardBackground,
+        backgroundImage: _user.imageUrl != null
+            ? NetworkImage(_user.imageUrl!)
+            : null,
+        child: _user.imageUrl == null
+            ? Icon(
+                Icons.person,
+                size: AppSizes.iconSizeGiant,
+                color: theme.secondaryText,
+              )
+            : null,
       ),
     );
   }
 
-  Widget _buildUserInfo(_AccountScreenTheme theme) {
+  Widget _buildUserInfo(AppTheme theme) {
     return Column(
       children: [
-        Text(_user.displayName,
+        Text(
+          _user.displayName,
           textAlign: TextAlign.center,
-          style: GoogleFonts.montserrat(color: theme.textColor, fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 6),
-        Text(_user.email,
+          style: GoogleFonts.montserrat(
+            color: theme.primaryText,
+            fontSize: AppTypography.fontSizeExtraLarge,
+            fontWeight: AppTypography.fontWeightBold,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm - 2),
+        Text(
+          _user.email,
           textAlign: TextAlign.center,
-          style: GoogleFonts.montserrat(color: theme.secondaryText, fontSize: 14)),
+          style: GoogleFonts.montserrat(
+            color: theme.secondaryText,
+            fontSize: AppTypography.fontSizeMedium,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildConnectionCard(AppLocalizations l10n, _AccountScreenTheme theme, _AuthSourceInfo source) {
+  Widget _buildConnectionCard(
+    AppLocalizations localizations,
+    AppTheme theme,
+    _AuthSourceInfo authSourceInfo,
+  ) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: theme.cardBg,
-        borderRadius: BorderRadius.circular(24),
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(AppBorders.radiusRound),
         border: Border.all(color: theme.borderColor),
-        boxShadow: theme.shadow,
+        boxShadow: theme.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.accountConnection.toUpperCase(),
-            style: GoogleFonts.montserrat(color: theme.secondaryText, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+          Text(
+            localizations.accountConnection.toUpperCase(),
+            style: GoogleFonts.montserrat(
+              color: theme.secondaryText,
+              fontSize: 11,
+              fontWeight: AppTypography.fontWeightBold,
+              letterSpacing: AppTypography.letterSpacingWide,
+            ),
+          ),
           const SizedBox(height: 15),
           Row(
             children: [
-              _buildSourceIcon(source),
-              const SizedBox(width: 16),
-              Expanded(child: _buildSourceText(l10n, theme, source)),
-              Icon(Icons.check_circle, color: source.color, size: 20),
+              _buildSourceIcon(authSourceInfo),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: _buildSourceText(localizations, theme, authSourceInfo),
+              ),
+              Icon(
+                Icons.check_circle,
+                color: authSourceInfo.color,
+                size: AppSizes.iconSizeMedium,
+              ),
             ],
           ),
           if (_user.profileUrl != null) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             const Divider(color: Colors.white10),
             const SizedBox(height: 15),
-            _buildExternalProfileButton(l10n, source),
-          ]
+            _buildExternalProfileButton(localizations, authSourceInfo),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildSourceIcon(_AuthSourceInfo source) {
+  Widget _buildSourceIcon(_AuthSourceInfo authSourceInfo) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        // Cambio: withOpacity -> withValues
-        color: source.color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
+        color: authSourceInfo.color.withValues(alpha: AppColors.opacityMedium),
+        borderRadius: BorderRadius.circular(AppBorders.radiusLarge),
       ),
-      child: Icon(source.icon, color: source.color, size: 26),
+      child: Icon(
+        authSourceInfo.icon,
+        color: authSourceInfo.color,
+        size: AppSizes.iconSizeExtraLarge,
+      ),
     );
   }
 
-  Widget _buildSourceText(AppLocalizations l10n, _AccountScreenTheme theme, _AuthSourceInfo source) {
+  Widget _buildSourceText(
+    AppLocalizations localizations,
+    AppTheme theme,
+    _AuthSourceInfo authSourceInfo,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(source.name, 
-          style: GoogleFonts.montserrat(color: theme.textColor, fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(l10n.accountLinked, 
-          style: GoogleFonts.montserrat(color: theme.secondaryText, fontSize: 12)),
+        Text(
+          authSourceInfo.name,
+          style: GoogleFonts.montserrat(
+            color: theme.primaryText,
+            fontSize: AppTypography.fontSizeLarge,
+            fontWeight: AppTypography.fontWeightBold,
+          ),
+        ),
+        Text(
+          localizations.accountLinked,
+          style: GoogleFonts.montserrat(
+            color: theme.secondaryText,
+            fontSize: AppTypography.fontSizeSmall,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildExternalProfileButton(AppLocalizations l10n, _AuthSourceInfo source) {
+  Widget _buildExternalProfileButton(
+    AppLocalizations localizations,
+    _AuthSourceInfo authSourceInfo,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         onPressed: _handleLaunchUrl,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          // Cambio: withOpacity -> withValues
-          backgroundColor: source.color.withValues(alpha: 0.1),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          backgroundColor: authSourceInfo.color.withValues(
+            alpha: AppColors.opacityMedium,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppBorders.radiusMedium),
+          ),
         ),
-        child: Text(l10n.accountOpenProfile(source.name),
-          style: GoogleFonts.montserrat(color: source.color, fontWeight: FontWeight.w600)),
+        child: Text(
+          localizations.accountOpenProfile(authSourceInfo.name),
+          style: GoogleFonts.montserrat(
+            color: authSourceInfo.color,
+            fontWeight: AppTypography.fontWeightSemiBold,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildLogoutButton(AppLocalizations l10n) {
+  Widget _buildLogoutButton(AppLocalizations localizations) {
     return TextButton(
       onPressed: _handleLogout,
       style: TextButton.styleFrom(
-        foregroundColor: Colors.redAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        foregroundColor: AppColors.errorColor,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xxxl,
+          vertical: 15,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-          // Cambio: withOpacity -> withValues
-          side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.3))
+          borderRadius: BorderRadius.circular(AppBorders.radiusCircular),
+          side: BorderSide(
+            color: AppColors.errorColor.withValues(
+              alpha: AppColors.opacityVeryHigh,
+            ),
+          ),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.logout, size: 20),
-          const SizedBox(width: 10),
-          Text(l10n.menuLogout, style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
+          const Icon(Icons.logout, size: AppSizes.iconSizeMedium),
+          const SizedBox(width: AppSpacing.md),
+          Text(
+            localizations.menuLogout,
+            style: GoogleFonts.montserrat(
+              fontWeight: AppTypography.fontWeightSemiBold,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );
@@ -239,23 +344,10 @@ class _AccountScreenState extends State<AccountScreen> {
 
 // --- HELPER CLASSES ---
 
-class _AccountScreenTheme {
-  final Color textColor;
-  final Color secondaryText;
-  final Color cardBg;
-  final Color scaffoldBg;
-  final Color borderColor;
-  final List<BoxShadow> shadow;
+/// Helper class para obtener colores del tema de la pantalla de cuenta
+// --- HELPER CLASSES ---
 
-  _AccountScreenTheme(bool isDark)
-      : textColor = isDark ? Colors.white : const Color(0xFF222222),
-        secondaryText = isDark ? Colors.white54 : Colors.grey[600]!,
-        cardBg = isDark ? const Color(0xFF1C1C1E) : Colors.white,
-        scaffoldBg = isDark ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
-        borderColor = isDark ? Colors.white10 : Colors.grey.shade300,
-        // Cambio: withOpacity -> withValues
-        shadow = isDark ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))];
-}
+// Helper class removed as it is no longer used. AppTheme is used directly.
 
 class _AuthSourceInfo {
   final String name;
@@ -263,7 +355,9 @@ class _AuthSourceInfo {
   final IconData icon;
 
   _AuthSourceInfo(String source)
-      : name = source == 'spotify' ? 'Spotify' : 'Google',
-        color = source == 'spotify' ? const Color(0xFF1DB954) : const Color(0xFF4285F4),
-        icon = source == 'spotify' ? Icons.music_note : Icons.g_mobiledata;
+    : name = source == 'spotify' ? 'Spotify' : 'Google',
+      color = source == 'spotify'
+          ? const Color(0xFF1DB954)
+          : const Color(0xFF4285F4),
+      icon = source == 'spotify' ? Icons.music_note : Icons.g_mobiledata;
 }

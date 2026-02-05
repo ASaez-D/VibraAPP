@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../models/concert_detail.dart';
 import '../services/ticketmaster_service.dart';
 import '../l10n/app_localizations.dart';
 import 'concert_detail_screen.dart';
+import '../utils/app_constants.dart';
+import '../utils/app_theme.dart';
+import '../utils/text_constants.dart';
+import '../widgets/empty_state_widget.dart';
 
 class FilteredEventsScreen extends StatefulWidget {
   final String categoryName;
   final String categoryId;
   final Color accentColor;
-  // Nuevos parámetros para filtrar por región
   final String countryCode;
   final String? city;
 
@@ -18,7 +22,7 @@ class FilteredEventsScreen extends StatefulWidget {
     required this.categoryName,
     required this.categoryId,
     required this.accentColor,
-    this.countryCode = 'ES', // Valor por defecto
+    this.countryCode = AppTextConstants.defaultCountryCode,
     this.city,
   });
 
@@ -27,58 +31,61 @@ class FilteredEventsScreen extends StatefulWidget {
 }
 
 class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
-  final TicketmasterService _service = TicketmasterService();
+  final TicketmasterService _ticketmasterService = TicketmasterService();
   late Future<List<ConcertDetail>> _eventsFuture;
 
   @override
   void initState() {
     super.initState();
-    // AHORA SÍ FILTRAMOS POR PAÍS Y CIUDAD
-    _eventsFuture = _service.getConcerts(
+    // Filtrar eventos por país, ciudad y clasificación
+    _eventsFuture = _ticketmasterService.getConcerts(
       DateTime.now(),
-      DateTime.now().add(const Duration(days: 90)),
+      DateTime.now().add(Duration(days: AppTime.daysInThreeMonths)),
       classificationId: widget.categoryId,
-      countryCode: widget.countryCode, // <--- USO DEL PAÍS
-      city: widget.city,               // <--- USO DE LA CIUDAD
+      countryCode: widget.countryCode,
+      city: widget.city,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final localizations = AppLocalizations.of(context)!;
+    final theme = AppTheme(context);
     final String currentLocale = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: isDarkMode ? Colors.white : Colors.black, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.primaryText,
+            size: AppSizes.iconSizeMedium,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           children: [
             Text(
-              l10n.rangeTitle.toUpperCase(),
+              localizations.rangeTitle.toUpperCase(),
               style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
+                color: theme.primaryText,
+                fontSize: AppTypography.fontSizeMedium,
+                fontWeight: AppTypography.fontWeightBlack,
                 letterSpacing: 1.2,
               ),
             ),
             Text(
-              // Mostramos también la ubicación en el título para que el usuario sepa qué está viendo
-              widget.city != null 
+              widget.city != null
                   ? "${widget.categoryName} (${widget.city})"
                   : widget.categoryName,
               style: TextStyle(
                 color: widget.accentColor,
                 fontSize: 11,
-                fontWeight: FontWeight.bold,
+                fontWeight: AppTypography.fontWeightBold,
               ),
             ),
           ],
@@ -88,41 +95,37 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
         future: _eventsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: widget.accentColor));
+            return Center(
+              child: CircularProgressIndicator(color: widget.accentColor),
+            );
           }
 
-          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.event_busy, size: 50, color: Colors.grey.withOpacity(0.5)),
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.homeSearchNoResults,
-                    style: const TextStyle(color: Colors.grey, fontSize: 16),
-                  ),
-                  if (widget.city != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        "No hay eventos de '${widget.categoryName}' en ${widget.city}",
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                ],
-              ),
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
+            return EmptyStateWidget(
+              icon: Icons.event_busy,
+              title: localizations.homeSearchNoResults,
+              subtitle: widget.city != null
+                  ? "No hay eventos de '${widget.categoryName}' en ${widget.city}"
+                  : null,
             );
           }
 
           final events = snapshot.data!;
 
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             itemCount: events.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
             itemBuilder: (context, index) {
-              return _buildEventCard(context, events[index], l10n, currentLocale);
+              return _buildEventCard(
+                context,
+                events[index],
+                localizations,
+                currentLocale,
+                theme,
+              );
             },
           );
         },
@@ -130,11 +133,18 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
     );
   }
 
-  Widget _buildEventCard(BuildContext context, ConcertDetail event, AppLocalizations l10n, String locale) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildEventCard(
+    BuildContext context,
+    ConcertDetail event,
+    AppLocalizations localizations,
+    String locale,
+    AppTheme theme,
+  ) {
     // Formato de fecha localizado (JAN/ENE)
-    final String dateStr = DateFormat('dd MMM', locale).format(event.date).toUpperCase();
+    final String dateStr = DateFormat(
+      'dd MMM',
+      locale,
+    ).format(event.date).toUpperCase();
     final String timeStr = DateFormat('HH:mm').format(event.date);
 
     return GestureDetector(
@@ -143,33 +153,41 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
         MaterialPageRoute(builder: (_) => ConcertDetailScreen(concert: event)),
       ),
       child: Container(
-        height: 120,
+        height: AppSizes.cardHeightSmall,
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: theme.cardBackground,
+          borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1), // Corregido: withValues -> withOpacity para compatibilidad
+              color: Colors.black.withValues(alpha: AppColors.opacityMedium),
               blurRadius: 10,
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(20),
+              ),
               child: Image.network(
                 event.imageUrl,
-                width: 100,
-                height: 120,
+                width: AppSizes.imageWidthMedium,
+                height: AppSizes.cardHeightSmall,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(width: 100, color: Colors.grey),
+                errorBuilder: (_, __, ___) => Container(
+                  width: AppSizes.imageWidthMedium,
+                  color: Colors.grey,
+                ),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -180,52 +198,70 @@ class _FilteredEventsScreenState extends State<FilteredEventsScreen> {
                           "$dateStr  •  $timeStr",
                           style: TextStyle(
                             color: widget.accentColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontSize: AppTypography.fontSizeSmall,
+                            fontWeight: AppTypography.fontWeightBold,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       event.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        color: theme.primaryText,
+                        fontWeight: AppTypography.fontWeightBold,
+                        fontSize: AppTypography.fontSizeRegular,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.xs / 2),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 12, color: Colors.grey),
-                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.location_on,
+                          size: AppSizes.iconSizeSmall,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
                         Expanded(
                           child: Text(
                             event.venue,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: AppTypography.fontSizeSmall,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     // BOTÓN VER MÁS
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12),
+                        color: theme.isDarkMode
+                            ? Colors.white.withValues(
+                                alpha: AppColors.opacityMedium,
+                              )
+                            : Colors.black.withValues(
+                                alpha: AppColors.opacityLow,
+                              ),
+                        borderRadius: BorderRadius.circular(
+                          AppBorders.radiusMedium,
+                        ),
                       ),
                       child: Text(
-                        l10n.savedPriceInfo, // "See more" / "Ver más"
+                        localizations.savedPriceInfo,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: theme.primaryText,
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: AppTypography.fontWeightBold,
                         ),
                       ),
                     ),

@@ -1,102 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
 import 'concert_detail_screen.dart';
+import '../utils/app_constants.dart';
+import '../utils/app_theme.dart';
+import '../widgets/empty_state_widget.dart';
 
 class SavedEventsScreen extends StatelessWidget {
   final List<ConcertDetail> savedConcerts;
 
   const SavedEventsScreen({super.key, required this.savedConcerts});
 
-  Map<String, dynamic> _getThemedColors(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    return {
-      'scaffoldBg': isDarkMode ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7),
-      'primaryText': isDarkMode ? Colors.white : Colors.black87,
-      'secondaryText': isDarkMode ? Colors.grey[400] : Colors.grey[600],
-      'accentColor': Colors.greenAccent,
-      'cardGradient': isDarkMode 
-          ? const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF252525), Color(0xFF151515)],
-            )
-          : const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFFFFFF), Color(0xFFEEEEEE)],
-            ),
-      'cardShadow': isDarkMode 
-          ? BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 15, offset: const Offset(0, 8))
-          : BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
-      'cardBorderColor': isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
-      'emptyIconColor': isDarkMode ? Colors.grey[800] : Colors.grey[400],
-      'emptyTextColor': isDarkMode ? Colors.grey[600] : Colors.grey[700],
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final colors = _getThemedColors(context);
-    final Color scaffoldBg = colors['scaffoldBg'];
-    final Color primaryText = colors['primaryText'];
-    
+    final localizations = AppLocalizations.of(context)!;
+    final theme = AppTheme(context);
+
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      backgroundColor: theme.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: scaffoldBg,
+        backgroundColor: theme.scaffoldBackground,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: primaryText, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.primaryText,
+            size: AppSizes.iconSizeMedium,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          l10n.menuSaved.toUpperCase(),
+          localizations.menuSaved.toUpperCase(),
           style: TextStyle(
-            color: primaryText,
-            fontWeight: FontWeight.w900,
+            color: theme.primaryText,
+            fontWeight: AppTypography.fontWeightBlack,
             letterSpacing: 1.2,
-            fontSize: 16,
+            fontSize: AppTypography.fontSizeRegular,
           ),
         ),
       ),
       body: savedConcerts.isEmpty
-          ? _buildEmptyState(context, colors, l10n)
+          ? _buildEmptyState(context, localizations, theme)
           : ListView.separated(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               physics: const BouncingScrollPhysics(),
               itemCount: savedConcerts.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 20),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSpacing.lg),
               itemBuilder: (context, index) {
-                return _buildConcertCard(context, savedConcerts[index], index, colors, l10n);
+                return _buildConcertCard(
+                  context,
+                  savedConcerts[index],
+                  index,
+                  theme,
+                  localizations,
+                );
               },
             ),
     );
   }
 
-  Widget _buildConcertCard(BuildContext context, ConcertDetail concert, int index, Map<String, dynamic> colors, AppLocalizations l10n) {
-    final Color primaryText = colors['primaryText'];
-    final Color secondaryText = colors['secondaryText'];
-    final Color accentColor = colors['accentColor'];
-    final Gradient cardGradient = colors['cardGradient'];
-    final BoxShadow cardShadow = colors['cardShadow'];
-    final Color cardBorderColor = colors['cardBorderColor'];
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildConcertCard(
+    BuildContext context,
+    ConcertDetail concert,
+    int index,
+    AppTheme theme,
+    AppLocalizations localizations,
+  ) {
     final currentLocale = Localizations.localeOf(context).languageCode;
 
     final String day = DateFormat('d', currentLocale).format(concert.date);
-    final String month = DateFormat('MMM', currentLocale).format(concert.date).toUpperCase();
+    final String month = DateFormat(
+      'MMM',
+      currentLocale,
+    ).format(concert.date).toUpperCase();
     final String time = DateFormat('HH:mm', currentLocale).format(concert.date);
 
     final String uniqueHeroTag = "saved_${concert.name}_$index";
 
-    String priceLabel = concert.priceRange.isNotEmpty ? concert.priceRange.split('-')[0].trim() : "Info";
+    String priceLabel = concert.priceRange.isNotEmpty
+        ? concert.priceRange.split('-')[0].trim()
+        : "Info";
     if (priceLabel.length > 8) {
-      priceLabel = l10n.savedPriceInfo;
+      priceLabel = localizations.savedPriceInfo;
     }
 
     return GestureDetector(
@@ -106,101 +95,173 @@ class SavedEventsScreen extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => ConcertDetailScreen(
               concert: concert,
-              heroTag: uniqueHeroTag, 
-              initialIsSaved: true, 
+              heroTag: uniqueHeroTag,
+              initialIsSaved: true,
             ),
           ),
         );
       },
       child: Container(
-        height: 145, 
+        height: AppSizes.cardHeightMedium,
         decoration: BoxDecoration(
-          gradient: cardGradient,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: cardBorderColor),
-          boxShadow: [cardShadow],
+          color: theme
+              .cardBackground, // Simplified to card background as gradient might be too custom
+          borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
+          border: Border.all(color: theme.borderColor),
+          boxShadow: theme.cardShadow,
         ),
         child: Row(
           children: [
             Hero(
-              tag: uniqueHeroTag, 
+              tag: uniqueHeroTag,
               child: Container(
-                width: 115,
+                width: AppSizes.imageWidthLarge,
                 height: double.infinity,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    bottomLeft: Radius.circular(24),
+                    topLeft: Radius.circular(AppBorders.radiusExtraLarge),
+                    bottomLeft: Radius.circular(AppBorders.radiusExtraLarge),
                   ),
                 ),
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), bottomLeft: Radius.circular(24)),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(AppBorders.radiusExtraLarge),
+                    bottomLeft: Radius.circular(AppBorders.radiusExtraLarge),
+                  ),
                   child: concert.imageUrl.isNotEmpty
                       ? Image.network(
-                            concert.imageUrl, 
-                            fit: BoxFit.cover,
-                            cacheWidth: 300, 
+                          concert.imageUrl,
+                          fit: BoxFit.cover,
+                          cacheWidth: AppSizes.imageCacheWidth,
                         )
-                      : Center(child: Icon(Icons.music_note, color: secondaryText.withValues(alpha: 0.5))),
+                      : Center(
+                          child: Icon(
+                            Icons.music_note,
+                            color: theme.secondaryText.withValues(alpha: 0.5),
+                          ),
+                        ),
                 ),
               ),
             ),
 
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       children: [
-                        Text("$day $month", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 13)),
-                        const SizedBox(width: 8),
-                        Container(width: 4, height: 4, decoration: BoxDecoration(color: secondaryText.withValues(alpha: 0.5), shape: BoxShape.circle)),
-                        const SizedBox(width: 8),
-                        Text(time, style: TextStyle(color: secondaryText, fontSize: 13, fontWeight: FontWeight.w500)),
+                        Text(
+                          "$day $month",
+                          style: TextStyle(
+                            color: AppColors.primaryAccent,
+                            fontWeight: AppTypography.fontWeightBold,
+                            fontSize: AppTypography.fontSizeSmall,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Container(
+                          width: 4,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: theme.secondaryText.withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          time,
+                          style: TextStyle(
+                            color: theme.secondaryText,
+                            fontSize: AppTypography.fontSizeSmall,
+                            fontWeight: AppTypography.fontWeightRegular,
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.xs),
                     Flexible(
                       child: Text(
                         concert.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: primaryText, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1),
+                        style: TextStyle(
+                          color: theme.primaryText,
+                          fontWeight: AppTypography.fontWeightBlack,
+                          fontSize: AppTypography.fontSizeRegular,
+                          height: 1.1,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 12, color: secondaryText),
-                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.location_on,
+                          size: AppSizes.iconSizeSmall,
+                          color: theme.secondaryText,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
                         Expanded(
-                          child: Text(concert.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: secondaryText, fontSize: 12, fontWeight: FontWeight.w500)),
+                          child: Text(
+                            concert.venue,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: theme.secondaryText,
+                              fontSize: AppTypography.fontSizeSmall,
+                              fontWeight: AppTypography.fontWeightRegular,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(border: Border.all(color: cardBorderColor), borderRadius: BorderRadius.circular(20)),
-                          child: Text(priceLabel, style: TextStyle(color: primaryText, fontWeight: FontWeight.bold, fontSize: 11)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: theme.borderColor),
+                            borderRadius: BorderRadius.circular(
+                              AppBorders.radiusMedium,
+                            ),
+                          ),
+                          child: Text(
+                            priceLabel,
+                            style: TextStyle(
+                              color: theme.primaryText,
+                              fontWeight: AppTypography.fontWeightBold,
+                              fontSize: 11,
+                            ),
+                          ),
                         ),
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(AppSpacing.xs + 2),
                           decoration: BoxDecoration(
-                            color: isDarkMode ? Colors.black : Colors.grey[100], 
-                            shape: BoxShape.circle, 
-                            border: Border.all(color: cardBorderColor)
+                            color: theme.isDarkMode
+                                ? Colors.black
+                                : Colors.grey[100],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: theme.borderColor),
                           ),
-                          child: Icon(Icons.arrow_forward_ios_rounded, color: primaryText, size: 12),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: theme.primaryText,
+                            size: AppSizes.iconSizeSmall,
+                          ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -211,21 +272,15 @@ class SavedEventsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, Map<String, dynamic> colors, AppLocalizations l10n) {
-    final Color emptyIconColor = colors['emptyIconColor'];
-    final Color emptyTextColor = colors['emptyTextColor'];
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.bookmark_border, size: 80, color: emptyIconColor),
-          const SizedBox(height: 16),
-          Text(l10n.savedEmptyTitle, style: TextStyle(color: emptyTextColor, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Text(l10n.savedEmptySub, style: TextStyle(color: emptyIconColor, fontSize: 14)),
-        ],
-      ),
+  Widget _buildEmptyState(
+    BuildContext context,
+    AppLocalizations localizations,
+    AppTheme theme,
+  ) {
+    return EmptyStateWidget(
+      icon: Icons.bookmark_border,
+      title: localizations.savedEmptyTitle,
+      subtitle: localizations.savedEmptySub,
     );
   }
 }

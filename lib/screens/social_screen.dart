@@ -1,40 +1,64 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_constants.dart';
+
 class SocialScreen extends StatelessWidget {
   const SocialScreen({super.key});
 
   // Mantenemos accentColor ya que es el color de marca (verde)
-  final Color accentColor = Colors.greenAccent; 
+  final Color accentColor = Colors.greenAccent;
 
   // Datos de ejemplo
   final List<Map<String, dynamic>> friends = const [
-    {"name": "Ana García", "status": "En línea", "img": "https://i.pravatar.cc/150?u=1"},
-    {"name": "Carlos Ruiz", "status": "Escuchando Jazz", "img": "https://i.pravatar.cc/150?u=2"},
-    {"name": "Laura M.", "status": "Desconectado", "img": "https://i.pravatar.cc/150?u=3"},
-    {"name": "David V.", "status": "En el concierto de Vecinos", "img": "https://i.pravatar.cc/150?u=4"},
-    {"name": "Sofía L.", "status": "En línea", "img": "https://i.pravatar.cc/150?u=5"},
+    {
+      "name": "Ana García",
+      "status": "En línea",
+      "img": "https://i.pravatar.cc/150?u=1",
+    },
+    {
+      "name": "Carlos Ruiz",
+      "status": "Escuchando Jazz",
+      "img": "https://i.pravatar.cc/150?u=2",
+    },
+    {
+      "name": "Laura M.",
+      "status": "Desconectado",
+      "img": "https://i.pravatar.cc/150?u=3",
+    },
+    {
+      "name": "David V.",
+      "status": "En el concierto de Vecinos",
+      "img": "https://i.pravatar.cc/150?u=4",
+    },
+    {
+      "name": "Sofía L.",
+      "status": "En línea",
+      "img": "https://i.pravatar.cc/150?u=5",
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     // 1. Obtener el estado del tema y los colores dinámicos
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // Colores base dinámicos
-    final mainTextColor = isDark ? Colors.white : Colors.black;
-    final hintColor = isDark ? Colors.grey[600] : Colors.grey[700];
-    final searchFieldColor = isDark ? const Color(0xFF1C1C1E) : Colors.grey[200];
-    
+    final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final hintColor = isDarkMode ? Colors.grey[600] : Colors.grey[700];
+    final searchFieldColor = isDarkMode
+        ? const Color(0xFF1C1C1E)
+        : Colors.grey[200];
+
     // --- CAMBIO AQUÍ: Uso de withValues en lugar de withOpacity ---
-    final listTileDividerColor = isDark 
-        ? Colors.white.withValues(alpha: 0.05) 
+    final listTileDividerColor = isDarkMode
+        ? Colors.white.withValues(alpha: 0.05)
         : Colors.black.withValues(alpha: 0.1);
-        
-    final trailingIconColor = isDark ? Colors.white54 : Colors.black45;
-    
+
+    final trailingIconColor = isDarkMode ? Colors.white54 : Colors.black45;
+
     // Color de fondo del Scaffold
-    final scaffoldBgColor = Theme.of(context).scaffoldBackgroundColor; 
-    
+    final scaffoldBgColor = Theme.of(context).scaffoldBackgroundColor;
+
     // Color del fondo de la AppBar
     final appBarBgColor = Theme.of(context).appBarTheme.backgroundColor;
 
@@ -47,14 +71,14 @@ class SocialScreen extends StatelessWidget {
         title: Text(
           "Mis Amigos",
           style: TextStyle(
-            fontWeight: FontWeight.bold, 
-            fontSize: 22, 
-            color: mainTextColor
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: primaryTextColor,
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person_add_alt_1_rounded, color: mainTextColor),
+            icon: Icon(Icons.person_add_alt_1_rounded, color: primaryTextColor),
             onPressed: () {},
           ),
         ],
@@ -63,9 +87,9 @@ class SocialScreen extends StatelessWidget {
         children: [
           // Barra de búsqueda
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: TextField(
-              style: TextStyle(color: mainTextColor),
+              style: TextStyle(color: primaryTextColor),
               decoration: InputDecoration(
                 hintText: "Buscar amigo...",
                 hintStyle: TextStyle(color: hintColor),
@@ -73,7 +97,7 @@ class SocialScreen extends StatelessWidget {
                 filled: true,
                 fillColor: searchFieldColor,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppBorders.radiusMedium),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -85,17 +109,21 @@ class SocialScreen extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               itemCount: friends.length,
-              separatorBuilder: (context, index) => Divider(color: listTileDividerColor, height: 1),
+              separatorBuilder: (context, index) =>
+                  Divider(color: listTileDividerColor, height: 1),
               itemBuilder: (context, index) {
                 final friend = friends[index];
                 final isOnline = friend['status'] == "En línea";
 
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
+                  ),
                   leading: Stack(
                     children: [
                       CircleAvatar(
-                        radius: 24,
+                        radius: AppSizes.avatarSizeMedium / 2,
                         backgroundImage: NetworkImage(friend['img']),
                         backgroundColor: Colors.grey[800],
                       ),
@@ -109,7 +137,10 @@ class SocialScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: accentColor,
                               shape: BoxShape.circle,
-                              border: Border.all(color: scaffoldBgColor, width: 2), 
+                              border: Border.all(
+                                color: scaffoldBgColor,
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -118,20 +149,24 @@ class SocialScreen extends StatelessWidget {
                   title: Text(
                     friend['name'],
                     style: TextStyle(
-                      color: mainTextColor,
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 16
+                      color: primaryTextColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppTypography.fontSizeRegular,
                     ),
                   ),
                   subtitle: Text(
                     friend['status'],
                     style: TextStyle(
-                      color: isOnline ? accentColor : hintColor, 
-                      fontSize: 13,
+                      color: isOnline ? accentColor : hintColor,
+                      fontSize: AppTypography.fontSizeSmall,
                     ),
                   ),
                   trailing: IconButton(
-                    icon: Icon(Icons.chat_bubble_outline_rounded, color: trailingIconColor, size: 22),
+                    icon: Icon(
+                      Icons.chat_bubble_outline_rounded,
+                      color: trailingIconColor,
+                      size: AppSizes.iconSizeMedium,
+                    ),
                     onPressed: () {},
                   ),
                 );

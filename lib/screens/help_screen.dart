@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Necesario para abrir el correo
+import 'package:url_launcher/url_launcher.dart';
+
 import '../l10n/app_localizations.dart';
+import '../utils/app_constants.dart';
+import '../utils/app_theme.dart';
+import '../utils/app_logger.dart';
+import '../utils/text_constants.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
 
-  // Función para abrir el correo
+  /// Abre el cliente de correo para contactar con soporte
   Future<void> _sendEmail(BuildContext context) async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'vibra@support.com',
-      query: 'subject=Soporte Vibra App', // Asunto opcional por defecto
+      path: AppTextConstants.supportEmail,
+      query: 'subject=${AppTextConstants.supportEmailSubject}',
     );
 
     try {
       if (!await launchUrl(emailUri)) {
-        throw Exception('No se pudo lanzar el correo');
+        throw Exception(AppTextConstants.errorFailedToOpenEmail);
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      AppLogger.error('Failed to open email client', error, stackTrace);
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("No se pudo abrir la aplicación de correo. Escribe a vibra@support.com"),
-            backgroundColor: Colors.redAccent,
+            content: Text(
+              "No se pudo abrir la aplicación de correo. Escribe a ${AppTextConstants.supportEmail}",
+            ),
+            backgroundColor: AppColors.errorColor,
           ),
         );
       }
@@ -31,124 +40,143 @@ class HelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Paleta de colores Premium
-    final Color bgColor = isDark ? const Color(0xFF0E0E0E) : const Color(0xFFF7F7F7);
-    final Color cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final Color textColor = isDark ? Colors.white : const Color(0xFF222222);
-    final Color subTextColor = isDark ? Colors.white54 : Colors.grey.shade600;
-    final Color accentColor = const Color(0xFF54FF78);
+    final localizations = AppLocalizations.of(context)!;
+    final theme = AppTheme(context);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: bgColor,
+        backgroundColor: theme.scaffoldBackground,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: textColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.primaryText,
+            size: AppSizes.iconSizeMedium,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          l10n.menuHelp,
+          localizations.menuHelp,
           style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
+            color: theme.primaryText,
+            fontSize: AppTypography.fontSizeRegular,
+            fontWeight: AppTypography.fontWeightBold,
+            letterSpacing: AppTypography.letterSpacingNormal,
           ),
         ),
       ),
       body: ListView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.md,
+        ),
         children: [
-          // 1. CABECERA GRANDE
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.md),
           Text(
-            l10n.helpMainSubtitle, // "¿En qué podemos ayudarte?"
+            localizations.helpMainSubtitle,
             style: TextStyle(
-              color: textColor,
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
+              color: theme.primaryText,
+              fontSize: AppTypography.fontSizeTitle,
+              fontWeight: AppTypography.fontWeightBlack,
               height: 1.1,
-              letterSpacing: -0.5,
+              letterSpacing: AppTypography.letterSpacingTight,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: AppSpacing.xxxl),
 
-          // 2. PREGUNTAS FRECUENTES (Estilo Acordeón Limpio)
           Text(
-            l10n.helpSectionFaq.toUpperCase(),
+            localizations.helpSectionFaq.toUpperCase(),
             style: TextStyle(
-              color: subTextColor,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              color: theme.secondaryText,
+              fontSize: AppTypography.fontSizeSmall,
+              fontWeight: AppTypography.fontWeightBold,
+              letterSpacing: AppTypography.letterSpacingExtraWide,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Container(
             decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade200),
+              color: theme.cardBackground,
+              borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
+              border: Border.all(color: theme.borderColor),
             ),
             child: Column(
               children: [
-                _FaqTile(question: l10n.helpFaq1Q, answer: l10n.helpFaq1A, textColor: textColor, subTextColor: subTextColor),
-                Divider(height: 1, color: isDark ? Colors.white10 : Colors.grey.shade100),
-                _FaqTile(question: l10n.helpFaq2Q, answer: l10n.helpFaq2A, textColor: textColor, subTextColor: subTextColor),
-                Divider(height: 1, color: isDark ? Colors.white10 : Colors.grey.shade100),
-                _FaqTile(question: l10n.helpFaq3Q, answer: l10n.helpFaq3A, textColor: textColor, subTextColor: subTextColor, isLast: true),
+                _FaqTile(
+                  question: localizations.helpFaq1Q,
+                  answer: localizations.helpFaq1A,
+                  textColor: theme.primaryText,
+                  subTextColor: theme.secondaryText,
+                ),
+                Divider(height: 1, color: theme.dividerColor),
+                _FaqTile(
+                  question: localizations.helpFaq2Q,
+                  answer: localizations.helpFaq2A,
+                  textColor: theme.primaryText,
+                  subTextColor: theme.secondaryText,
+                ),
+                Divider(height: 1, color: theme.dividerColor),
+                _FaqTile(
+                  question: localizations.helpFaq3Q,
+                  answer: localizations.helpFaq3A,
+                  textColor: theme.primaryText,
+                  subTextColor: theme.secondaryText,
+                  isLast: true,
+                ),
               ],
             ),
           ),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: AppSpacing.xxxl),
 
-          // 3. SOPORTE Y CONTACTO (Botones Grandes - Con funcionalidad de Email)
           Text(
-            l10n.helpSectionSupport.toUpperCase(),
+            localizations.helpSectionSupport.toUpperCase(),
             style: TextStyle(
-              color: subTextColor,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              color: theme.secondaryText,
+              fontSize: AppTypography.fontSizeSmall,
+              fontWeight: AppTypography.fontWeightBold,
+              letterSpacing: AppTypography.letterSpacingExtraWide,
             ),
           ),
-          const SizedBox(height: 16),
-          
+          const SizedBox(height: AppSpacing.lg),
+
           _SupportButton(
             icon: Icons.email_outlined,
-            title: l10n.helpSupportContact,
-            subtitle: "vibra@support.com",
-            accentColor: accentColor,
-            cardColor: cardColor,
-            textColor: textColor,
-            onTap: () => _sendEmail(context), // Abre el correo
+            title: localizations.helpSupportContact,
+            subtitle: AppTextConstants.supportEmail,
+            accentColor: theme.accentColor,
+            cardColor: theme.cardBackground,
+            textColor: theme.primaryText,
+            onTap: () => _sendEmail(context),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           _SupportButton(
             icon: Icons.bug_report_outlined,
-            title: l10n.helpSupportReport,
+            title: localizations.helpSupportReport,
             subtitle: "Reportar error técnico",
-            accentColor: Colors.orangeAccent,
-            cardColor: cardColor,
-            textColor: textColor,
-            onTap: () => _sendEmail(context), // Abre el correo
+            accentColor: AppColors.warningColor,
+            cardColor: theme.cardBackground,
+            textColor: theme.primaryText,
+            onTap: () => _sendEmail(context),
           ),
-          
-          const SizedBox(height: 40),
+
+          const SizedBox(height: AppSpacing.huge),
           Center(
             child: Text(
-              "Vibra App v1.0.0",
-              style: TextStyle(color: subTextColor.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w600),
+              "${AppTextConstants.appName} v${AppTextConstants.appVersion}",
+              style: TextStyle(
+                color: theme.secondaryText.withValues(
+                  alpha: AppColors.opacityVeryHigh,
+                ),
+                fontSize: AppTypography.fontSizeSmall,
+                fontWeight: AppTypography.fontWeightSemiBold,
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
         ],
       ),
     );
@@ -179,16 +207,24 @@ class _FaqTile extends StatelessWidget {
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        tilePadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.xs,
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          0,
+          AppSpacing.xl,
+          AppSpacing.xl,
+        ),
         iconColor: textColor,
         collapsedIconColor: subTextColor,
         title: Text(
           question,
           style: TextStyle(
             color: textColor,
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
+            fontWeight: AppTypography.fontWeightSemiBold,
+            fontSize: AppTypography.fontSizeMedium + 1,
           ),
         ),
         children: [
@@ -196,7 +232,7 @@ class _FaqTile extends StatelessWidget {
             answer,
             style: TextStyle(
               color: subTextColor,
-              fontSize: 14,
+              fontSize: AppTypography.fontSizeMedium,
               height: 1.5,
             ),
           ),
@@ -230,23 +266,32 @@ class _SupportButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: textColor.withValues(alpha: 0.05)),
+          borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
+          border: Border.all(
+            color: textColor.withValues(alpha: AppColors.opacityLow),
+          ),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: accentColor.withValues(alpha: AppColors.opacityMedium),
+                borderRadius: BorderRadius.circular(AppBorders.radiusMedium),
               ),
-              child: Icon(icon, color: accentColor, size: 24),
+              child: Icon(
+                icon,
+                color: accentColor,
+                size: AppSizes.iconSizeLarge,
+              ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,18 +304,22 @@ class _SupportButton extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.xs / 2),
                   Text(
                     subtitle,
                     style: TextStyle(
                       color: textColor.withValues(alpha: 0.5),
-                      fontSize: 12,
+                      fontSize: AppTypography.fontSizeSmall,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: textColor.withValues(alpha: 0.3), size: 14),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: textColor.withValues(alpha: AppColors.opacityVeryHigh),
+              size: AppSizes.iconSizeSmall + 2,
+            ),
           ],
         ),
       ),

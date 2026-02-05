@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../l10n/app_localizations.dart';
 import '../services/spotify_api_service.dart';
 import '../services/user_data_service.dart';
+import '../utils/app_constants.dart';
+
 import 'home_screen.dart';
 
 class MusicPreferencesScreen extends StatefulWidget {
@@ -27,19 +30,35 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
 
   List<Map<String, String>> searchResults = [];
   final Set<Map<String, String>> selectedArtists = {};
-  final Set<String> selectedGenres = {}; 
+  final Set<String> selectedGenres = {};
 
   bool _isSearching = false;
   bool _isSaving = false;
 
   final List<Map<String, dynamic>> genreOptions = [
-    {'label': '🔥 Urbano & Reggaeton', 'value': 'Urbano', 'color': Colors.orangeAccent},
-    {'label': '🎸 Rock & Alternative', 'value': 'Rock', 'color': Colors.redAccent},
+    {
+      'label': '🔥 Urbano & Reggaeton',
+      'value': 'Urbano',
+      'color': Colors.orangeAccent,
+    },
+    {
+      'label': '🎸 Rock & Alternative',
+      'value': 'Rock',
+      'color': Colors.redAccent,
+    },
     {'label': '🎤 Pop & Hits', 'value': 'Pop', 'color': Colors.pinkAccent},
     {'label': '💃 Indie Español', 'value': 'Indie', 'color': Colors.tealAccent},
-    {'label': '🎧 Electrónica & House', 'value': 'Electronic', 'color': Colors.blueAccent},
+    {
+      'label': '🎧 Electrónica & House',
+      'value': 'Electronic',
+      'color': Colors.blueAccent,
+    },
     {'label': '🎪 Festivales', 'value': 'Festival', 'color': Colors.amber},
-    {'label': '🎤 Hip-Hop / Rap', 'value': 'Hip-Hop', 'color': Colors.purpleAccent},
+    {
+      'label': '🎤 Hip-Hop / Rap',
+      'value': 'Hip-Hop',
+      'color': Colors.purpleAccent,
+    },
     {'label': '🤘 Heavy Metal', 'value': 'Metal', 'color': Colors.grey},
     {'label': '💃 Flamenco', 'value': 'Flamenco', 'color': Colors.deepOrange},
     {'label': '🎹 Jazz & Blues', 'value': 'Jazz', 'color': Colors.indigoAccent},
@@ -66,16 +85,18 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
   Future<void> _saveAndContinue() async {
     setState(() => _isSaving = true);
     try {
-      final List<String> artistNames = selectedArtists.map((a) => a['name']!).toList();
+      final List<String> artistNames = selectedArtists
+          .map((a) => a['name']!)
+          .toList();
       final List<String> genreValues = selectedGenres.toList();
 
       await _userDataService.saveUserPreferences(
-        widget.userProfile['uid'] ?? widget.userProfile['id'], 
+        widget.userProfile['uid'] ?? widget.userProfile['id'],
         {
           'favoriteArtists': artistNames,
           'favoriteGenres': genreValues,
           'preferencesSet': true,
-        }
+        },
       );
 
       if (!mounted) return;
@@ -91,9 +112,9 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error guardando: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error guardando: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -106,21 +127,32 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
     final String displayName = widget.userProfile['displayName'] ?? 'Usuario';
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors
+          .black, // Mantener dark, pero podría usar AppColors.darkScaffoldBackground
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.lg,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 l10n.prefsTitle(displayName),
-                style: GoogleFonts.montserrat(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: AppTypography.fontWeightBold,
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 l10n.prefsSubtitle,
-                style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 15),
+                style: GoogleFonts.montserrat(
+                  color: Colors.white70,
+                  fontSize: AppTypography.fontSizeMedium,
+                ),
               ),
               const SizedBox(height: 25),
 
@@ -134,37 +166,69 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                   prefixIcon: const Icon(Icons.search, color: Colors.white38),
                   filled: true,
                   fillColor: const Color(0xFF1A1A1A),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
-              
+
               // Nota: No uses llaves {} aquí dentro de la Column para evitar errores de Set/List
               if (_isSearching)
-                 const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(color: Colors.greenAccent)))
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(color: Colors.greenAccent),
+                  ),
+                )
               else if (searchResults.isNotEmpty)
-                 Container(
+                Container(
                   constraints: const BoxConstraints(maxHeight: 200),
                   margin: const EdgeInsets.only(top: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A), 
-                    borderRadius: BorderRadius.circular(20), 
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(
+                      AppBorders.radiusExtraLarge,
+                    ),
                     border: Border.all(color: Colors.white10),
                   ),
                   child: ListView.builder(
                     itemCount: searchResults.length,
                     itemBuilder: (context, index) {
                       final artist = searchResults[index];
-                      final isSelected = selectedArtists.any((a) => a['name'] == artist['name']);
+                      final isSelected = selectedArtists.any(
+                        (a) => a['name'] == artist['name'],
+                      );
                       return ListTile(
-                        leading: CircleAvatar(backgroundImage: NetworkImage(artist['image']!)),
-                        title: Text(artist['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        trailing: Icon(isSelected ? Icons.check_circle : Icons.add_circle_outline, color: isSelected ? Colors.greenAccent : Colors.white38),
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(artist['image']!),
+                        ),
+                        title: Text(
+                          artist['name']!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: AppTypography.fontWeightBold,
+                          ),
+                        ),
+                        trailing: Icon(
+                          isSelected
+                              ? Icons.check_circle
+                              : Icons.add_circle_outline,
+                          color: isSelected
+                              ? AppColors.primaryAccent
+                              : Colors.white38,
+                        ),
                         onTap: () {
                           HapticFeedback.lightImpact();
                           setState(() {
                             if (isSelected) {
-                              selectedArtists.removeWhere((a) => a['name'] == artist['name']);
+                              selectedArtists.removeWhere(
+                                (a) => a['name'] == artist['name'],
+                              );
                             } else {
                               selectedArtists.add(artist);
                             }
@@ -177,7 +241,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                   ),
                 ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.lg),
 
               Expanded(
                 child: SingleChildScrollView(
@@ -186,20 +250,46 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (selectedArtists.isNotEmpty) ...[
-                        Text(l10n.prefsYourArtists, style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 10),
+                        Text(
+                          l10n.prefsYourArtists,
+                          style: GoogleFonts.montserrat(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: AppTypography.fontWeightSemiBold,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         Wrap(
-                          spacing: 10, runSpacing: 10,
+                          spacing: 10,
+                          runSpacing: 10,
                           children: selectedArtists.map((artist) {
                             return Chip(
-                              label: Text(artist['name']!, style: const TextStyle(color: Colors.white)),
-                              avatar: CircleAvatar(backgroundImage: NetworkImage(artist['image']!)),
-                              backgroundColor: Colors.greenAccent.withValues(alpha: 0.15),
-                              deleteIcon: const Icon(Icons.close, size: 16, color: Colors.greenAccent),
-                              onDeleted: () => setState(() => selectedArtists.removeWhere((a) => a['name'] == artist['name'])),
+                              label: Text(
+                                artist['name']!,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              avatar: CircleAvatar(
+                                backgroundImage: NetworkImage(artist['image']!),
+                              ),
+                              backgroundColor: AppColors.primaryAccent
+                                  .withValues(alpha: 0.15),
+                              deleteIcon: const Icon(
+                                Icons.close,
+                                size: 16,
+                                color: AppColors.primaryAccent,
+                              ),
+                              onDeleted: () => setState(
+                                () => selectedArtists.removeWhere(
+                                  (a) => a['name'] == artist['name'],
+                                ),
+                              ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30), 
-                                side: BorderSide(color: Colors.greenAccent.withValues(alpha: 0.3)),
+                                borderRadius: BorderRadius.circular(30),
+                                side: BorderSide(
+                                  color: AppColors.primaryAccent.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
                               ),
                             );
                           }).toList(),
@@ -207,19 +297,31 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                         const SizedBox(height: 25),
                       ],
 
-                      Text(l10n.prefsGenres, style: GoogleFonts.montserrat(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(
+                        l10n.prefsGenres,
+                        style: GoogleFonts.montserrat(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: AppTypography.fontWeightBold,
+                        ),
+                      ),
                       const SizedBox(height: 15),
-                      
+
                       Wrap(
-                        spacing: 10, runSpacing: 10,
+                        spacing: 10,
+                        runSpacing: 10,
                         children: genreOptions.map((genre) {
-                          final isSelected = selectedGenres.contains(genre['value']);
+                          final isSelected = selectedGenres.contains(
+                            genre['value'],
+                          );
                           final color = genre['color'] as Color;
                           return FilterChip(
                             label: Text(genre['label']),
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
+                              fontWeight: isSelected
+                                  ? AppTypography.fontWeightBold
+                                  : FontWeight.normal,
                             ),
                             selected: isSelected,
                             onSelected: (bool selected) {
@@ -233,17 +335,28 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
                               });
                             },
                             backgroundColor: const Color(0xFF1F1F1F),
-                            selectedColor: color, 
+                            selectedColor: color,
                             checkmarkColor: Colors.black,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: isSelected ? BorderSide.none : BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                              borderRadius: BorderRadius.circular(
+                                AppBorders.radiusExtraLarge,
+                              ),
+                              side: isSelected
+                                  ? BorderSide.none
+                                  : BorderSide(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                    ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 8,
+                            ),
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 100), 
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -252,7 +365,7 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
           ),
         ),
       ),
-      
+
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         color: Colors.black,
@@ -261,9 +374,9 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
           height: 55,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) 
-                ? [Colors.greenAccent, Colors.lightGreenAccent] 
-                : [Colors.grey.shade800, Colors.grey.shade700],
+              colors: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty)
+                  ? [AppColors.primaryAccent, Colors.lightGreenAccent]
+                  : [Colors.grey.shade800, Colors.grey.shade700],
             ),
             borderRadius: BorderRadius.circular(30),
           ),
@@ -271,21 +384,36 @@ class _MusicPreferencesScreenState extends State<MusicPreferencesScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
             ),
-            onPressed: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) && !_isSaving
+            onPressed:
+                (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) &&
+                    !_isSaving
                 ? _saveAndContinue
                 : null,
-            child: _isSaving 
-              ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-              : Text(
-                  l10n.prefsBtnStart,
-                  style: TextStyle(
-                    color: (selectedArtists.isNotEmpty || selectedGenres.isNotEmpty) ? Colors.black : Colors.white38, 
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 16
+            child: _isSaving
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.black,
+                      strokeWidth: 2,
+                    ),
                   )
-                ),
+                : Text(
+                    l10n.prefsBtnStart,
+                    style: TextStyle(
+                      color:
+                          (selectedArtists.isNotEmpty ||
+                              selectedGenres.isNotEmpty)
+                          ? Colors.black
+                          : Colors.white38,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
           ),
         ),
       ),
