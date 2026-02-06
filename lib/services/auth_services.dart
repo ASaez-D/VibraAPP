@@ -1,43 +1,69 @@
-import 'dart:developer' as developer; // Añadido para logs profesionales
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../utils/app_logger.dart';
 
+/// Service for handling authentication operations
+/// Manages Google Sign In integration with Firebase Authentication
 class AuthServices {
-  // Google Sign In
+  /// Timeout duration for authentication operations
+  static const Duration _authTimeout = Duration(seconds: 30);
+
+  /// Authenticates user with Google Sign In and Firebase
+  ///
+  /// Returns [UserCredential] if successful, null if user cancels or error occurs
+  ///
+  /// Throws [TimeoutException] if operation takes longer than 30 seconds
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-      
+      AppLogger.info('Iniciando proceso de Google Sign In');
+
+      // Request Google Sign In with timeout
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn().timeout(
+        _authTimeout,
+      );
+
       if (gUser == null) {
-        developer.log('El usuario canceló el inicio de sesión', name: 'auth.services');
-        return null; 
+        AppLogger.info('Usuario canceló el inicio de sesión con Google');
+        return null;
       }
 
+      AppLogger.debug('Usuario seleccionado: ${gUser.email}');
+
       final GoogleSignInAuthentication gAuth = await gUser.authentication;
-      
+
       final credential = GoogleAuthProvider.credential(
         accessToken: gAuth.accessToken,
         idToken: gAuth.idToken,
       );
 
-      // Iniciamos sesión en Firebase con la credencial de Google
-      return await FirebaseAuth.instance.signInWithCredential(credential);
-      
+      // Sign in to Firebase with Google credential
+      final userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential)
+          .timeout(_authTimeout);
+
+      AppLogger.info('Google Sign In exitoso: ${userCredential.user?.email}');
+      return userCredential;
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.error('Timeout en Google Sign In', e, stackTrace);
+      return null;
     } catch (e, stackTrace) {
-      // Reemplazado print por developer.log
-      developer.log(
-        'Error Google Sign In',
-        name: 'auth.services',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.error('Error en Google Sign In', e, stackTrace);
       return null;
     }
   }
 
-  // Método opcional para cerrar sesión
+  /// Signs out the current user from both Google and Firebase
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
-    await FirebaseAuth.instance.signOut();
+    try {
+      AppLogger.info('Cerrando sesión');
+      await GoogleSignIn().signOut();
+      await FirebaseAuth.instance.signOut();
+      AppLogger.info('Sesión cerrada exitosamente');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error al cerrar sesión', e, stackTrace);
+      rethrow;
+    }
   }
 }

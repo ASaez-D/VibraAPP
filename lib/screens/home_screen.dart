@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../l10n/app_localizations.dart';
 import '../services/user_data_service.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_logger.dart';
+import '../utils/app_constants.dart';
 
 // WIDGETS REFACTORIZADOS (IMPORTAR AQUÍ)
 import '../widgets/home_drawer.dart';
@@ -25,6 +27,18 @@ import '../services/ticketmaster_service.dart';
 import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
 
+/// Main home screen showing personalized concert recommendations
+///
+/// Displays concerts based on user's Spotify taste or saved preferences,
+/// with sections for recommendations, weekend events, and trending concerts.
+///
+/// Features:
+/// - Personalized recommendations from Spotify or user preferences
+/// - Weekend events section
+/// - Search functionality
+/// - Like/Save functionality
+/// - Region filtering
+/// - Pagination support
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile;
   final String authSource;
@@ -101,17 +115,22 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchCtrl.addListener(_onSearch);
   }
 
+  /// Loads user's liked and saved events from Firestore
   Future<void> _loadInteractions() async {
     try {
       final likes = await _dbService.getUserInteractions('favorites');
       final saves = await _dbService.getUserInteractions('saved_events');
-      if (mounted)
+      if (mounted) {
         setState(() {
           _likedIds.addAll(likes);
           _savedIds.addAll(saves);
         });
-    } catch (e) {
-      debugPrint("Error interacciones: $e");
+      }
+      AppLogger.debug(
+        'Interacciones cargadas: ${likes.length} likes, ${saves.length} guardados',
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('Error cargando interacciones de usuario', e, stackTrace);
     }
   }
 
@@ -132,6 +151,9 @@ class _HomeScreenState extends State<HomeScreen> {
         : _loadPrefs();
   }
 
+  /// Loads user preferences from Firestore (for Google auth users)
+  ///
+  /// Falls back to generic recommendations if no preferences found
   Future<void> _loadPrefs() async {
     bool hasPrefs = false;
     try {
@@ -150,14 +172,24 @@ class _HomeScreenState extends State<HomeScreen> {
             keyword: genres.isNotEmpty ? genres[0] : null,
             refresh: true,
           );
+          AppLogger.info(
+            'Preferencias cargadas: ${genres.length} géneros, ${artists.length} artistas',
+          );
         }
       }
-    } catch (e) {
-      debugPrint("Error DB: $e");
+    } catch (e, stackTrace) {
+      AppLogger.error('Error cargando preferencias de usuario', e, stackTrace);
     }
-    if (!hasPrefs) _loadData(keyword: null, refresh: true);
+    if (!hasPrefs) {
+      AppLogger.debug('Sin preferencias guardadas, cargando eventos generales');
+      _loadData(keyword: null, refresh: true);
+    }
   }
 
+  /// Analyzes user's Spotify taste to personalize recommendations
+  ///
+  /// Fetches top artists and their genres from Spotify API,
+  /// then determines dominant music taste (Urbano, Rock, Electronic, Pop)
   Future<void> _analyzeTaste() async {
     try {
       final top = await _spService.getUserTopArtistsWithGenres(
@@ -191,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Loads weekend events (Friday-Sunday)
   void _loadWeekend() {
     DateTime now = DateTime.now();
     int days = (DateTime.friday - now.weekday + 7) % 7;
@@ -207,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
   }
 
+  /// Loads secondary vibe section with keyword filter
   void _loadSecVibe(String k) {
     setState(() => _secVibeTitle = k);
     _tmService
@@ -223,6 +257,11 @@ class _HomeScreenState extends State<HomeScreen> {
         });
   }
 
+  /// Loads main concert data with pagination support
+  ///
+  /// Parameters:
+  /// - [keyword]: Optional filter keyword (genre)
+  /// - [refresh]: If true, resets pagination and clears cache
   void _loadData({String? keyword, bool refresh = false}) {
     if (refresh) {
       _page = 0;
@@ -276,6 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Loads recommended concerts based on user's favorite artists
   Future<void> _loadRecs(List<String> artists) async {
     if (artists.isEmpty) return;
     _topArtist = artists.first;
@@ -311,12 +351,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Shares concert details via system share sheet
   void _share(ConcertDetail c) {
     Share.share(
       '¡Mira este planazo en Vibra! 🎸\n${c.name}\n📅 ${DateFormat('d MMM').format(c.date)}\n📍 ${c.venue}\n${c.ticketUrl}',
     );
   }
 
+  /// Toggles like status for a concert
   void _like(ConcertDetail c) {
     HapticFeedback.lightImpact();
     setState(
@@ -332,6 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Toggles save status for a concert and shows confirmation
   void _save(ConcertDetail c) {
     HapticFeedback.mediumImpact();
     setState(
@@ -370,46 +413,59 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = Colors.greenAccent;
+    final accentColor = AppColors.primaryAccent;
     final scaffoldBg = isDarkMode
-        ? const Color(0xFF0E0E0E)
-        : const Color(0xFFF7F7F7);
-    final primaryText = isDarkMode ? Colors.white : const Color(0xFF222222);
-    final secondaryText = isDarkMode ? Colors.white54 : Colors.grey.shade600;
+        ? AppColors.darkScaffoldBackground
+        : AppColors.lightScaffoldBackground;
+    final primaryText = isDarkMode
+        ? AppColors.darkPrimaryText
+        : AppColors.lightPrimaryText;
+    final secondaryText = isDarkMode
+        ? AppColors.darkSecondaryText
+        : Colors.grey.shade600;
     final hintText = isDarkMode
         ? Colors.white.withOpacity(0.4)
         : Colors.grey.shade400;
     final searchBarBg = isDarkMode
-        ? const Color(0xFF1C1C1E)
+        ? AppColors.darkCardBackground
         : Colors.grey.shade200;
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: scaffoldBg,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
+        preferredSize: const Size.fromHeight(AppSizes.appBarHeight),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 50,
+                    height: AppSizes.searchBarHeight,
                     decoration: BoxDecoration(
                       color: searchBarBg,
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(
+                        AppBorders.radiusCircular,
+                      ),
                       border: Border.all(
                         color: isDarkMode
                             ? Colors.white.withOpacity(0.08)
                             : Colors.grey.shade300,
-                        width: 1,
+                        width: AppBorders.borderWidthThin,
                       ),
                       boxShadow: [
                         BoxShadow(
                           color: isDarkMode
-                              ? Colors.black.withOpacity(0.2)
-                              : Colors.grey.withOpacity(0.1),
+                              ? Colors.black.withOpacity(AppColors.opacityHigh)
+                              : Colors.grey.withOpacity(
+                                  AppColors.opacityMedium,
+                                ),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -417,22 +473,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: TextField(
                       controller: _searchCtrl,
-                      style: TextStyle(color: primaryText, fontSize: 15),
+                      style: TextStyle(
+                        color: primaryText,
+                        fontSize: AppTypography.fontSizeMedium + 1,
+                      ),
                       cursorColor: accentColor,
                       decoration: InputDecoration(
                         hintText: l10n.homeSearchHint(_country),
-                        hintStyle: TextStyle(color: hintText, fontSize: 14),
+                        hintStyle: TextStyle(
+                          color: hintText,
+                          fontSize: AppTypography.fontSizeMedium,
+                        ),
                         prefixIcon: Icon(
                           Icons.search,
                           color: hintText,
-                          size: 22,
+                          size: AppSizes.iconSizeMedium + 2,
                         ),
                         suffixIcon: _searchCtrl.text.isNotEmpty
                             ? IconButton(
                                 icon: Icon(
                                   Icons.close,
                                   color: secondaryText,
-                                  size: 20,
+                                  size: AppSizes.iconSizeMedium,
                                 ),
                                 onPressed: () {
                                   _searchCtrl.clear();
@@ -442,23 +504,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
+                          vertical: AppTypography.fontSizeMedium,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.lg),
                 GestureDetector(
                   onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
                   child: CircleAvatar(
-                    radius: 22,
+                    radius: AppSizes.avatarRadiusLarge,
                     backgroundColor: Theme.of(context).cardColor,
                     backgroundImage: widget.userProfile['photoURL'] != null
                         ? NetworkImage(widget.userProfile['photoURL'])
                         : null,
                     child: widget.userProfile['photoURL'] == null
-                        ? Icon(Icons.person, color: primaryText, size: 24)
+                        ? Icon(
+                            Icons.person,
+                            color: primaryText,
+                            size: AppSizes.iconSizeLarge,
+                          )
                         : null,
                   ),
                 ),

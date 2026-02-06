@@ -1,107 +1,165 @@
-import 'package:flutter/foundation.dart'; // Importante para debugPrint
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SpotifyAuth {
-  final String clientId = '80f01713b268402aa0bd1c47c8524bd9';
-  final String clientSecret = 'a9f061e91c35424480bdb3f271407864';
-  final String redirectUri = 'vibraapp://callback'; 
-  final String scopes = 'user-read-private user-read-email user-top-read';
+import '../utils/api_constants.dart';
+import '../utils/app_logger.dart';
 
+/// Service for Spotify OAuth authentication
+/// Handles user authorization and token management
+class SpotifyAuth {
+  /// Spotify client ID from environment variables
+  String get clientId => dotenv.env['SPOTIFY_CLIENT_ID'] ?? '';
+
+  /// Spotify client secret from environment variables
+  String get clientSecret => dotenv.env['SPOTIFY_CLIENT_SECRET'] ?? '';
+
+  /// SharedPreferences key for storing Spotify token
+  static const String _tokenKey = 'spotify_token';
+
+  /// Authenticates user with Spotify OAuth flow
+  ///
+  /// Returns user profile data with access token, or null if authentication fails
+  ///
+  /// Steps:
+  /// 1. Clears any existing token
+  /// 2. Opens browser for user authorization
+  /// 3. Exchanges authorization code for access token
+  /// 4. Fetches user profile
+  /// 5. Stores token in SharedPreferences
   Future<Map<String, dynamic>?> login() async {
     try {
+      // Validate credentials
+      if (clientId.isEmpty || clientSecret.isEmpty) {
+        AppLogger.error('Faltan credenciales de Spotify en .env');
+        return null;
+      }
+
+      // Clear previous token
       await logout();
-      debugPrint('🧹 Token anterior eliminado.');
+      AppLogger.debug('Token anterior eliminado');
 
-      // 1. URL DE LOGIN
-      // Nota: He corregido los dominios a los oficiales de Spotify
-      final url = Uri.https('accounts.spotify.com', '/authorize', {
-        'response_type': 'code',
+      // Build authorization URL
+      final authUrl = Uri.https('accounts.spotify.com', '/authorize', {
+        'response_type': SpotifyApiConstants.responseType,
         'client_id': clientId,
-        'redirect_uri': redirectUri,
-        'scope': scopes,
+        'redirect_uri': SpotifyApiConstants.redirectUri,
+        'scope': SpotifyApiConstants.scopes,
       }).toString();
-      
-      debugPrint('URL para login Spotify: $url');
 
-      // 2. Abrir navegador
-      debugPrint('🕒 Abriendo navegador...');
+      AppLogger.info('Iniciando Spotify OAuth');
+
+      // Open browser for authorization
       final result = await FlutterWebAuth2.authenticate(
-        url: url,
+        url: authUrl,
         callbackUrlScheme: 'vibraapp',
-      );
-      debugPrint('📥 Resultado recibido correctamente');
+      ).timeout(SpotifyApiConstants.requestTimeout);
 
-      // 3. Obtener el código
+      AppLogger.debug('Callback recibido de Spotify');
+
+      // Extract authorization code
       final uri = Uri.parse(result);
       final code = uri.queryParameters['code'];
 
       if (code == null) {
-        debugPrint('Error: No se recibió código de autorización');
+        AppLogger.warning('No se recibió código de autorización de Spotify');
         return null;
       }
 
-      debugPrint('✅ Código recibido');
+      AppLogger.debug('Código de autorización obtenido');
 
-      // 4. Intercambiar código por Token
-      final tokenResponse = await http.post(
-        Uri.parse('https://accounts.spotify.com/api/token'),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: {
-          'grant_type': 'authorization_code',
-          'code': code,
-          'redirect_uri': redirectUri,
-          'client_id': clientId,
-          'client_secret': clientSecret,
-        },
-      );
+      // Exchange code for access token
+      final tokenResponse = await http
+          .post(
+            Uri.parse(SpotifyApiConstants.tokenEndpoint),
+            headers: {
+              HttpConstants.headerContentType:
+                  HttpConstants.contentTypeFormUrlEncoded,
+            },
+            body: {
+              'grant_type': SpotifyApiConstants.grantTypeAuthCode,
+              'code': code,
+              'redirect_uri': SpotifyApiConstants.redirectUri,
+              'client_id': clientId,
+              'client_secret': clientSecret,
+            },
+          )
+          .timeout(SpotifyApiConstants.requestTimeout);
 
       if (tokenResponse.statusCode != 200) {
-        debugPrint('Error Token: ${tokenResponse.statusCode} - ${tokenResponse.body}');
+        AppLogger.error(
+          'Error obteniendo token de Spotify',
+          'Status: ${tokenResponse.statusCode}, Body: ${tokenResponse.body}',
+        );
         return null;
       }
 
       final tokenData = json.decode(tokenResponse.body);
       final accessToken = tokenData['access_token'];
-      debugPrint('✅ Access Token obtenido');
+      AppLogger.debug('Access token obtenido');
 
+      // Save token to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('spotify_token', accessToken);
+      await prefs.setString(_tokenKey, accessToken);
 
-      // 5. Obtener Perfil de Usuario
-      final response = await http.get(
-        Uri.parse('https://api.spotify.com/v1/me'),
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
+      // Fetch user profile
+      final profileResponse = await http
+          .get(
+            Uri.parse(SpotifyApiConstants.userProfileEndpoint),
+            headers: {
+              HttpConstants.headerAuthorization:
+                  '${HttpConstants.authTypeBearer} $accessToken',
+            },
+          )
+          .timeout(SpotifyApiConstants.requestTimeout);
 
-      if (response.statusCode != 200) {
-        debugPrint('Error Perfil: ${response.statusCode}');
+      if (profileResponse.statusCode != 200) {
+        AppLogger.error(
+          'Error obteniendo perfil de Spotify',
+          'Status: ${profileResponse.statusCode}',
+        );
         return null;
       }
 
-      final Map<String, dynamic> profile = json.decode(response.body);
-      profile['access_token'] = accessToken; 
+      final Map<String, dynamic> profile = json.decode(profileResponse.body);
+      profile['access_token'] = accessToken;
 
-      debugPrint('Perfil obtenido correctamente: ${profile['display_name']}');
+      AppLogger.info('Spotify login exitoso: ${profile['display_name']}');
       return profile;
-
-    } catch (e) {
-      debugPrint('🚨 Excepción en Spotify Auth: $e');
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.error('Timeout en Spotify Auth', e, stackTrace);
+      return null;
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en Spotify Auth', e, stackTrace);
       return null;
     }
   }
 
+  /// Retrieves saved Spotify access token from SharedPreferences
+  ///
+  /// Returns token string or null if not found
   static Future<String?> getSavedToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('spotify_token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_tokenKey);
+    } catch (e, stackTrace) {
+      AppLogger.error('Error obteniendo token guardado', e, stackTrace);
+      return null;
+    }
   }
 
+  /// Removes saved Spotify token from SharedPreferences
   static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('spotify_token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      AppLogger.debug('Token de Spotify eliminado');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error eliminando token de Spotify', e, stackTrace);
+    }
   }
 }

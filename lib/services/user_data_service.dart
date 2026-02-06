@@ -1,146 +1,243 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../utils/app_logger.dart';
+
+/// Service for managing user data in Firestore
+/// Handles user profiles, preferences, favorites, and saved events
 class UserDataService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Obtener el ID del usuario actual de forma segura
+  /// Collection names
+  static const String _usersCollection = 'users';
+  static const String _favoritesCollection = 'favorites';
+  static const String _savedEventsCollection = 'saved_events';
+
+  /// Gets the current user's UID safely
   String? get _uid => _auth.currentUser?.uid;
 
-  // --- FUNCIÓN AUXILIAR PARA LIMPIAR NOMBRES (EVITA ERRORES EN RUTAS) ---
-  // Cambia las barras '/' por guiones bajos '_' para no romper la ruta de Firebase
+  /// Cleans IDs to prevent Firebase path errors
+  ///
+  /// Replaces forward and backward slashes with underscores
+  /// to avoid breaking Firestore document paths
   String _cleanId(String id) {
     return id.replaceAll('/', '_').replaceAll('\\', '_');
   }
 
   // ---------------------------------------------------
-  // 1. GESTIÓN DE USUARIOS (LOGIN)
+  // USER MANAGEMENT (LOGIN)
   // ---------------------------------------------------
 
-  // Guardar datos al iniciar sesión (Google/Spotify)
+  /// Saves user data from authentication profile map
+  ///
+  /// Used after Google/Spotify login to store user info
+  /// Merges with existing data to preserve preferences
   Future<void> saveUserFromMap(Map<String, dynamic> profile) async {
     String? uid = profile['uid'] ?? profile['id'];
-    if (uid == null) return;
+    if (uid == null) {
+      AppLogger.warning('saveUserFromMap: No se encontró UID en el perfil');
+      return;
+    }
+
     try {
-      await _db.collection('users').doc(uid).set({
+      await _db.collection(_usersCollection).doc(uid).set({
         'id': uid,
         'displayName': profile['displayName'],
         'email': profile['email'],
         'photoURL': profile['photoURL'],
         'lastLogin': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true)); // Merge para no borrar datos existentes
-    } catch (e) { 
-      print("Error saveUserFromMap: $e"); 
+      }, SetOptions(merge: true));
+
+      AppLogger.info('Usuario guardado desde mapa: $uid');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en saveUserFromMap', e, stackTrace);
     }
   }
 
-  // Guardar datos si ya existe sesión activa
+  /// Saves user profile from Firebase User object
+  ///
+  /// Used when there's an active Firebase session
+  /// Merges with existing data to preserve preferences
   Future<void> saveUserProfile(User user) async {
     try {
-      await _db.collection('users').doc(user.uid).set({
+      await _db.collection(_usersCollection).doc(user.uid).set({
         'id': user.uid,
         'displayName': user.displayName,
         'email': user.email,
         'photoURL': user.photoURL,
         'lastLogin': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-    } catch (e) { 
-      print("Error saveUserProfile: $e"); 
+
+      AppLogger.info('Perfil de usuario guardado: ${user.uid}');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en saveUserProfile', e, stackTrace);
     }
   }
 
   // ---------------------------------------------------
-  // 2. GESTIÓN DE PREFERENCIAS (ONBOARDING)
+  // PREFERENCES MANAGEMENT (ONBOARDING)
   // ---------------------------------------------------
-  
-  // Guardar géneros y artistas seleccionados
-  Future<void> saveUserPreferences(String uid, Map<String, dynamic> preferences) async {
+
+  /// Saves user music preferences (genres and artists)
+  ///
+  /// Used during onboarding to store user's music taste
+  /// Throws exception on error for proper error handling in UI
+  Future<void> saveUserPreferences(
+    String uid,
+    Map<String, dynamic> preferences,
+  ) async {
     try {
-      await _db.collection('users').doc(uid).set({
-        'preferences': preferences
-      }, SetOptions(merge: true)); 
-      print("✅ Preferencias guardadas para $uid");
-    } catch (e) {
-      print("❌ Error guardando preferencias: $e");
-      throw e; 
+      await _db.collection(_usersCollection).doc(uid).set({
+        'preferences': preferences,
+      }, SetOptions(merge: true));
+
+      AppLogger.info('Preferencias guardadas para usuario: $uid');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error guardando preferencias', e, stackTrace);
+      rethrow;
     }
   }
 
-  // Recuperar preferencias para filtrar la Home (IMPORTANTE PARA GOOGLE)
+  /// Retrieves user's music preferences
+  ///
+  /// Returns preferences map or null if not found
+  /// Used to filter home screen concerts by user taste
   Future<Map<String, dynamic>?> getUserPreferences() async {
-    if (_uid == null) return null;
+    if (_uid == null) {
+      AppLogger.warning('getUserPreferences: No hay usuario autenticado');
+      return null;
+    }
+
     try {
-      final doc = await _db.collection('users').doc(_uid).get();
+      final doc = await _db.collection(_usersCollection).doc(_uid).get();
       if (doc.exists && doc.data() != null) {
-        // Devolvemos solo la parte de preferencias
-        return doc.data()!['preferences'] as Map<String, dynamic>?;
+        final prefs = doc.data()!['preferences'] as Map<String, dynamic>?;
+        AppLogger.debug('Preferencias obtenidas para usuario: $_uid');
+        return prefs;
       }
-    } catch (e) {
-      print("Error leyendo preferencias: $e");
+    } catch (e, stackTrace) {
+      AppLogger.error('Error leyendo preferencias', e, stackTrace);
     }
     return null;
   }
 
   // ---------------------------------------------------
-  // 3. GESTIÓN DE FAVORITOS (CORAZÓN ❤️)
+  // FAVORITES MANAGEMENT (HEART ❤️)
   // ---------------------------------------------------
 
-  Future<void> toggleFavorite(String eventId, Map<String, dynamic> eventData) async {
-    if (_uid == null) return;
-    
-    final safeId = _cleanId(eventId); 
-    final ref = _db.collection('users').doc(_uid).collection('favorites').doc(safeId);
-    
-    final doc = await ref.get();
-    if (doc.exists) {
-      await ref.delete(); // Si existe, lo borramos (toggle off)
-    } else {
-      await ref.set({ // Si no existe, lo creamos (toggle on)
-        ...eventData,
-        'id': safeId,
-        'originalName': eventId,
-        'addedAt': FieldValue.serverTimestamp(),
-      });
+  /// Toggles favorite status for an event
+  ///
+  /// If event is already favorited, removes it
+  /// If event is not favorited, adds it
+  Future<void> toggleFavorite(
+    String eventId,
+    Map<String, dynamic> eventData,
+  ) async {
+    if (_uid == null) {
+      AppLogger.warning('toggleFavorite: No hay usuario autenticado');
+      return;
     }
-  }
 
-  // ---------------------------------------------------
-  // 4. GESTIÓN DE GUARDADOS (MARCADOR 🔖)
-  // ---------------------------------------------------
-
-  Future<void> toggleSaved(String eventId, Map<String, dynamic> eventData) async {
-    if (_uid == null) return;
-
-    final safeId = _cleanId(eventId);
-    final ref = _db.collection('users').doc(_uid).collection('saved_events').doc(safeId);
-    
-    final doc = await ref.get();
-    if (doc.exists) {
-      await ref.delete(); 
-    } else {
-      await ref.set({ 
-        ...eventData,
-        'id': safeId,
-        'originalName': eventId,
-        'savedAt': FieldValue.serverTimestamp(),
-      });
-    }
-  }
-  
-  // ---------------------------------------------------
-  // 5. CONSULTAS GENERALES
-  // ---------------------------------------------------
-
-  // Devuelve la lista de IDs para pintar los iconos rojos/verdes al entrar
-  Future<List<String>> getUserInteractions(String collectionName) async {
-    if (_uid == null) return [];
     try {
-      final snapshot = await _db.collection('users').doc(_uid).collection(collectionName).get();
-      // Mapeamos a una lista de Strings con los IDs originales (o limpios)
-      return snapshot.docs.map((doc) => doc.id).toList();
-    } catch (e) {
-      print("Error obteniendo interacciones: $e");
+      final safeId = _cleanId(eventId);
+      final ref = _db
+          .collection(_usersCollection)
+          .doc(_uid)
+          .collection(_favoritesCollection)
+          .doc(safeId);
+
+      final doc = await ref.get();
+      if (doc.exists) {
+        await ref.delete();
+        AppLogger.debug('Favorito eliminado: $safeId');
+      } else {
+        await ref.set({
+          ...eventData,
+          'id': safeId,
+          'originalName': eventId,
+          'addedAt': FieldValue.serverTimestamp(),
+        });
+        AppLogger.debug('Favorito añadido: $safeId');
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en toggleFavorite', e, stackTrace);
+    }
+  }
+
+  // ---------------------------------------------------
+  // SAVED EVENTS MANAGEMENT (BOOKMARK 🔖)
+  // ---------------------------------------------------
+
+  /// Toggles saved status for an event
+  ///
+  /// If event is already saved, removes it
+  /// If event is not saved, adds it
+  Future<void> toggleSaved(
+    String eventId,
+    Map<String, dynamic> eventData,
+  ) async {
+    if (_uid == null) {
+      AppLogger.warning('toggleSaved: No hay usuario autenticado');
+      return;
+    }
+
+    try {
+      final safeId = _cleanId(eventId);
+      final ref = _db
+          .collection(_usersCollection)
+          .doc(_uid)
+          .collection(_savedEventsCollection)
+          .doc(safeId);
+
+      final doc = await ref.get();
+      if (doc.exists) {
+        await ref.delete();
+        AppLogger.debug('Evento guardado eliminado: $safeId');
+      } else {
+        await ref.set({
+          ...eventData,
+          'id': safeId,
+          'originalName': eventId,
+          'savedAt': FieldValue.serverTimestamp(),
+        });
+        AppLogger.debug('Evento guardado añadido: $safeId');
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en toggleSaved', e, stackTrace);
+    }
+  }
+
+  // ---------------------------------------------------
+  // GENERAL QUERIES
+  // ---------------------------------------------------
+
+  /// Gets list of event IDs for a specific collection
+  ///
+  /// Used to determine which events are favorited/saved
+  /// for displaying correct icon states in UI
+  ///
+  /// [collectionName] should be 'favorites' or 'saved_events'
+  Future<List<String>> getUserInteractions(String collectionName) async {
+    if (_uid == null) {
+      AppLogger.warning('getUserInteractions: No hay usuario autenticado');
+      return [];
+    }
+
+    try {
+      final snapshot = await _db
+          .collection(_usersCollection)
+          .doc(_uid)
+          .collection(collectionName)
+          .get();
+
+      final ids = snapshot.docs.map((doc) => doc.id).toList();
+      AppLogger.debug(
+        'Interacciones obtenidas de $collectionName: ${ids.length}',
+      );
+      return ids;
+    } catch (e, stackTrace) {
+      AppLogger.error('Error obteniendo interacciones', e, stackTrace);
       return [];
     }
   }

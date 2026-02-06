@@ -148,6 +148,13 @@ class AppSizes {
 
   // Cache de imágenes
   static const int imageCacheWidth = 300;
+  static const int imageCacheHeight = 300;
+
+  // Tamaños de UI específicos
+  static const double appBarHeight = 80.0;
+  static const double searchBarHeight = 50.0;
+  static const double avatarRadiusLarge = 22.0;
+  static const double avatarRadiusSmall = 18.0;
 }
 
 /// Constantes de grid y layout
