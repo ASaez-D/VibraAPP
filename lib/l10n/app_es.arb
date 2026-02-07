@@ -232,6 +232,21 @@
     "songRecOpenSpotify": "ESCUCHAR EN SPOTIFY",
     "songRecTryAgain": "Intentar de nuevo",
     "songRecClose": "Cerrar",
+
+    "nearbyEventsTitle": "Eventos Cercanos",
+    "nearbyEventsPermissionDenied": "Se requieren permisos de ubicación.",
+    "nearbyEventsPermissionPermanentlyDenied": "Permisos de ubicación denegados permanentemente. Por favor, habilítalos en ajustes.",
+    "nearbyEventsLocationError": "No se pudo obtener la ubicación actual.",
+    "nearbyEventsRadius": "Radio de búsqueda: {km} km",
+    "@nearbyEventsRadius": {
+      "placeholders": {
+        "km": {
+          "type": "int"
+        }
+      }
+    },
+    "nearbyEventsNoEvents": "No se encontraron eventos cercanos.",
+    "nearbyEventsViewDetails": "Ver Detalles",
     "songRecUpcomingEvents": "PRÓXIMOS EVENTOS",
     "songRecNoEvents": "No hay conciertos próximos.",
     "songRecErrorLoadingEvents": "No se pudo cargar la info de conciertos.",
@@ -241,5 +256,35 @@
     "songRecErrorGeneric": "Error desconocido",
     "songRecOpenSpotifyError": "No se pudo abrir Spotify",
     "songRecOpenTicket": "Abrir",
-    "songRecSearchArtistEvents": "Buscando eventos de {artist}..."
+    "songRecSearchArtistEvents": "Buscando eventos de {artist}...",
+    "nearbyEventsMusicOnly": "Solo Música",
+    "nearbyEventsLocationDisabled": "Ubicación desactivada.",
+    "nearbyEventsCount": "{count} eventos",
+    "@nearbyEventsCount": {
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "nearbyEventsDaysAhead": "Próximos días:",
+    "nearbyEventsTimeRange30Days": "30 días",
+    "nearbyEventsTimeRange60Days": "60 días",
+    "nearbyEventsTimeRange3Months": "3 meses",
+    "nearbyEventsTimeRange6Months": "6 meses",
+    "nearbyEventsTimeRange1Year": "1 año",
+    "nearbyEventsRetry": "Reintentar",
+    "nearbyEventsLoadError": "Error al cargar eventos.",
+    "songRecNoDatesAvailable": "No hay fechas disponibles.",
+    "songRecListenAgain": "Escuchar otra vez",
+    "commonMonthShort1": "ENE",
+    "commonMonthShort2": "FEB",
+    "commonMonthShort3": "MAR",
+    "commonMonthShort4": "ABR",
+    "commonMonthShort5": "MAY",
+    "commonMonthShort6": "JUN",
+    "commonMonthShort7": "JUL",
+    "commonMonthShort8": "AGO",
+    "commonMonthShort9": "SEP",
+    "commonMonthShort10": "OCT",
+    "commonMonthShort11": "NOV",
+    "commonMonthShort12": "DIC"
 }

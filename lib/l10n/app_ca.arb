@@ -224,5 +224,65 @@
     "regionOptionManual": "Escriure una altra ciutat...",
     "regionManualTitle": "Escriure ciutat",
     "regionManualHint": "Ex: Benidorm",
-    "regionManualSearch": "Cercar"
+    "regionManualSearch": "Cercar",
+    "songRecListening": "Escoltant...",
+    "songRecCancel": "Cancel·lar",
+    "songRecRetry": "Reintentar",
+    "songRecOpenSpotify": "OBRIR A SPOTIFY",
+    "songRecTryAgain": "Tornar a provar",
+    "songRecClose": "Tancar",
+    "nearbyEventsTitle": "Esdeveniments Propers",
+    "nearbyEventsPermissionDenied": "Es requereixen permisos d'ubicació.",
+    "nearbyEventsPermissionPermanentlyDenied": "Permisos d'ubicació denegats permanentment. Si us plau, habilita'ls als ajustos.",
+    "nearbyEventsLocationError": "No s'ha pogut obtenir la ubicació actual.",
+    "nearbyEventsRadius": "Radi de cerca: {km} km",
+    "@nearbyEventsRadius": {
+      "placeholders": {
+        "km": {
+          "type": "int"
+        }
+      }
+    },
+    "nearbyEventsNoEvents": "No s'han trobat esdeveniments propers.",
+    "nearbyEventsViewDetails": "Veure Detalls",
+    "nearbyEventsMusicOnly": "Només Música",
+    "nearbyEventsLocationDisabled": "Ubicació desactivada.",
+    "nearbyEventsCount": "{count} esdeveniments",
+    "@nearbyEventsCount": {
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "nearbyEventsDaysAhead": "Propers dies:",
+    "nearbyEventsTimeRange30Days": "30 dies",
+    "nearbyEventsTimeRange60Days": "60 dies",
+    "nearbyEventsTimeRange3Months": "3 mesos",
+    "nearbyEventsTimeRange6Months": "6 mesos",
+    "nearbyEventsTimeRange1Year": "1 any",
+    "nearbyEventsRetry": "Reintentar",
+    "nearbyEventsLoadError": "Error en carregar esdeveniments.",
+    "songRecNoDatesAvailable": "No hi ha dates disponibles.",
+    "songRecListenAgain": "Escoltar de nou",
+    "commonMonthShort1": "GEN",
+    "commonMonthShort2": "FEB",
+    "commonMonthShort3": "MAR",
+    "commonMonthShort4": "ABR",
+    "commonMonthShort5": "MAI",
+    "commonMonthShort6": "JUN",
+    "commonMonthShort7": "JUL",
+    "commonMonthShort8": "AGO",
+    "commonMonthShort9": "SET",
+    "commonMonthShort10": "OCT",
+    "commonMonthShort11": "NOV",
+    "commonMonthShort12": "DES",
+    "songRecUpcomingEvents": "PROPERS ESDEVENIMENTS",
+    "songRecNoEvents": "No hi ha concerts propers.",
+    "songRecErrorLoadingEvents": "No s'ha pogut carregar la info de concerts.",
+    "songRecNoMatch": "No s'ha trobat cap coincidència.",
+    "songRecErrorInit": "No s'ha pogut iniciar el reconeixement.",
+    "songRecNoResponse": "No s'ha rebut resposta.",
+    "songRecErrorGeneric": "Error desconegut",
+    "songRecOpenSpotifyError": "No s'ha pogut obrir Spotify",
+    "songRecOpenTicket": "Obrir",
+    "songRecSearchArtistEvents": "Cercant esdeveniments de {artist}..."
 }

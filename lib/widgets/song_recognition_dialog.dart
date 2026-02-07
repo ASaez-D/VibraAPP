@@ -8,6 +8,7 @@ import '../models/concert_detail.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_constants.dart';
 import '../l10n/app_localizations.dart';
+import '../screens/concert_detail_screen.dart';
 
 class SongRecognitionDialog extends StatefulWidget {
   const SongRecognitionDialog({super.key});
@@ -142,7 +143,8 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
         if (events.isNotEmpty) {
           _upcomingEvent = events.first; // Pick the first relevant event
         } else {
-          _eventError = l10n?.songRecNoEvents ?? "No hay conciertos próximos.";
+          _eventError =
+              l10n?.songRecNoDatesAvailable ?? "No hay fechas disponibles.";
         }
       });
     } catch (e) {
@@ -198,12 +200,14 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
     }
   }
 
-  Future<void> _openTicketUrl() async {
-    if (_upcomingEvent?.ticketUrl != null) {
-      final uri = Uri.parse(_upcomingEvent!.ticketUrl);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
+  void _openEventDetail() {
+    if (_upcomingEvent != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConcertDetailScreen(concert: _upcomingEvent!),
+        ),
+      );
     }
   }
 
@@ -419,7 +423,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     )
                   else if (_upcomingEvent != null)
                     GestureDetector(
-                      onTap: _openTicketUrl,
+                      onTap: _openEventDetail,
                       child: Container(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
@@ -516,7 +520,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                   TextButton(
                     onPressed: _startListening,
                     child: Text(
-                      l10n?.songRecTryAgain ?? "Escuchar otra vez",
+                      l10n?.songRecListenAgain ?? "Escuchar otra vez",
                       style: const TextStyle(color: secondaryTextColor),
                     ),
                   ),
@@ -569,22 +573,34 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
   }
 
   String _monthName(int month) {
-    const months = [
-      "ENE",
-      "FEB",
-      "MAR",
-      "ABR",
-      "MAY",
-      "JUN",
-      "JUL",
-      "AGO",
-      "SEP",
-      "OCT",
-      "NOV",
-      "DIC",
-    ];
-    // Ideally this should also be localized, but for now we follow the existing pattern
-    // or use DateFormat if intl is used.
-    return months[month - 1];
+    final l10n = AppLocalizations.of(context);
+    switch (month) {
+      case 1:
+        return l10n?.commonMonthShort1 ?? "ENE";
+      case 2:
+        return l10n?.commonMonthShort2 ?? "FEB";
+      case 3:
+        return l10n?.commonMonthShort3 ?? "MAR";
+      case 4:
+        return l10n?.commonMonthShort4 ?? "ABR";
+      case 5:
+        return l10n?.commonMonthShort5 ?? "MAY";
+      case 6:
+        return l10n?.commonMonthShort6 ?? "JUN";
+      case 7:
+        return l10n?.commonMonthShort7 ?? "JUL";
+      case 8:
+        return l10n?.commonMonthShort8 ?? "AGO";
+      case 9:
+        return l10n?.commonMonthShort9 ?? "SEP";
+      case 10:
+        return l10n?.commonMonthShort10 ?? "OCT";
+      case 11:
+        return l10n?.commonMonthShort11 ?? "NOV";
+      case 12:
+        return l10n?.commonMonthShort12 ?? "DIC";
+      default:
+        return "";
+    }
   }
 }

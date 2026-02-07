@@ -23,6 +23,9 @@ class TicketmasterService {
   /// - [city]: Optional city filter
   /// - [keyword]: Optional search keyword
   /// - [classificationId]: Optional genre/category ID
+  /// - [geoPoint]: Optional "lat,long" string for geospatial search
+  /// - [radius]: Radius for geospatial search (default 5 if geoPoint provided)
+  /// - [unit]: Unit for radius ('km' or 'miles', default 'km')
   /// - [page]: Page number for pagination (default: 0)
   /// - [size]: Results per page (default: 20)
   ///
@@ -34,8 +37,12 @@ class TicketmasterService {
     String? city,
     String? keyword,
     String? classificationId,
+    String? geoPoint,
+    int? radius,
+    String? unit,
     int page = TicketmasterApiConstants.defaultPage,
     int size = TicketmasterApiConstants.defaultPageSize,
+    String? segmentName = TicketmasterApiConstants.segmentNameMusic,
   }) async {
     // Validate API key
     if (_apiKey.isEmpty) {
@@ -55,8 +62,12 @@ class TicketmasterService {
         '&endDateTime=$endStr'
         '&size=$size'
         '&page=$page'
-        '&sort=${TicketmasterApiConstants.sortByDate}'
-        '&segmentName=${TicketmasterApiConstants.segmentNameMusic}';
+        '&sort=${TicketmasterApiConstants.sortByDate}';
+
+    // Add segmentName if provided
+    if (segmentName != null && segmentName.isNotEmpty) {
+      url += '&segmentName=$segmentName';
+    }
 
     // Add optional filters
     if (countryCode != null && countryCode.isNotEmpty) {
@@ -75,6 +86,17 @@ class TicketmasterService {
       url += '&classificationId=$classificationId';
     }
 
+    // Geospatial search
+    if (geoPoint != null && geoPoint.isNotEmpty) {
+      url += '&geoPoint=$geoPoint';
+      if (radius != null) {
+        url += '&radius=$radius';
+      }
+      if (unit != null) {
+        url += '&unit=$unit';
+      }
+    }
+
     try {
       AppLogger.debug('Ticketmaster API call: $url');
 
@@ -85,10 +107,17 @@ class TicketmasterService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
+        // Log total elements if available
+        if (data['page'] != null && data['page']['totalElements'] != null) {
+          AppLogger.info(
+            'Total items found in Ticketmaster API: ${data['page']['totalElements']}',
+          );
+        }
+
         if (data['_embedded'] != null && data['_embedded']['events'] != null) {
           final List<dynamic> eventsJson = data['_embedded']['events'];
           AppLogger.info(
-            'Eventos obtenidos de Ticketmaster: ${eventsJson.length}',
+            'Eventos obtenidos de Ticketmaster (página actual): ${eventsJson.length}',
           );
           return eventsJson
               .map((json) => ConcertDetail.fromJson(json))
@@ -120,7 +149,7 @@ class TicketmasterService {
   /// Returns up to 5 matching events
   Future<List<ConcertDetail>> searchEventsByKeyword(
     String keyword,
-    String countryCode,
+    String? countryCode,
   ) async {
     return getConcerts(
       DateTime.now(),

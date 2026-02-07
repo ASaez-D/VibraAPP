@@ -1096,6 +1096,48 @@ abstract class AppLocalizations {
   /// **'Cerrar'**
   String get songRecClose;
 
+  /// No description provided for @nearbyEventsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos Cercanos'**
+  String get nearbyEventsTitle;
+
+  /// No description provided for @nearbyEventsPermissionDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Se requieren permisos de ubicación.'**
+  String get nearbyEventsPermissionDenied;
+
+  /// No description provided for @nearbyEventsPermissionPermanentlyDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Permisos de ubicación denegados permanentemente. Por favor, habilítalos en ajustes.'**
+  String get nearbyEventsPermissionPermanentlyDenied;
+
+  /// No description provided for @nearbyEventsLocationError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo obtener la ubicación actual.'**
+  String get nearbyEventsLocationError;
+
+  /// No description provided for @nearbyEventsRadius.
+  ///
+  /// In es, this message translates to:
+  /// **'Radio de búsqueda: {km} km'**
+  String nearbyEventsRadius(int km);
+
+  /// No description provided for @nearbyEventsNoEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontraron eventos cercanos.'**
+  String get nearbyEventsNoEvents;
+
+  /// No description provided for @nearbyEventsViewDetails.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver Detalles'**
+  String get nearbyEventsViewDetails;
+
   /// No description provided for @songRecUpcomingEvents.
   ///
   /// In es, this message translates to:
@@ -1155,6 +1197,156 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Buscando eventos de {artist}...'**
   String songRecSearchArtistEvents(Object artist);
+
+  /// No description provided for @nearbyEventsMusicOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo Música'**
+  String get nearbyEventsMusicOnly;
+
+  /// No description provided for @nearbyEventsLocationDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación desactivada.'**
+  String get nearbyEventsLocationDisabled;
+
+  /// No description provided for @nearbyEventsCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} eventos'**
+  String nearbyEventsCount(int count);
+
+  /// No description provided for @nearbyEventsDaysAhead.
+  ///
+  /// In es, this message translates to:
+  /// **'Próximos días:'**
+  String get nearbyEventsDaysAhead;
+
+  /// No description provided for @nearbyEventsTimeRange30Days.
+  ///
+  /// In es, this message translates to:
+  /// **'30 días'**
+  String get nearbyEventsTimeRange30Days;
+
+  /// No description provided for @nearbyEventsTimeRange60Days.
+  ///
+  /// In es, this message translates to:
+  /// **'60 días'**
+  String get nearbyEventsTimeRange60Days;
+
+  /// No description provided for @nearbyEventsTimeRange3Months.
+  ///
+  /// In es, this message translates to:
+  /// **'3 meses'**
+  String get nearbyEventsTimeRange3Months;
+
+  /// No description provided for @nearbyEventsTimeRange6Months.
+  ///
+  /// In es, this message translates to:
+  /// **'6 meses'**
+  String get nearbyEventsTimeRange6Months;
+
+  /// No description provided for @nearbyEventsTimeRange1Year.
+  ///
+  /// In es, this message translates to:
+  /// **'1 año'**
+  String get nearbyEventsTimeRange1Year;
+
+  /// No description provided for @nearbyEventsRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get nearbyEventsRetry;
+
+  /// No description provided for @nearbyEventsLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al cargar eventos.'**
+  String get nearbyEventsLoadError;
+
+  /// No description provided for @songRecNoDatesAvailable.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay fechas disponibles.'**
+  String get songRecNoDatesAvailable;
+
+  /// No description provided for @songRecListenAgain.
+  ///
+  /// In es, this message translates to:
+  /// **'Escuchar otra vez'**
+  String get songRecListenAgain;
+
+  /// No description provided for @commonMonthShort1.
+  ///
+  /// In es, this message translates to:
+  /// **'ENE'**
+  String get commonMonthShort1;
+
+  /// No description provided for @commonMonthShort2.
+  ///
+  /// In es, this message translates to:
+  /// **'FEB'**
+  String get commonMonthShort2;
+
+  /// No description provided for @commonMonthShort3.
+  ///
+  /// In es, this message translates to:
+  /// **'MAR'**
+  String get commonMonthShort3;
+
+  /// No description provided for @commonMonthShort4.
+  ///
+  /// In es, this message translates to:
+  /// **'ABR'**
+  String get commonMonthShort4;
+
+  /// No description provided for @commonMonthShort5.
+  ///
+  /// In es, this message translates to:
+  /// **'MAY'**
+  String get commonMonthShort5;
+
+  /// No description provided for @commonMonthShort6.
+  ///
+  /// In es, this message translates to:
+  /// **'JUN'**
+  String get commonMonthShort6;
+
+  /// No description provided for @commonMonthShort7.
+  ///
+  /// In es, this message translates to:
+  /// **'JUL'**
+  String get commonMonthShort7;
+
+  /// No description provided for @commonMonthShort8.
+  ///
+  /// In es, this message translates to:
+  /// **'AGO'**
+  String get commonMonthShort8;
+
+  /// No description provided for @commonMonthShort9.
+  ///
+  /// In es, this message translates to:
+  /// **'SEP'**
+  String get commonMonthShort9;
+
+  /// No description provided for @commonMonthShort10.
+  ///
+  /// In es, this message translates to:
+  /// **'OCT'**
+  String get commonMonthShort10;
+
+  /// No description provided for @commonMonthShort11.
+  ///
+  /// In es, this message translates to:
+  /// **'NOV'**
+  String get commonMonthShort11;
+
+  /// No description provided for @commonMonthShort12.
+  ///
+  /// In es, this message translates to:
+  /// **'DIC'**
+  String get commonMonthShort12;
 }
 
 class _AppLocalizationsDelegate

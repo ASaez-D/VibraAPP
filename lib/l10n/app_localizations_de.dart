@@ -529,53 +529,156 @@ class AppLocalizationsDe extends AppLocalizations {
   String get regionManualSearch => 'Suchen';
 
   @override
-  String get songRecListening => 'Escuchando...';
+  String get songRecListening => 'Zuhören...';
 
   @override
-  String get songRecCancel => 'Cancelar';
+  String get songRecCancel => 'Abbrechen';
 
   @override
-  String get songRecRetry => 'Reintentar';
+  String get songRecRetry => 'Wiederholen';
 
   @override
-  String get songRecOpenSpotify => 'ESCUCHAR EN SPOTIFY';
+  String get songRecOpenSpotify => 'IN SPOTIFY ÖFFNEN';
 
   @override
-  String get songRecTryAgain => 'Intentar de nuevo';
+  String get songRecTryAgain => 'Erneut versuchen';
 
   @override
-  String get songRecClose => 'Cerrar';
+  String get songRecClose => 'Schließen';
 
   @override
-  String get songRecUpcomingEvents => 'PRÓXIMOS EVENTOS';
+  String get nearbyEventsTitle => 'Events in der Nähe';
 
   @override
-  String get songRecNoEvents => 'No hay conciertos próximos.';
+  String get nearbyEventsPermissionDenied =>
+      'Standortberechtigung erforderlich.';
+
+  @override
+  String get nearbyEventsPermissionPermanentlyDenied =>
+      'Standortberechtigung dauerhaft verweigert. Bitte in den Einstellungen aktivieren.';
+
+  @override
+  String get nearbyEventsLocationError =>
+      'Aktueller Standort konnte nicht abgerufen werden.';
+
+  @override
+  String nearbyEventsRadius(int km) {
+    return 'Suchradius: $km km';
+  }
+
+  @override
+  String get nearbyEventsNoEvents => 'Keine Events in der Nähe gefunden.';
+
+  @override
+  String get nearbyEventsViewDetails => 'Details anzeigen';
+
+  @override
+  String get songRecUpcomingEvents => 'NÄCHSTE EVENTS';
+
+  @override
+  String get songRecNoEvents => 'Keine kommenden Konzerte.';
 
   @override
   String get songRecErrorLoadingEvents =>
-      'No se pudo cargar la info de conciertos.';
+      'Konzertinfos konnten nicht geladen werden.';
 
   @override
-  String get songRecNoMatch => 'No se encontró ninguna coincidencia.';
+  String get songRecNoMatch => 'Keine Übereinstimmung gefunden.';
 
   @override
-  String get songRecErrorInit => 'No se pudo iniciar el reconocimiento.';
+  String get songRecErrorInit => 'Erkennung konnte nicht gestartet werden.';
 
   @override
-  String get songRecNoResponse => 'No se recibió respuesta.';
+  String get songRecNoResponse => 'Keine Antwort erhalten.';
 
   @override
-  String get songRecErrorGeneric => 'Error desconocido';
+  String get songRecErrorGeneric => 'Unbekannter Fehler';
 
   @override
-  String get songRecOpenSpotifyError => 'No se pudo abrir Spotify';
+  String get songRecOpenSpotifyError => 'Spotify konnte nicht geöffnet werden';
 
   @override
-  String get songRecOpenTicket => 'Abrir';
+  String get songRecOpenTicket => 'Öffnen';
 
   @override
   String songRecSearchArtistEvents(Object artist) {
-    return 'Buscando eventos de $artist...';
+    return 'Suche Events für $artist...';
   }
+
+  @override
+  String get nearbyEventsMusicOnly => 'Nur Musik';
+
+  @override
+  String get nearbyEventsLocationDisabled => 'Standort deaktiviert.';
+
+  @override
+  String nearbyEventsCount(int count) {
+    return '$count Events';
+  }
+
+  @override
+  String get nearbyEventsDaysAhead => 'Nächste Tage:';
+
+  @override
+  String get nearbyEventsTimeRange30Days => '30 Tage';
+
+  @override
+  String get nearbyEventsTimeRange60Days => '60 Tage';
+
+  @override
+  String get nearbyEventsTimeRange3Months => '3 Monate';
+
+  @override
+  String get nearbyEventsTimeRange6Months => '6 Monate';
+
+  @override
+  String get nearbyEventsTimeRange1Year => '1 Jahr';
+
+  @override
+  String get nearbyEventsRetry => 'Wiederholen';
+
+  @override
+  String get nearbyEventsLoadError => 'Fehler beim Laden.';
+
+  @override
+  String get songRecNoDatesAvailable => 'Keine Termine verfügbar.';
+
+  @override
+  String get songRecListenAgain => 'Nochmal hören';
+
+  @override
+  String get commonMonthShort1 => 'JAN';
+
+  @override
+  String get commonMonthShort2 => 'FEB';
+
+  @override
+  String get commonMonthShort3 => 'MÄR';
+
+  @override
+  String get commonMonthShort4 => 'APR';
+
+  @override
+  String get commonMonthShort5 => 'MAI';
+
+  @override
+  String get commonMonthShort6 => 'JUN';
+
+  @override
+  String get commonMonthShort7 => 'JUL';
+
+  @override
+  String get commonMonthShort8 => 'AUG';
+
+  @override
+  String get commonMonthShort9 => 'SEP';
+
+  @override
+  String get commonMonthShort10 => 'OKT';
+
+  @override
+  String get commonMonthShort11 => 'NOV';
+
+  @override
+  String get commonMonthShort12 => 'DEZ';
 }

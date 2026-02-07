@@ -224,5 +224,65 @@
     "regionOptionManual": "Andere Stadt eingeben...",
     "regionManualTitle": "Stadt eingeben",
     "regionManualHint": "Bsp: Stuttgart",
-    "regionManualSearch": "Suchen"
+    "regionManualSearch": "Suchen",
+    "songRecListening": "Zuhören...",
+    "songRecCancel": "Abbrechen",
+    "songRecRetry": "Wiederholen",
+    "songRecOpenSpotify": "IN SPOTIFY ÖFFNEN",
+    "songRecTryAgain": "Erneut versuchen",
+    "songRecClose": "Schließen",
+    "nearbyEventsTitle": "Events in der Nähe",
+    "nearbyEventsPermissionDenied": "Standortberechtigung erforderlich.",
+    "nearbyEventsPermissionPermanentlyDenied": "Standortberechtigung dauerhaft verweigert. Bitte in den Einstellungen aktivieren.",
+    "nearbyEventsLocationError": "Aktueller Standort konnte nicht abgerufen werden.",
+    "nearbyEventsRadius": "Suchradius: {km} km",
+    "@nearbyEventsRadius": {
+      "placeholders": {
+        "km": {
+          "type": "int"
+        }
+      }
+    },
+    "nearbyEventsNoEvents": "Keine Events in der Nähe gefunden.",
+    "nearbyEventsViewDetails": "Details anzeigen",
+    "nearbyEventsMusicOnly": "Nur Musik",
+    "nearbyEventsLocationDisabled": "Standort deaktiviert.",
+    "nearbyEventsCount": "{count} Events",
+    "@nearbyEventsCount": {
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "nearbyEventsDaysAhead": "Nächste Tage:",
+    "nearbyEventsTimeRange30Days": "30 Tage",
+    "nearbyEventsTimeRange60Days": "60 Tage",
+    "nearbyEventsTimeRange3Months": "3 Monate",
+    "nearbyEventsTimeRange6Months": "6 Monate",
+    "nearbyEventsTimeRange1Year": "1 Jahr",
+    "nearbyEventsRetry": "Wiederholen",
+    "nearbyEventsLoadError": "Fehler beim Laden.",
+    "songRecNoDatesAvailable": "Keine Termine verfügbar.",
+    "songRecListenAgain": "Nochmal hören",
+    "commonMonthShort1": "JAN",
+    "commonMonthShort2": "FEB",
+    "commonMonthShort3": "MÄR",
+    "commonMonthShort4": "APR",
+    "commonMonthShort5": "MAI",
+    "commonMonthShort6": "JUN",
+    "commonMonthShort7": "JUL",
+    "commonMonthShort8": "AUG",
+    "commonMonthShort9": "SEP",
+    "commonMonthShort10": "OKT",
+    "commonMonthShort11": "NOV",
+    "commonMonthShort12": "DEZ",
+    "songRecUpcomingEvents": "NÄCHSTE EVENTS",
+    "songRecNoEvents": "Keine kommenden Konzerte.",
+    "songRecErrorLoadingEvents": "Konzertinfos konnten nicht geladen werden.",
+    "songRecNoMatch": "Keine Übereinstimmung gefunden.",
+    "songRecErrorInit": "Erkennung konnte nicht gestartet werden.",
+    "songRecNoResponse": "Keine Antwort erhalten.",
+    "songRecErrorGeneric": "Unbekannter Fehler",
+    "songRecOpenSpotifyError": "Spotify konnte nicht geöffnet werden",
+    "songRecOpenTicket": "Öffnen",
+    "songRecSearchArtistEvents": "Suche Events für {artist}..."
 }

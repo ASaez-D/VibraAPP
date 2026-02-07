@@ -224,6 +224,66 @@
     "regionOptionManual": "Type another city...",
     "regionManualTitle": "Type city",
     "regionManualHint": "Ex: Benidorm",
-    "regionManualSearch": "Search"
+    "regionManualSearch": "Search",
+    "songRecListening": "Listening...",
+    "songRecCancel": "Cancel",
+    "songRecRetry": "Retry",
+    "songRecOpenSpotify": "OPEN IN SPOTIFY",
+    "songRecTryAgain": "Try again",
+    "songRecClose": "Close",
+    "nearbyEventsTitle": "Nearby Events",
+    "nearbyEventsPermissionDenied": "Location permissions required.",
+    "nearbyEventsPermissionPermanentlyDenied": "Location permissions permanently denied. Please enable them in settings.",
+    "nearbyEventsLocationError": "Could not get current location.",
+    "nearbyEventsRadius": "Search radius: {km} km",
+    "@nearbyEventsRadius": {
+      "placeholders": {
+        "km": {
+          "type": "int"
+        }
+      }
+    },
+    "nearbyEventsNoEvents": "No nearby events found.",
+    "nearbyEventsViewDetails": "View Details",
+    "nearbyEventsMusicOnly": "Music Only",
+    "nearbyEventsLocationDisabled": "Location disabled.",
+    "nearbyEventsCount": "{count} events",
+    "@nearbyEventsCount": {
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "nearbyEventsDaysAhead": "Next days:",
+    "nearbyEventsTimeRange30Days": "30 days",
+    "nearbyEventsTimeRange60Days": "60 days",
+    "nearbyEventsTimeRange3Months": "3 months",
+    "nearbyEventsTimeRange6Months": "6 months",
+    "nearbyEventsTimeRange1Year": "1 year",
+    "nearbyEventsRetry": "Retry",
+    "nearbyEventsLoadError": "Error loading events.",
+    "songRecNoDatesAvailable": "No dates available.",
+    "songRecListenAgain": "Listen again",
+    "commonMonthShort1": "JAN",
+    "commonMonthShort2": "FEB",
+    "commonMonthShort3": "MAR",
+    "commonMonthShort4": "APR",
+    "commonMonthShort5": "MAY",
+    "commonMonthShort6": "JUN",
+    "commonMonthShort7": "JUL",
+    "commonMonthShort8": "AUG",
+    "commonMonthShort9": "SEP",
+    "commonMonthShort10": "OCT",
+    "commonMonthShort11": "NOV",
+    "commonMonthShort12": "DEC",
+    "songRecUpcomingEvents": "UPCOMING EVENTS",
+    "songRecNoEvents": "No upcoming concerts.",
+    "songRecErrorLoadingEvents": "Could not load concert info.",
+    "songRecNoMatch": "No match found.",
+    "songRecErrorInit": "Could not initialize recognition.",
+    "songRecNoResponse": "No response received.",
+    "songRecErrorGeneric": "Unknown error",
+    "songRecOpenSpotifyError": "Could not open Spotify",
+    "songRecOpenTicket": "Open",
+    "songRecSearchArtistEvents": "Searching events for {artist}..."
 }
 

@@ -7,6 +7,7 @@ import '../screens/customize_profile_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/region_screen.dart';
 import '../widgets/song_recognition_dialog.dart';
+import '../screens/events_map_screen.dart';
 
 class HomeDrawer extends StatelessWidget {
   final Map<String, dynamic> userProfile;
@@ -163,6 +164,13 @@ class HomeDrawer extends StatelessWidget {
                   builder: (_) => const SongRecognitionDialog(),
                 );
               },
+            ),
+
+            _menuItem(
+              context,
+              l10n.nearbyEventsTitle,
+              Icons.map_outlined,
+              const EventsMapScreen(),
             ),
 
             _menuItem(
