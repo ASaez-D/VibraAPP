@@ -3,7 +3,7 @@ import '../l10n/app_localizations.dart';
 import '../screens/settings_screen.dart';
 import '../screens/help_screen.dart';
 import '../screens/account_screen.dart';
-import '../screens/customize_profile_screen.dart';
+
 import '../screens/login_screen.dart';
 import '../screens/region_screen.dart';
 import '../widgets/song_recognition_dialog.dart';
@@ -86,22 +86,6 @@ class HomeDrawer extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CustomizeProfileScreen(),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.menuEditProfile,
-                      style: TextStyle(
-                        color: primaryText.withOpacity(0.7),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
                   ),
                 ],
               ),

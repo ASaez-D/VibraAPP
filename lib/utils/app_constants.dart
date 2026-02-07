@@ -25,6 +25,10 @@ class AppColors {
   static const Color lightPrimaryText = Color(0xFF222222);
 
   // Colores de estado
+  static const Color error = Colors.redAccent;
+  static const Color warning = Colors.orangeAccent;
+  static const Color success = primaryAccent;
+
   static const Color errorColor = Colors.redAccent;
   static const Color warningColor = Colors.orangeAccent;
   static const Color successColor = primaryAccent;

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:app_settings/app_settings.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../screens/login_screen.dart';
+import '../screens/permission_manager_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/language_provider.dart';
 import '../main.dart';
@@ -715,7 +716,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return InkWell(
       onTap: () {
         if (text == AppLocalizations.of(context)!.settingsLocationPermissions)
-          AppSettings.openAppSettings(type: AppSettingsType.location);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PermissionManagerScreen(),
+            ),
+          );
         else if (text == AppLocalizations.of(context)!.settingsSharedData)
           Navigator.push(
             context,

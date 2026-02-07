@@ -26,6 +26,7 @@ import 'saved_events_screen.dart';
 import '../services/ticketmaster_service.dart';
 import '../services/spotify_api_service.dart';
 import '../models/concert_detail.dart';
+import '../models/ticket.dart';
 
 /// Main home screen showing personalized concert recommendations
 ///
@@ -792,13 +793,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (i == 2)
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => SavedEventsScreen(
-                  savedConcerts: _cached
-                      .where((c) => _savedIds.contains(c.name))
-                      .toList(),
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => const SavedEventsScreen()),
             );
           if (i == 3)
             Navigator.push(

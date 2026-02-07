@@ -3,19 +3,65 @@ import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/concert_detail.dart';
+import '../services/user_data_service.dart';
 import 'concert_detail_screen.dart';
 import '../utils/app_constants.dart';
 import '../utils/app_theme.dart';
 import '../widgets/empty_state_widget.dart';
 
-class SavedEventsScreen extends StatelessWidget {
-  final List<ConcertDetail> savedConcerts;
+class SavedEventsScreen extends StatefulWidget {
+  const SavedEventsScreen({super.key});
 
-  const SavedEventsScreen({super.key, required this.savedConcerts});
+  @override
+  State<SavedEventsScreen> createState() => _SavedEventsScreenState();
+}
+
+class _SavedEventsScreenState extends State<SavedEventsScreen> {
+  final UserDataService _dataService = UserDataService();
+  List<ConcertDetail> _savedConcerts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedEvents();
+  }
+
+  Future<void> _loadSavedEvents() async {
+    try {
+      final eventsData = await _dataService.getSavedEvents();
+      if (mounted) {
+        setState(() {
+          _savedConcerts = eventsData.map((data) {
+            // Map Firestore data to ConcertDetail
+            // Note: We might have partial data here depending on what we saved
+            // Adjust fields as necessary based on what toggleSaved stores
+            return ConcertDetail(
+              name: data['name'] ?? '',
+              date: data['date'] != null
+                  ? DateTime.parse(data['date'])
+                  : DateTime.now(),
+              venue: data['venue'] ?? '',
+              imageUrl: data['imageUrl'] ?? '',
+              ticketUrl: data['ticketUrl'] ?? '',
+              priceRange: data['priceRange'] ?? '',
+
+              genre: data['genre'] ?? '',
+            );
+          }).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;
     final theme = AppTheme(context);
 
     return Scaffold(
@@ -33,7 +79,7 @@ class SavedEventsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          localizations.menuSaved.toUpperCase(),
+          l10n.menuSaved.toUpperCase(),
           style: TextStyle(
             color: theme.primaryText,
             fontWeight: AppTypography.fontWeightBlack,
@@ -42,21 +88,25 @@ class SavedEventsScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: savedConcerts.isEmpty
-          ? _buildEmptyState(context, localizations, theme)
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(color: AppColors.primaryAccent),
+            )
+          : _savedConcerts.isEmpty
+          ? _buildEmptyState(context, l10n, theme)
           : ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.lg),
               physics: const BouncingScrollPhysics(),
-              itemCount: savedConcerts.length,
+              itemCount: _savedConcerts.length,
               separatorBuilder: (context, index) =>
                   const SizedBox(height: AppSpacing.lg),
               itemBuilder: (context, index) {
                 return _buildConcertCard(
                   context,
-                  savedConcerts[index],
+                  _savedConcerts[index],
                   index,
                   theme,
-                  localizations,
+                  l10n,
                 );
               },
             ),
@@ -104,8 +154,7 @@ class SavedEventsScreen extends StatelessWidget {
       child: Container(
         height: AppSizes.cardHeightMedium,
         decoration: BoxDecoration(
-          color: theme
-              .cardBackground, // Simplified to card background as gradient might be too custom
+          color: theme.cardBackground,
           borderRadius: BorderRadius.circular(AppBorders.radiusExtraLarge),
           border: Border.all(color: theme.borderColor),
           boxShadow: theme.cardShadow,
@@ -137,7 +186,7 @@ class SavedEventsScreen extends StatelessWidget {
                       : Center(
                           child: Icon(
                             Icons.music_note,
-                            color: theme.secondaryText.withValues(alpha: 0.5),
+                            color: theme.secondaryText.withOpacity(0.5),
                           ),
                         ),
                 ),
@@ -169,7 +218,7 @@ class SavedEventsScreen extends StatelessWidget {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: theme.secondaryText.withValues(alpha: 0.5),
+                            color: theme.secondaryText.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                         ),

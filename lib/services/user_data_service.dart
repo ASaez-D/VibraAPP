@@ -241,4 +241,28 @@ class UserDataService {
       return [];
     }
   }
+
+  /// Retrieves all saved events for the current user
+  ///
+  /// Used by SavedEventsScreen to display global saved events
+  /// regardless of current region
+  Future<List<Map<String, dynamic>>> getSavedEvents() async {
+    if (_uid == null) {
+      return [];
+    }
+
+    try {
+      final snapshot = await _db
+          .collection(_usersCollection)
+          .doc(_uid)
+          .collection(_savedEventsCollection)
+          .orderBy('savedAt', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e, stackTrace) {
+      AppLogger.error('Error obteniendo eventos guardados', e, stackTrace);
+      return [];
+    }
+  }
 }

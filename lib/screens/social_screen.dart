@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../utils/app_constants.dart';
 
 class SocialScreen extends StatelessWidget {
@@ -62,6 +63,8 @@ class SocialScreen extends StatelessWidget {
     // Color del fondo de la AppBar
     final appBarBgColor = Theme.of(context).appBarTheme.backgroundColor;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: scaffoldBgColor,
       appBar: AppBar(
@@ -69,7 +72,7 @@ class SocialScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: false,
         title: Text(
-          "Mis Amigos",
+          l10n.socialTitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -91,7 +94,7 @@ class SocialScreen extends StatelessWidget {
             child: TextField(
               style: TextStyle(color: primaryTextColor),
               decoration: InputDecoration(
-                hintText: "Buscar amigo...",
+                hintText: l10n.socialSearchHint,
                 hintStyle: TextStyle(color: hintColor),
                 prefixIcon: Icon(Icons.search, color: hintColor),
                 filled: true,
@@ -113,7 +116,13 @@ class SocialScreen extends StatelessWidget {
                   Divider(color: listTileDividerColor, height: 1),
               itemBuilder: (context, index) {
                 final friend = friends[index];
+                // Check if status is "En línea" (hardcoded in data) to use localized version
+                // For demo purposes we can leave the data as is or try to map it
+                // But specifically for the online check logic:
                 final isOnline = friend['status'] == "En línea";
+                final displayStatus = isOnline
+                    ? l10n.socialStatusOnline
+                    : friend['status'];
 
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(
@@ -155,7 +164,7 @@ class SocialScreen extends StatelessWidget {
                     ),
                   ),
                   subtitle: Text(
-                    friend['status'],
+                    displayStatus,
                     style: TextStyle(
                       color: isOnline ? accentColor : hintColor,
                       fontSize: AppTypography.fontSizeSmall,

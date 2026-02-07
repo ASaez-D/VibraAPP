@@ -55,6 +55,9 @@ class AppTheme {
   Color get disabledColor =>
       isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300;
 
+  Color get success => AppColors.success;
+  Color get error => AppColors.error;
+
   Color get pastDateColor => isDarkMode ? Colors.white38 : Colors.grey.shade400;
 
   // Colores de rango (para calendario)

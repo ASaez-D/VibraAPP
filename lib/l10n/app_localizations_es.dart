@@ -9,6 +9,46 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get permManagerTitle => 'Gestor de Permisos';
+
+  @override
+  String get permLocation => 'Ubicación';
+
+  @override
+  String get permCamera => 'Cámara';
+
+  @override
+  String get permMicrophone => 'Micrófono';
+
+  @override
+  String get permNotifications => 'Notificaciones';
+
+  @override
+  String get permStorage => 'Fotos y Almacenamiento';
+
+  @override
+  String get permStatusAllowed => 'Permitido';
+
+  @override
+  String get permStatusDenied => 'Denegado';
+
+  @override
+  String get permStatusRestricted => 'Restringido';
+
+  @override
+  String get permStatusPermanentlyDenied => 'Denegado permanentemente';
+
+  @override
+  String get permTip =>
+      'Para cambiar un permiso denegado permanentemente, debes ir a los ajustes del sistema.';
+
+  @override
+  String get permBtnSettings => 'Abrir Ajustes';
+
+  @override
+  String get permBtnRequest => 'Solicitar';
+
+  @override
   String get appTitle => 'Vibra';
 
   @override
@@ -477,6 +517,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get time1min => 'Hace 1 min';
+
+  @override
+  String get settingsPermissionManager => 'Gestor de permisos';
+
+  @override
+  String get snackNotificationsEnabled => 'Notificaciones activadas';
+
+  @override
+  String get inDevelopment => 'Próximamente';
+
+  @override
+  String get ticketScreenTitle => 'Mis Entradas';
+
+  @override
+  String get navSocial => 'Social';
+
+  @override
+  String get socialTitle => 'Mis Amigos';
+
+  @override
+  String get socialSearchHint => 'Buscar amigo...';
+
+  @override
+  String get socialStatusOnline => 'En línea';
 
   @override
   String get regionTitle => 'Selecciona tu Región';

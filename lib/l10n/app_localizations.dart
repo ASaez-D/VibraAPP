@@ -106,6 +106,84 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
+  /// No description provided for @permManagerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Gestor de Permisos'**
+  String get permManagerTitle;
+
+  /// No description provided for @permLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Ubicación'**
+  String get permLocation;
+
+  /// No description provided for @permCamera.
+  ///
+  /// In es, this message translates to:
+  /// **'Cámara'**
+  String get permCamera;
+
+  /// No description provided for @permMicrophone.
+  ///
+  /// In es, this message translates to:
+  /// **'Micrófono'**
+  String get permMicrophone;
+
+  /// No description provided for @permNotifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones'**
+  String get permNotifications;
+
+  /// No description provided for @permStorage.
+  ///
+  /// In es, this message translates to:
+  /// **'Fotos y Almacenamiento'**
+  String get permStorage;
+
+  /// No description provided for @permStatusAllowed.
+  ///
+  /// In es, this message translates to:
+  /// **'Permitido'**
+  String get permStatusAllowed;
+
+  /// No description provided for @permStatusDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Denegado'**
+  String get permStatusDenied;
+
+  /// No description provided for @permStatusRestricted.
+  ///
+  /// In es, this message translates to:
+  /// **'Restringido'**
+  String get permStatusRestricted;
+
+  /// No description provided for @permStatusPermanentlyDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Denegado permanentemente'**
+  String get permStatusPermanentlyDenied;
+
+  /// No description provided for @permTip.
+  ///
+  /// In es, this message translates to:
+  /// **'Para cambiar un permiso denegado permanentemente, debes ir a los ajustes del sistema.'**
+  String get permTip;
+
+  /// No description provided for @permBtnSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir Ajustes'**
+  String get permBtnSettings;
+
+  /// No description provided for @permBtnRequest.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitar'**
+  String get permBtnRequest;
+
   /// No description provided for @appTitle.
   ///
   /// In es, this message translates to:
@@ -969,6 +1047,54 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hace 1 min'**
   String get time1min;
+
+  /// No description provided for @settingsPermissionManager.
+  ///
+  /// In es, this message translates to:
+  /// **'Gestor de permisos'**
+  String get settingsPermissionManager;
+
+  /// No description provided for @snackNotificationsEnabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones activadas'**
+  String get snackNotificationsEnabled;
+
+  /// No description provided for @inDevelopment.
+  ///
+  /// In es, this message translates to:
+  /// **'Próximamente'**
+  String get inDevelopment;
+
+  /// No description provided for @ticketScreenTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis Entradas'**
+  String get ticketScreenTitle;
+
+  /// No description provided for @navSocial.
+  ///
+  /// In es, this message translates to:
+  /// **'Social'**
+  String get navSocial;
+
+  /// No description provided for @socialTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis Amigos'**
+  String get socialTitle;
+
+  /// No description provided for @socialSearchHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar amigo...'**
+  String get socialSearchHint;
+
+  /// No description provided for @socialStatusOnline.
+  ///
+  /// In es, this message translates to:
+  /// **'En línea'**
+  String get socialStatusOnline;
 
   /// No description provided for @regionTitle.
   ///
