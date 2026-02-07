@@ -225,5 +225,21 @@
     "regionOptionManual": "Escribir otra ciudad...",
     "regionManualTitle": "Escriure ciutat",
     "regionManualHint": "Ej: Benidorm",
-    "regionManualSearch": "Buscar"
+    "regionManualSearch": "Buscar",
+    "songRecListening": "Escuchando...",
+    "songRecCancel": "Cancelar",
+    "songRecRetry": "Reintentar",
+    "songRecOpenSpotify": "ESCUCHAR EN SPOTIFY",
+    "songRecTryAgain": "Intentar de nuevo",
+    "songRecClose": "Cerrar",
+    "songRecUpcomingEvents": "PRÓXIMOS EVENTOS",
+    "songRecNoEvents": "No hay conciertos próximos.",
+    "songRecErrorLoadingEvents": "No se pudo cargar la info de conciertos.",
+    "songRecNoMatch": "No se encontró ninguna coincidencia.",
+    "songRecErrorInit": "No se pudo iniciar el reconocimiento.",
+    "songRecNoResponse": "No se recibió respuesta.",
+    "songRecErrorGeneric": "Error desconocido",
+    "songRecOpenSpotifyError": "No se pudo abrir Spotify",
+    "songRecOpenTicket": "Abrir",
+    "songRecSearchArtistEvents": "Buscando eventos de {artist}..."
 }

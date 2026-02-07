@@ -34,6 +34,14 @@ class AppColors {
   static const double opacityMedium = 0.1;
   static const double opacityHigh = 0.2;
   static const double opacityVeryHigh = 0.3;
+
+  static const double opacityGlass = 0.95;
+
+  // Song Recognition
+  static const Color listeningPulseStart = Colors.redAccent;
+  static const Color listeningPulseEnd = Colors.deepOrange;
+  static const Color glassmorphismStart = Color(0xFF1E1E1E);
+  static const Color glassmorphismEnd = Color(0xFF2C2C2C);
 }
 
 /// Constantes de tipografía
@@ -103,6 +111,7 @@ class AppAnimations {
   static const Duration durationNormal = Duration(milliseconds: 300);
   static const Duration durationSlow = Duration(milliseconds: 500);
   static const Duration durationSnackbar = Duration(milliseconds: 800);
+  static const Duration durationOneSecond = Duration(seconds: 1);
 
   // Escalas
   static const double scaleNormal = 1.0;

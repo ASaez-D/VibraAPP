@@ -524,4 +524,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regionManualSearch => 'Search';
+
+  @override
+  String get songRecListening => 'Escuchando...';
+
+  @override
+  String get songRecCancel => 'Cancelar';
+
+  @override
+  String get songRecRetry => 'Reintentar';
+
+  @override
+  String get songRecOpenSpotify => 'ESCUCHAR EN SPOTIFY';
+
+  @override
+  String get songRecTryAgain => 'Intentar de nuevo';
+
+  @override
+  String get songRecClose => 'Cerrar';
+
+  @override
+  String get songRecUpcomingEvents => 'PRÓXIMOS EVENTOS';
+
+  @override
+  String get songRecNoEvents => 'No hay conciertos próximos.';
+
+  @override
+  String get songRecErrorLoadingEvents =>
+      'No se pudo cargar la info de conciertos.';
+
+  @override
+  String get songRecNoMatch => 'No se encontró ninguna coincidencia.';
+
+  @override
+  String get songRecErrorInit => 'No se pudo iniciar el reconocimiento.';
+
+  @override
+  String get songRecNoResponse => 'No se recibió respuesta.';
+
+  @override
+  String get songRecErrorGeneric => 'Error desconocido';
+
+  @override
+  String get songRecOpenSpotifyError => 'No se pudo abrir Spotify';
+
+  @override
+  String get songRecOpenTicket => 'Abrir';
+
+  @override
+  String songRecSearchArtistEvents(Object artist) {
+    return 'Buscando eventos de $artist...';
+  }
 }

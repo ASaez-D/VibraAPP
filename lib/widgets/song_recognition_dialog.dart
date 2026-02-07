@@ -6,6 +6,8 @@ import '../services/song_recognition_service.dart';
 import '../services/ticketmaster_service.dart';
 import '../models/concert_detail.dart';
 import '../utils/app_logger.dart';
+import '../utils/app_constants.dart';
+import '../l10n/app_localizations.dart';
 
 class SongRecognitionDialog extends StatefulWidget {
   const SongRecognitionDialog({super.key});
@@ -36,7 +38,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: AppAnimations.durationOneSecond,
     )..repeat(reverse: true);
 
     _startListening();
@@ -50,9 +52,10 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
   }
 
   Future<void> _startListening() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _isListening = true;
-      _statusMessage = "Escuchando...";
+      _statusMessage = l10n?.songRecListening ?? "Escuchando...";
       _songResult = null;
       _upcomingEvent = null;
       _eventError = null;
@@ -61,7 +64,9 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
     try {
       _session = await _recognitionService.startRecognition();
       if (_session == null) {
-        _handleError("No se pudo iniciar el reconocimiento.");
+        _handleError(
+          l10n?.songRecErrorInit ?? "No se pudo iniciar el reconocimiento.",
+        );
         return;
       }
 
@@ -74,9 +79,10 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
 
   Future<void> _processResult(ACRCloudResponse? response) async {
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
 
     if (response == null) {
-      _handleError("No se recibió respuesta.");
+      _handleError(l10n?.songRecNoResponse ?? "No se recibió respuesta.");
       return;
     }
 
@@ -91,12 +97,13 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
 
       // Attempt to find Spotify ID safely
       String? spotifyId;
+      // Debug logging
       try {
-        // ACRCloud structure varies; primarily used for consistency check
-        // In production, we might parse external_metadata if available
-        // dynamic extMeta = (music as dynamic).externalMetadata;
-        // spotifyId = extMeta?['spotify']?['track']?['id'];
-      } catch (_) {}
+        // Try to print the raw structure if possible
+        AppLogger.debug("ACRCloud Metadata: ${response.metadata.toString()}");
+      } catch (e) {
+        AppLogger.error("Error logging metadata", e);
+      }
 
       // Update UI with Song Info
       setState(() {
@@ -113,11 +120,14 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
       // Search for Upcoming Events Globally
       _searchArtistEvents(artist);
     } else {
-      _handleError("No se encontró ninguna coincidencia.");
+      _handleError(
+        l10n?.songRecNoMatch ?? "No se encontró ninguna coincidencia.",
+      );
     }
   }
 
   Future<void> _searchArtistEvents(String artistName) async {
+    final l10n = AppLocalizations.of(context);
     try {
       // Search globally (no country code) to find the next big event
       final events = await _ticketmasterService.searchEventsByKeyword(
@@ -132,14 +142,16 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
         if (events.isNotEmpty) {
           _upcomingEvent = events.first; // Pick the first relevant event
         } else {
-          _eventError = "No hay conciertos próximos.";
+          _eventError = l10n?.songRecNoEvents ?? "No hay conciertos próximos.";
         }
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoadingEvent = false;
-        _eventError = "No se pudo cargar la info de conciertos.";
+        _eventError =
+            l10n?.songRecErrorLoadingEvents ??
+            "No se pudo cargar la info de conciertos.";
       });
     }
   }
@@ -156,6 +168,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
 
   Future<void> _openSpotify() async {
     if (_songResult == null) return;
+    final l10n = AppLocalizations.of(context);
 
     final String title = _songResult!['title'];
     final String artist = _songResult!['artist'];
@@ -175,7 +188,11 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No se pudo abrir Spotify")),
+          SnackBar(
+            content: Text(
+              l10n?.songRecOpenSpotifyError ?? "No se pudo abrir Spotify",
+            ),
+          ),
         );
       }
     }
@@ -192,31 +209,42 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
 
   @override
   Widget build(BuildContext context) {
-    // Premium Dark Theme styling
-    const textColor = Colors.white;
-    const secondaryColor = Colors.white70;
+    // Localization
+    final l10n = AppLocalizations.of(context);
+
+    // Premium Dark Theme styling from AppConstants/AppColors
+    const textColor =
+        Colors.white; // Explicitly white for contrast on dark gradient
+    const secondaryTextColor = Colors.white70;
 
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: const EdgeInsets.all(20),
+      insetPadding: const EdgeInsets.all(AppSpacing.xl),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppBorders.radiusRound),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppSpacing.xxl),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1E1E1E).withOpacity(0.95),
-                  const Color(0xFF2C2C2C).withOpacity(0.95),
+                  AppColors.glassmorphismStart.withOpacity(
+                    AppColors.opacityGlass,
+                  ),
+                  AppColors.glassmorphismEnd.withOpacity(
+                    AppColors.opacityGlass,
+                  ),
                 ],
               ),
-              border: Border.all(color: Colors.white12, width: 1),
-              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white12,
+                width: AppBorders.borderWidthThin,
+              ),
+              borderRadius: BorderRadius.circular(AppBorders.radiusRound),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.5),
@@ -236,15 +264,20 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                       end: 1.2,
                     ).animate(_animationController),
                     child: Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(AppSpacing.xxl),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: const LinearGradient(
-                          colors: [Colors.redAccent, Colors.deepOrange],
+                          colors: [
+                            AppColors.listeningPulseStart,
+                            AppColors.listeningPulseEnd,
+                          ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.redAccent.withOpacity(0.4),
+                            color: AppColors.listeningPulseStart.withOpacity(
+                              0.4,
+                            ),
                             blurRadius: 30,
                             spreadRadius: 5,
                           ),
@@ -252,26 +285,27 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                       ),
                       child: const Icon(
                         Icons.mic,
-                        size: 60,
+                        size: AppSizes.iconSizeMassive,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: AppSpacing.xxxl),
                   Text(
-                    _statusMessage ?? "Escuchando...",
+                    _statusMessage ??
+                        (l10n?.songRecListening ?? "Escuchando..."),
                     style: const TextStyle(
                       color: textColor,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeExtraLarge,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacing.md),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      "Cancelar",
+                      l10n?.songRecCancel ?? "Cancelar",
                       style: TextStyle(color: textColor.withOpacity(0.5)),
                     ),
                   ),
@@ -299,11 +333,11 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     ),
                     child: const Icon(
                       Icons.music_note_rounded,
-                      size: 60,
+                      size: AppSizes.iconSizeMassive,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
 
                   // Title & Artist
                   Text(
@@ -311,36 +345,45 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: AppTypography.fontSizeTitle, // Slightly larger
+                      fontWeight: AppTypography.fontWeightBold,
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     _songResult!['artist'],
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: secondaryColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
+                      color: secondaryTextColor,
+                      fontSize: AppTypography.fontSizeLarge,
+                      fontWeight: AppTypography.fontWeightRegular,
                     ),
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: AppSpacing.xxxl),
 
                   // Spotify Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      icon: const Icon(Icons.open_in_new, size: 20),
-                      label: const Text("ESCUCHAR EN SPOTIFY"),
+                      icon: const Icon(
+                        Icons.open_in_new,
+                        size: AppSizes.iconSizeMedium,
+                      ),
+                      label: Text(
+                        l10n?.songRecOpenSpotify ?? "ESCUCHAR EN SPOTIFY",
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1DB954),
+                        backgroundColor: AppColors.secondaryAccent,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.lg,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            AppBorders.radiusMedium,
+                          ),
                         ),
                         elevation: 4,
                       ),
@@ -348,40 +391,42 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                   const Divider(color: Colors.white12),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // Concert Info Section
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "PRÓXIMOS EVENTOS",
+                      l10n?.songRecUpcomingEvents ?? "PRÓXIMOS EVENTOS",
                       style: TextStyle(
                         color: textColor.withOpacity(0.6),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
+                        fontSize: AppTypography.fontSizeSmall,
+                        fontWeight: AppTypography.fontWeightBold,
+                        letterSpacing: AppTypography.letterSpacingExtraWide,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   if (_isLoadingEvent)
                     const Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: secondaryColor,
+                        color: secondaryTextColor,
                       ),
                     )
                   else if (_upcomingEvent != null)
                     GestureDetector(
                       onTap: _openTicketUrl,
                       child: Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(AppColors.opacityLow),
+                          borderRadius: BorderRadius.circular(
+                            AppBorders.radiusMedium,
+                          ),
                           border: Border.all(color: Colors.white10),
                         ),
                         child: Row(
@@ -389,12 +434,16 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                             // Date Box
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.sm,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white.withOpacity(
+                                  AppColors.opacityMedium,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppBorders.radiusSmall,
+                                ),
                               ),
                               child: Column(
                                 children: [
@@ -402,21 +451,21 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                                     "${_upcomingEvent!.date.day}",
                                     style: const TextStyle(
                                       color: textColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontWeight: AppTypography.fontWeightBold,
+                                      fontSize: AppTypography.fontSizeLarge,
                                     ),
                                   ),
                                   Text(
                                     _monthName(_upcomingEvent!.date.month),
                                     style: TextStyle(
                                       color: textColor.withOpacity(0.7),
-                                      fontSize: 12,
+                                      fontSize: AppTypography.fontSizeSmall,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: AppSpacing.lg),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,15 +474,15 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                                     _upcomingEvent!.city,
                                     style: const TextStyle(
                                       color: textColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                      fontWeight: AppTypography.fontWeightBold,
+                                      fontSize: AppTypography.fontSizeRegular,
                                     ),
                                   ),
                                   Text(
                                     _upcomingEvent!.venue,
                                     style: TextStyle(
                                       color: textColor.withOpacity(0.7),
-                                      fontSize: 14,
+                                      fontSize: AppTypography.fontSizeMedium,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -443,7 +492,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                             const Icon(
                               Icons.arrow_forward_ios,
                               size: 16,
-                              color: secondaryColor,
+                              color: secondaryTextColor,
                             ),
                           ],
                         ),
@@ -453,7 +502,9 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        _eventError ?? "No hay fechas disponibles.",
+                        _eventError ??
+                            (l10n?.songRecNoEvents ??
+                                "No hay fechas disponibles."),
                         style: TextStyle(
                           color: textColor.withOpacity(0.5),
                           fontStyle: FontStyle.italic,
@@ -461,12 +512,12 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                       ),
                     ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   TextButton(
                     onPressed: _startListening,
-                    child: const Text(
-                      "Escuchar otra vez",
-                      style: TextStyle(color: secondaryColor),
+                    child: Text(
+                      l10n?.songRecTryAgain ?? "Escuchar otra vez",
+                      style: const TextStyle(color: secondaryTextColor),
                     ),
                   ),
 
@@ -474,16 +525,20 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                 ] else ...[
                   Icon(
                     Icons.error_outline,
-                    size: 60,
+                    size: AppSizes.iconSizeMassive,
                     color: textColor.withOpacity(0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   Text(
-                    _statusMessage ?? "Error desconocido",
+                    _statusMessage ??
+                        (l10n?.songRecErrorGeneric ?? "Error desconocido"),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: textColor, fontSize: 16),
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: AppTypography.fontSizeRegular,
+                    ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                   ElevatedButton(
                     onPressed: _startListening,
                     style: ElevatedButton.styleFrom(
@@ -494,14 +549,14 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                         vertical: 12,
                       ),
                     ),
-                    child: const Text("Reintentar"),
+                    child: Text(l10n?.songRecRetry ?? "Reintentar"),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacing.sm),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(
-                      "Cerrar",
-                      style: TextStyle(color: secondaryColor),
+                    child: Text(
+                      l10n?.songRecClose ?? "Cerrar",
+                      style: const TextStyle(color: secondaryTextColor),
                     ),
                   ),
                 ],
@@ -528,6 +583,8 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
       "NOV",
       "DIC",
     ];
+    // Ideally this should also be localized, but for now we follow the existing pattern
+    // or use DateFormat if intl is used.
     return months[month - 1];
   }
 }

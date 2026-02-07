@@ -1059,6 +1059,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Buscar'**
   String get regionManualSearch;
+
+  /// No description provided for @songRecListening.
+  ///
+  /// In es, this message translates to:
+  /// **'Escuchando...'**
+  String get songRecListening;
+
+  /// No description provided for @songRecCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get songRecCancel;
+
+  /// No description provided for @songRecRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get songRecRetry;
+
+  /// No description provided for @songRecOpenSpotify.
+  ///
+  /// In es, this message translates to:
+  /// **'ESCUCHAR EN SPOTIFY'**
+  String get songRecOpenSpotify;
+
+  /// No description provided for @songRecTryAgain.
+  ///
+  /// In es, this message translates to:
+  /// **'Intentar de nuevo'**
+  String get songRecTryAgain;
+
+  /// No description provided for @songRecClose.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get songRecClose;
+
+  /// No description provided for @songRecUpcomingEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'PRÓXIMOS EVENTOS'**
+  String get songRecUpcomingEvents;
+
+  /// No description provided for @songRecNoEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conciertos próximos.'**
+  String get songRecNoEvents;
+
+  /// No description provided for @songRecErrorLoadingEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cargar la info de conciertos.'**
+  String get songRecErrorLoadingEvents;
+
+  /// No description provided for @songRecNoMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontró ninguna coincidencia.'**
+  String get songRecNoMatch;
+
+  /// No description provided for @songRecErrorInit.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo iniciar el reconocimiento.'**
+  String get songRecErrorInit;
+
+  /// No description provided for @songRecNoResponse.
+  ///
+  /// In es, this message translates to:
+  /// **'No se recibió respuesta.'**
+  String get songRecNoResponse;
+
+  /// No description provided for @songRecErrorGeneric.
+  ///
+  /// In es, this message translates to:
+  /// **'Error desconocido'**
+  String get songRecErrorGeneric;
+
+  /// No description provided for @songRecOpenSpotifyError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir Spotify'**
+  String get songRecOpenSpotifyError;
+
+  /// No description provided for @songRecOpenTicket.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir'**
+  String get songRecOpenTicket;
+
+  /// No description provided for @songRecSearchArtistEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscando eventos de {artist}...'**
+  String songRecSearchArtistEvents(Object artist);
 }
 
 class _AppLocalizationsDelegate

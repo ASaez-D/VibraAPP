@@ -58,6 +58,16 @@ class TicketmasterApiConstants {
   static const Duration requestTimeout = Duration(seconds: 10);
 }
 
+/// ACRCloud API constants
+class AcrCloudApiConstants {
+  AcrCloudApiConstants._();
+
+  // Environment Keys (from .env)
+  static const String envHost = 'ACR_CLOUD_HOST';
+  static const String envAccessKey = 'ACR_CLOUD_ACCESS_KEY';
+  static const String envAccessSecret = 'ACR_CLOUD_ACCESS_SECRET';
+}
+
 /// HTTP client constants
 class HttpConstants {
   HttpConstants._();
