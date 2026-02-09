@@ -573,8 +573,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _linkTile(
                 context,
-                Icons.location_on,
-                l10n.settingsLocationPermissions,
+                Icons.security,
+                l10n.settingsPermissionManager,
                 theme,
               ),
               _divider(theme),
@@ -715,7 +715,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ) {
     return InkWell(
       onTap: () {
-        if (text == AppLocalizations.of(context)!.settingsLocationPermissions)
+        if (text == AppLocalizations.of(context)!.settingsPermissionManager)
           Navigator.push(
             context,
             MaterialPageRoute(

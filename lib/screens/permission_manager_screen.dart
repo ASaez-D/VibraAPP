@@ -157,9 +157,30 @@ class _PermissionManagerScreenState extends State<PermissionManagerScreen>
             )
           : ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.md),
-              itemCount: _permissions.length,
-              separatorBuilder: (context, index) => const Divider(),
+              itemCount: _permissions.length + 1,
+              separatorBuilder: (context, index) {
+                if (index == _permissions.length - 1) {
+                  return const SizedBox(height: 10); // Spacing before button
+                }
+                return const Divider();
+              },
               itemBuilder: (context, index) {
+                if (index == _permissions.length) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.lg,
+                      horizontal: AppSpacing.md,
+                    ),
+                    child: TextButton.icon(
+                      onPressed: openAppSettings,
+                      icon: const Icon(Icons.settings),
+                      label: Text(l10n.dialogSettingsBtn),
+                      style: TextButton.styleFrom(
+                        foregroundColor: theme.secondaryText,
+                      ),
+                    ),
+                  );
+                }
                 final perm = _permissions[index];
                 final status = _statuses[perm] ?? PermissionStatus.denied;
                 return ListTile(
@@ -214,15 +235,6 @@ class _PermissionManagerScreenState extends State<PermissionManagerScreen>
                 );
               },
             ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: TextButton.icon(
-          onPressed: openAppSettings,
-          icon: const Icon(Icons.settings),
-          label: Text(l10n.permBtnSettings),
-          style: TextButton.styleFrom(foregroundColor: theme.secondaryText),
-        ),
-      ),
     );
   }
 }
