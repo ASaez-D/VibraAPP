@@ -1,93 +1,91 @@
 Changelog - VibraAPP
-Todos los cambios notables en este proyecto se documentan en este archivo siguiendo un estándar técnico de versiones y omitiendo fechas por requisitos de entrega.
+Nota: Todos los cambios notables se documentan aquí. Se sigue una estructura de versiones ascendente omitiendo fechas por requisitos del proyecto.
 
 [v1.0.0] - Versión Final (Optimización y Reconocimiento)
-Esta versión representa la culminación del proyecto, integrando reconocimiento de audio avanzado y una interfaz altamente optimizada.
+Versión definitiva con integración de servicios avanzados y pulido de rendimiento.
 
 Añadido
-ACR Integration (Shazam Upgrade): Implementación del sistema de reconocimiento de música en tiempo real mediante huella digital de audio.
 
-Sistema de Regiones: Lógica completa para el filtrado de eventos por países y regiones geográficas.
+ACR Integration (Shazam Upgrade): Sistema de reconocimiento de música en tiempo real.
 
-Mapa Final: Actualización definitiva de la lógica de mapas y geolocalización.
+Sistema de Regiones: Filtro funcional de eventos por países y zonas geográficas.
 
-Traducciones Finales: Pulido de las cadenas de texto en los 6 idiomas soportados.
+Mapa Final: Ajustes finales en la lógica de Google Maps y geolocalización.
+
+Traducciones: Revisión final de textos en los 6 idiomas de la app.
 
 Modificado
-Optimización de Rendimiento: Refactorización profunda de la HomeScreen y la HomePage para minimizar el consumo de recursos.
 
-Refactorización de Servicios: Limpieza técnica de los servicios de TicketMaster, Shazam/ACR y File Logger.
+Optimización: Refactorización de la HomeScreen y HomePage para mejorar la fluidez.
 
-Clean Code: Limpieza integral de las pantallas de Tests, Home y lógica de Services.
+Limpieza de Servicios: Código saneado en TicketMaster, Shazam y Logger.
+
+Tests & Services: Limpieza de código sobrante en carpetas de prueba y lógica interna.
 
 Arreglado
-Estabilidad General: Resolución de bugs tras la integración de ramas y optimización de las peticiones asíncronas.
+
+Estabilidad: Corrección de fallos tras la unión de ramas y optimización de carga de datos.
 
 [v0.9.0] - Internacionalización y Persistencia
-Fase enfocada en el soporte global y la gestión de datos en la nube con Firebase.
+Fase de soporte multiidioma y gestión de datos con Firebase.
 
 Añadido
-Soporte Multiidioma (l10n): Localización completa de la app en 6 lenguajes.
 
-Preferencias de Usuario: Integración de Firebase para persistir ajustes de Spotify, Google y configuración general.
+Soporte l10n: Implementación total de 6 lenguajes.
 
-SavesEvents: Funcionalidad para guardar conciertos en la cuenta del usuario.
+Firebase & Preferences: Guardado de ajustes de usuario (Spotify/Google) en la nube.
+
+SavesEvents: Sistema para guardar conciertos favoritos en el perfil.
 
 Arreglado
-API Spotify: Solución de errores en el manejo de tokens y respuestas del endpoint de Spotify.
 
-Localización: Corrección de bugs en las traducciones dinámicas y carga de idiomas.
+API Spotify: Solución a errores de respuesta y manejo de tokens.
 
-Help Screen: Reparación y ajuste de la interfaz de soporte al usuario.
+Localización: Fix en bugs de cambio de idioma en tiempo real.
+
+Help Screen: Ajustes en la pantalla de ayuda al usuario.
 
 [v0.8.0] - Refinamiento de UI y Estructura
-Mejoras visuales y refactorización de los componentes de pantalla.
-
 Añadido
-Modo Claro: Soporte para tema visual claro (Light Mode).
 
-Assets: Actualización de recursos gráficos e imágenes de alta resolución.
+Modo Claro: Implementación de soporte para Light Mode.
+
+Assets: Nuevas imágenes y recursos gráficos de alta calidad.
 
 Modificado
-Limpieza de Pantallas: Refactorización de código en:
 
-Login_Screen y Account_Screen
+Limpieza de Pantallas: Refactorización de Login, Account, Calendar y Detail.
 
-Calendar_Screen y ConcertDetail
-
-Customize_Profile
-
-Interfaz de Cuenta: Rediseño estético del perfil de usuario y fix en la carga de fotos.
+Perfil de Usuario: Rediseño visual de la cuenta y fix en la imagen de perfil.
 
 [v0.7.0] - Funcionalidades Core y Permisos
-Desarrollo de la lógica central de negocio y gestión de seguridad.
-
 Añadido
-Gestión de Permisos: Implementación de lógica para acceso a ubicación y datos compartidos.
 
-Navegación Lateral: Menú funcional con gestión de sesiones.
+Gestión de Permisos: Lógica para ubicación y datos compartidos.
+
+Navegación: Menú lateral (Drawer) con cierre de sesión funcional.
 
 Arreglado
-Google Maps: Sincronización de mapas con los filtros de fecha del calendario.
 
-Transacciones: Ajuste de precios y botones de compra en la vista de detalle.
+Google Maps: Sincronización con las fechas del calendario.
+
+Tickets: Ajuste en botones de compra y visualización de precios.
 
 [v0.6.0] - Integración TicketMaster
-Conexión con proveedores externos de eventos.
-
 Añadido
-API TicketMaster: Mapeo y conexión con el endpoint oficial de eventos.
 
-Vistas de Eventos: Creación de Ticket_Screen y Calendar_Screen.
+API TicketMaster: Conexión oficial para obtener conciertos reales.
+
+Pantallas: Desarrollo de Ticket_Screen y Calendar_Screen.
 
 [v0.5.0] - Autenticación e Inicio
-Configuración inicial y acceso de usuarios.
-
 Añadido
-Auth Multi-proveedor: Implementación de login con Spotify y Google.
 
-Arquitectura Base: Estructuración del proyecto en carpetas y definición de estilos globales.
+Auth Multi-proveedor: Login con Spotify y Google.
+
+Estructura: Organización inicial de carpetas y estilos del proyecto.
 
 [v0.1.0] - Inicialización
 Añadido
-Creación del repositorio y estructura base del proyecto.
+
+Estructura base del repositorio y configuración inicial.
