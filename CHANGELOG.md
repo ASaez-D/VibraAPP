@@ -2,8 +2,8 @@
 
 Todos los cambios notables en este proyecto se documentan en este archivo siguiendo un estándar técnico de versiones y omitiendo fechas por requisitos de entrega.
 
-## [v1.0.0] - Versión Final (Optimización y Reconocimiento)
-#### Esta versión representa la culminación del proyecto, integrando reconocimiento de audio avanzado y una interfaz altamente optimizada.
+## [v1.0.0] - Última version (Optimización y Reconocimiento)
+#### Reconocimiento de audio avanzado y una interfaz altamente optimizada.
 
 ### 🌟Añadido
 
