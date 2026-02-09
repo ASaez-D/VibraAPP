@@ -107,6 +107,29 @@ class SpotifyAuth {
       await prefs.setString(_tokenKey, accessToken);
 
       // Fetch user profile
+      final profile = await getUserProfile(accessToken);
+
+      if (profile == null) {
+        AppLogger.error('Error obteniendo perfil después de auth');
+        return null;
+      }
+
+      AppLogger.info('Spotify login exitoso: ${profile['display_name']}');
+      return profile;
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.error('Timeout en Spotify Auth', e, stackTrace);
+      return null;
+    } catch (e, stackTrace) {
+      AppLogger.error('Error en Spotify Auth', e, stackTrace);
+      return null;
+    }
+  }
+
+  /// Fetches user profile from Spotify API using access token
+  ///
+  /// Returns user profile map with access_token included, or null if failed
+  Future<Map<String, dynamic>?> getUserProfile(String accessToken) async {
+    try {
       final profileResponse = await http
           .get(
             Uri.parse(SpotifyApiConstants.userProfileEndpoint),
@@ -127,14 +150,9 @@ class SpotifyAuth {
 
       final Map<String, dynamic> profile = json.decode(profileResponse.body);
       profile['access_token'] = accessToken;
-
-      AppLogger.info('Spotify login exitoso: ${profile['display_name']}');
       return profile;
-    } on TimeoutException catch (e, stackTrace) {
-      AppLogger.error('Timeout en Spotify Auth', e, stackTrace);
-      return null;
     } catch (e, stackTrace) {
-      AppLogger.error('Error en Spotify Auth', e, stackTrace);
+      AppLogger.error('Error en getUserProfile', e, stackTrace);
       return null;
     }
   }

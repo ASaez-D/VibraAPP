@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // <--- 1. IMPORTAR DOTENV
 import 'l10n/app_localizations.dart';
 import 'providers/language_provider.dart';
 import 'screens/login_screen.dart';
+import 'services/session_manager.dart';
 
 // --------------------------------------------------------
 // NOTIFICADORES GLOBALES
@@ -156,7 +157,22 @@ class MyApp extends StatelessWidget {
                 useMaterial3: true,
               ),
 
-              home: const LoginScreen(),
+              home: FutureBuilder<Widget>(
+                future: SessionManager.getInitialScreen(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Scaffold(
+                      backgroundColor: Color(0xFF0C0C0C),
+                      body: Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF54FF78),
+                        ),
+                      ),
+                    );
+                  }
+                  return snapshot.data ?? const LoginScreen();
+                },
+              ),
             );
           },
         );

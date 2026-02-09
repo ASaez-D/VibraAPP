@@ -8,6 +8,8 @@ import '../screens/login_screen.dart';
 import '../screens/region_screen.dart';
 import '../widgets/song_recognition_dialog.dart';
 import '../screens/events_map_screen.dart';
+import '../services/auth_services.dart';
+import '../services/spotify_auth.dart';
 
 class HomeDrawer extends StatelessWidget {
   final Map<String, dynamic> userProfile;
@@ -182,12 +184,20 @@ class HomeDrawer extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: () {
+              onTap: () async {
                 Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+                
+                // Cerrar sesión en servicios
+                await AuthServices().signOut();
+                await SpotifyAuth.logout();
+
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
               },
             ),
           ],
