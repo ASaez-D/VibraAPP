@@ -11,6 +11,11 @@ import '../utils/app_logger.dart';
 /// Service for Ticketmaster API operations
 /// Handles concert/event search and retrieval
 class TicketmasterService {
+  final http.Client _client;
+
+  TicketmasterService({http.Client? client})
+    : _client = client ?? http.Client();
+
   /// Ticketmaster API key from environment variables
   String get _apiKey => dotenv.env['TICKETMASTER_API_KEY'] ?? '';
 
@@ -100,7 +105,7 @@ class TicketmasterService {
     try {
       AppLogger.debug('Ticketmaster API call: $url');
 
-      final response = await http
+      final response = await _client
           .get(Uri.parse(url))
           .timeout(TicketmasterApiConstants.requestTimeout);
 

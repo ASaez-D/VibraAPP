@@ -1,0 +1,625 @@
+﻿00:00 +0: loading C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart
+00:00 +0: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should create a valid ConcertDetail with all fields
+00:00 +0 -1: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should create a valid ConcertDetail with all fields [E]
+  Expected: 'https://example.com/high.jpg'
+    Actual: ''
+     Which: is different. Both strings start the same, but the actual value is missing the following trailing characters: https://ex ...
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\models\concert_detail_test.dart 50:7           main.<fn>.<fn>
+  
+00:00 +0 -1: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle missing venue data with defaults
+00:00 +1 -1: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should select high quality image (>600px)
+00:00 +1 -2: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should select high quality image (>600px) [E]
+  Expected: 'https://example.com/large.jpg'
+    Actual: ''
+     Which: is different. Both strings start the same, but the actual value is missing the following trailing characters: https://ex ...
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\models\concert_detail_test.dart 94:7           main.<fn>.<fn>
+  
+00:00 +1 -2: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle price ranges correctly
+00:00 +1 -3: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle price ranges correctly [E]
+  Expected: 'Desde 25.5 竄ｬ'
+    Actual: 'Desde 25.50 竄ｬ'
+     Which: is different.
+            Expected: Desde 25.5 竄ｬ
+              Actual: Desde 25.50 竄ｬ
+                                ^
+             Differ at offset 10
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\models\concert_detail_test.dart 138:7          main.<fn>.<fn>
+  
+00:00 +1 -3: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle different currencies
+00:00 +1 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle different currencies [E]
+  Expected: 'Desde 50 $'
+    Actual: '50 $'
+     Which: is different.
+            Expected: Desde 50 $ ...
+              Actual: 50 $
+                      ^
+             Differ at offset 0
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\models\concert_detail_test.dart 154:7          main.<fn>.<fn>
+  
+00:00 +1 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should use default value when price data is missing
+00:00 +2 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle null and empty JSON gracefully
+00:00 +3 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should parse location coordinates correctly
+00:00 +4 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_detail_test.dart: ConcertDetail Model Tests fromJson should handle invalid location data
+00:00 +5 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_test.dart: Concert Model Tests fromJson should create a valid Concert object
+00:00 +6 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_test.dart: Concert Model Tests fromJson should handle missing fields with default values
+00:00 +7 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/concert_test.dart: Concert Model Tests fromJson should handle nulls gracefully
+00:00 +8 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/ticket_test.dart: Ticket Model Tests should create a valid Ticket instance
+00:00 +9 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/ticket_test.dart: Ticket Model Tests should create Ticket with all required fields
+00:00 +10 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/ticket_test.dart: Ticket Model Tests should handle different status values
+00:00 +11 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/ticket_test.dart: Ticket Model Tests should handle past and future dates
+00:01 +12 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should create a valid UserAccount with all fields
+00:01 +13 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should use default displayName when missing
+00:01 +14 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should use default email when missing
+00:01 +15 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should handle null optional fields
+00:01 +16 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should handle missing optional fields
+00:01 +17 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should handle empty map with all defaults
+00:01 +18 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should handle Google Sign-In data structure
+00:01 +19 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/models/user_account_test.dart: UserAccount Model Tests fromMap should handle Spotify data structure
+00:01 +20 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests default locale is Spanish
+00:01 +21 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests setLocale changes locale and notifies listeners
+00:01 +22 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests setLocale persists locale to SharedPreferences
+00:01 +23 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests setLocale only accepts supported languages
+00:01 +24 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests loads saved language from SharedPreferences on initialization
+00:01 +25 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests loads saved language from SharedPreferences on initialization
+flutter : test/services/ticketmas
+ter_service_test.dart:14:12: 
+Error: The method 'testLoad' 
+isn't defined for the type 
+'DotEnv'.
+En línea: 1 Carácter: 1
++ flutter test 2>&1 | Out-File 
+-FilePath test_results.txt 
+-Encoding UTF ...
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+NotSpecif    ied: 
+(test/services/t... type 'DotE   
+ nv'.:String) [], RemoteException
+    + FullyQualifiedErrorId : 
+NativeCom    mandError
+ 
+ - 'DotEnv' is from 'package:flut
+ter_dotenv/src/dotenv.dart' ('../
+../../AppData/Local/Pub/Cache/hos
+ted/pub.dev/flutter_dotenv-6.0.0/
+lib/src/dotenv.dart').
+Try correcting the name to the 
+name of an existing method, or 
+defining a method named 
+'testLoad'.
+    dotenv.testLoad(fileInput: 
+'TICKETMASTER_API_KEY=test_key');
+           ^^^^^^^^
+00:01 +26 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests supports all required languages
+00:01 +27 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests setLocale with same locale still notifies listeners
+00:01 +28 -4: C:/Users/kvn/Desktop/proye/VibraAPP/test/providers/language_provider_test.dart: LanguageProvider Tests handles null saved language gracefully
+00:01 +29 -5: loading C:/Users/kvn/Desktop/proye/VibraAPP/test/services/ticketmaster_service_test.dart [E]
+  Failed to load "C:/Users/kvn/Desktop/proye/VibraAPP/test/services/ticketmaster_service_test.dart":
+  Compilation failed for testPath=C:/Users/kvn/Desktop/proye/VibraAPP/test/services/ticketmaster_service_test.dart: test/services/ticketmaster_service_test.dart:14:12: Error: The method 'testLoad' isn't defined for the type 'DotEnv'.
+   - 'DotEnv' is from 'package:flutter_dotenv/src/dotenv.dart' ('../../../AppData/Local/Pub/Cache/hosted/pub.dev/flutter_dotenv-6.0.0/lib/src/dotenv.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'testLoad'.
+      dotenv.testLoad(fileInput: 'TICKETMASTER_API_KEY=test_key');
+             ^^^^^^^^
+  .
+00:02 +29 -5: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/spotify_auth_test.dart: SpotifyAuth Tests getSavedToken retrieves token from SharedPreferences
+00:02 +30 -5: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/spotify_auth_test.dart: SpotifyAuth Tests getSavedToken returns null when no token exists
+00:02 +31 -5: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/spotify_auth_test.dart: SpotifyAuth Tests logout removes token from SharedPreferences
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:20.664 (+0:00:00.002506)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 Token de Spotify eliminado
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+00:02 +32 -5: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/spotify_auth_test.dart: SpotifyAuth Tests spotify auth service exists and can be instantiated
+00:04 +33 -5: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests cleanId logic - replaces slashes with underscores
+00:05 +33 -6: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests cleanId logic - replaces slashes with underscores [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -6: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests cleanId logic - handles backslashes
+00:05 +33 -7: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests cleanId logic - handles backslashes [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -7: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests saveUserFromMap handles missing uid gracefully
+00:05 +33 -8: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests saveUserFromMap handles missing uid gracefully [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -8: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getUserInteractions returns empty list when no user authenticated
+00:05 +33 -9: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getUserInteractions returns empty list when no user authenticated [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -9: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getSavedEvents returns empty list when no user authenticated
+00:05 +33 -10: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getSavedEvents returns empty list when no user authenticated [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -10: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getUserPreferences returns null when no user authenticated
+00:05 +33 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/services/user_data_service_test.dart: UserDataService Tests getUserPreferences returns null when no user authenticated [E]
+  [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+  package:firebase_core_platform_interface/src/method_channel/method_channel_firebase.dart 190:5  MethodChannelFirebase.app
+  package:firebase_core/src/firebase.dart 79:41                                                   Firebase.app
+  package:cloud_firestore/src/firestore.dart 33:21                                                FirebaseFirestore.instance
+  package:vibra_project/services/user_data_service.dart 9:51                                      new UserDataService
+  test\services\user_data_service_test.dart 9:25                                                  main.<fn>.<fn>
+  
+00:05 +33 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests debug method does not throw exception
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:23.682 (+0:00:00.002504)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 Debug message
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+00:05 +34 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests info method does not throw exception
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.698 (+0:00:00.018104)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 Info message[0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +35 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests warning method does not throw exception
+[38;5;208m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏・22:27:23.704 (+0:00:00.024720)[0m
+[38;5;208m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;208m笏・笞・・Warning message[0m
+[38;5;208m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +36 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests error method does not throw exception
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・22:27:23.709 (+0:00:00.029770)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・Error message[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +37 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests fatal method does not throw exception
+[38;5;199m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏・22:27:23.716 (+0:00:00.036375)[0m
+[38;5;199m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;199m笏・太 Fatal message[0m
+[38;5;199m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +38 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests debug method handles error parameter
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・Exception: Test error
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・#0   AppLogger.debug (package:vibra_project/utils/app_logger.dart:23:13)
+笏・#1   main.<anonymous closure>.<anonymous closure>.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart:28:25)
+笏・#2   _ReturnsNormally.typedMatches (package:matcher/src/core_matchers.dart:153:8)
+笏・#3   FeatureMatcher.matches (package:matcher/src/feature_matcher.dart:16:42)
+笏・#4   _expect (package:matcher/src/expect/expect.dart:138:30)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・22:27:23.723 (+0:00:00.042848)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 Debug with error
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+00:05 +39 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests error method handles error and stack trace
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・Exception: Test exception[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・#0   main.<anonymous closure>.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart:35:9)[0m
+[38;5;196m笏・#1   Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:242:19)[0m
+[38;5;196m笏・#2   <asynchronous suspension>[0m
+[38;5;196m笏・#3   Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:240:7)[0m
+[38;5;196m笏・#4   <asynchronous suspension>[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・22:27:23.745 (+0:00:00.064809)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・Error with stack[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +40 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests info method handles null error
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.751 (+0:00:00.071655)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 Info message[0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +41 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests all log levels work with various message types
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:23.757 (+0:00:00.076836)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 String message
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.757 (+0:00:00.076836)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 Message with number: 42[0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏・22:27:23.758 (+0:00:00.077908)[0m
+[38;5;208m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;208m笏・笞・・Message with bool: true[0m
+[38;5;208m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・22:27:23.758 (+0:00:00.077908)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・Message with null: null[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏・22:27:23.758 (+0:00:00.077908)[0m
+[38;5;199m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;199m笏・太 Complex message: {key: value}[0m
+[38;5;199m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +42 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests logger handles empty messages
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:23.770 (+0:00:00.090649)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.770 (+0:00:00.090649)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 [0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏・22:27:23.770 (+0:00:00.090649)[0m
+[38;5;208m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;208m笏・笞・・[0m
+[38;5;208m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・22:27:23.770 (+0:00:00.090649)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏・22:27:23.770 (+0:00:00.090649)[0m
+[38;5;199m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;199m笏・太 [0m
+[38;5;199m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +43 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests logger handles very long messages
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:23.781 (+0:00:00.101097)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.781 (+0:00:00.101097)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏・22:27:23.781 (+0:00:00.101097)[0m
+[38;5;208m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;208m笏・笞・・AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[0m
+[38;5;208m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・22:27:23.781 (+0:00:00.101097)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏・22:27:23.781 (+0:00:00.101097)[0m
+[38;5;199m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;199m笏・太 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[0m
+[38;5;199m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +44 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/utils/app_logger_test.dart: AppLogger Tests logger handles special characters
+笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+笏・22:27:23.789 (+0:00:00.109695)
+笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売
+笏・菅 Test
+笏・菅 	
+${"escaped"}
+笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+[38;5;12m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;12m笏・22:27:23.789 (+0:00:00.109695)[0m
+[38;5;12m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;12m笏・庁 Test[0m
+[38;5;12m笏・庁 	
+${"escaped"}[0m
+[38;5;12m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;208m笏・22:27:23.789 (+0:00:00.109695)[0m
+[38;5;208m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;208m笏・笞・・Test[0m
+[38;5;208m笏・笞・・	
+${"escaped"}[0m
+[38;5;208m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;196m笏・22:27:23.789 (+0:00:00.109695)[0m
+[38;5;196m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;196m笏・笵・Test[0m
+[38;5;196m笏・笵・	
+${"escaped"}[0m
+[38;5;196m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+[38;5;199m笏・22:27:23.789 (+0:00:00.109695)[0m
+[38;5;199m笏懌売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売笏・売[0m
+[38;5;199m笏・太 Test[0m
+[38;5;199m笏・太 	
+${"escaped"}[0m
+[38;5;199m笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏[0m
+00:05 +45 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests renders with correct text and icon
+00:06 +46 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/empty_state_widget_test.dart: EmptyStateWidget Tests renders with title only
+00:06 +46 -11: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests calls onPressed when tapped
+笊絶武笊｡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊・The following assertion was thrown running a test:
+The finder "Found 0 widgets with type "ElevatedButton": []" (used in a call to "tap()") could not
+find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2009:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1861:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1041:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart:45:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  calls onPressed when tapped
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+00:06 +46 -12: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/empty_state_widget_test.dart: EmptyStateWidget Tests renders with title only
+00:06 +46 -12: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests calls onPressed when tapped [E]
+  Test failed. See exception logs above.
+  The test description was: calls onPressed when tapped
+  
+00:06 +47 -12: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +48 -12: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +48 -12: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests renders with custom color
+笊絶武笊｡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊・The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:694:25)
+#1      WidgetController.widget (package:flutter_test/src/controller.dart:804:30)
+#2      main.<anonymous closure>.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart:65:29)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  renders with custom color
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+00:06 +48 -13: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +48 -13: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests renders with custom color [E]
+  Test failed. See exception logs above.
+  The test description was: renders with custom color
+  
+00:06 +49 -13: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +50 -13: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +50 -13: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests has full width
+笊絶武笊｡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊・The following StateError was thrown running a test:
+Bad state: Too many elements
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:696:24)
+#1      WidgetController.widget (package:flutter_test/src/controller.dart:804:30)
+#2      main.<anonymous closure>.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart:85:31)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  has full width
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+00:06 +50 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +50 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/custom_button_test.dart: CustomButton Widget Tests has full width [E]
+  Test failed. See exception logs above.
+  The test description was: has full width
+  
+00:06 +51 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +52 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +53 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +54 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders child widget
+00:06 +55 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+00:06 +56 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+00:06 +57 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+00:06 +58 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+00:07 +59 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+00:07 +60 -14: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test
+笊絶武笊｡ EXCEPTION CAUGHT BY WIDGETS LIBRARY 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+The following ProviderNotFoundException was thrown building MyApp(dirty):
+Error: Could not find the correct Provider<LanguageProvider> above this MyApp Widget
+
+This happens because you used a `BuildContext` that does not include the provider
+of your choice. There are a few common scenarios:
+
+- You added a new provider in your `main.dart` and performed a hot-reload.
+  To fix, perform a hot-restart.
+
+- The provider you are trying to read is in a different route.
+
+  Providers are "scoped". So if you insert of provider inside a route, then
+  other routes will not be able to access that provider.
+
+- You used a `BuildContext` that is an ancestor of the provider you are trying to read.
+
+  Make sure that MyApp is under your MultiProvider/Provider<LanguageProvider>.
+  This usually happens when you are creating a provider and trying to read it immediately.
+
+  For example, instead of:
+
+  ```
+  Widget build(BuildContext context) {
+    return Provider<Example>(
+      create: (_) => Example(),
+      // Will throw a ProviderNotFoundError, because `context` is associated
+      // to the widget that is the parent of `Provider<Example>`
+      child: Text(context.watch<Example>().toString()),
+    );
+  }
+  ```
+
+  consider using `builder` like so:
+
+  ```
+  Widget build(BuildContext context) {
+    return Provider<Example>(
+      create: (_) => Example(),
+      // we use `builder` to obtain a new `BuildContext` that has access to the provider
+      builder: (context, child) {
+        // No longer throws
+        return Text(context.watch<Example>().toString());
+      }
+    );
+  }
+  ```
+
+If none of these solutions work, consider asking for help on StackOverflow:
+https://stackoverflow.com/questions/tagged/flutter
+
+The relevant error-causing widget was:
+  MyApp MyApp:file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart:16:35
+
+When the exception was thrown, this was the stack:
+#0      Provider._inheritedElementOf (package:provider/src/provider.dart:377:7)
+#1      Provider.of (package:provider/src/provider.dart:327:30)
+#2      MyApp.build (package:vibra_project/main.dart:82:39)
+#3      StatelessElement.build (package:flutter/src/widgets/framework.dart:5791:49)
+#4      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5723:15)
+#5      Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#6      ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5705:5)
+#7      ComponentElement.mount (package:flutter/src/widgets/framework.dart:5699:5)
+#8      Element.inflateWidget (package:flutter/src/widgets/framework.dart:4548:16)
+#9      Element.updateChild (package:flutter/src/widgets/framework.dart:3998:20)
+#10     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#11     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#12     ProxyElement.update (package:flutter/src/widgets/framework.dart:6051:5)
+#13     _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#14     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#15     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#16     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5884:11)
+#17     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#18     StatefulElement.update (package:flutter/src/widgets/framework.dart:5909:5)
+#19     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#20     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#21     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#22     ProxyElement.update (package:flutter/src/widgets/framework.dart:6051:5)
+#23     _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#24     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#25     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#26     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5884:11)
+#27     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#28     StatefulElement.update (package:flutter/src/widgets/framework.dart:5909:5)
+#29     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#30     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#31     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5884:11)
+#32     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#33     StatefulElement.update (package:flutter/src/widgets/framework.dart:5909:5)
+#34     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#35     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#36     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#37     ProxyElement.update (package:flutter/src/widgets/framework.dart:6051:5)
+#38     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#39     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#40     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5884:11)
+#41     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#42     StatefulElement.update (package:flutter/src/widgets/framework.dart:5909:5)
+#43     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#44     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#45     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#46     ProxyElement.update (package:flutter/src/widgets/framework.dart:6051:5)
+#47     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#48     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#49     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#50     ProxyElement.update (package:flutter/src/widgets/framework.dart:6051:5)
+#51     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#52     _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#53     _RawViewElement.update (package:flutter/src/widgets/view.dart:568:5)
+#54     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#55     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#56     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#57     StatelessElement.update (package:flutter/src/widgets/framework.dart:5797:5)
+#58     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#59     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5747:16)
+#60     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5884:11)
+#61     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#62     StatefulElement.update (package:flutter/src/widgets/framework.dart:5909:5)
+#63     Element.updateChild (package:flutter/src/widgets/framework.dart:3982:15)
+#64     RootElement._rebuild (package:flutter/src/widgets/binding.dart:1716:16)
+#65     RootElement.update (package:flutter/src/widgets/binding.dart:1694:5)
+#66     RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1708:7)
+#67     Element.rebuild (package:flutter/src/widgets/framework.dart:5435:7)
+#68     BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2695:15)
+#69     BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2752:11)
+#70     BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3056:18)
+#71     AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:1506:19)
+#72     RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:495:5)
+#73     SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1434:15)
+#74     SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1347:9)
+#75     AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1335:9)
+#78     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#79     AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1324:27)
+#80     WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#83     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#84     WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#85     main.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart:16:18)
+#86     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#87     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+笊絶武笊｡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊・The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "0": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart:19:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart line 19
+The test description was:
+  Counter increments smoke test
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+笊絶武笊｡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK 笊樞武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊・The following message was thrown:
+Multiple exceptions (2) were detected during the running of the current test, and at least one was
+unexpected.
+笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武笊絶武
+00:07 +60 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders with custom padding
+00:07 +60 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widget_test.dart: Counter increments smoke test [E]
+  Test failed. See exception logs above.
+  The test description was: Counter increments smoke test
+  
+00:07 +61 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests renders with custom border radius
+00:07 +62 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests adapts to dark theme
+00:07 +63 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests adapts to light theme
+00:07 +64 -15: C:/Users/kvn/Desktop/proye/VibraAPP/test/widgets/themed_card_test.dart: ThemedCard Widget Tests can wrap complex child widgets
+00:07 +65 -15: Some tests failed.
