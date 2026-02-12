@@ -132,7 +132,7 @@ class _RegionScreenState extends State<RegionScreen> {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha : 0.3),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -170,7 +170,7 @@ class _RegionScreenState extends State<RegionScreen> {
                   child: ListView(
                     controller: controller,
                     children: [
-                      // OPCIÓN 1: TODO EL PAÍS
+                      // OPCIÓN 1:TODO EL PAÍS
                       ListTile(
                         leading: Container(
                           padding: const EdgeInsets.all(AppSpacing.sm),

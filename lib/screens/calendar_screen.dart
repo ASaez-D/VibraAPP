@@ -308,10 +308,11 @@ class _CalendarTheme {
         secondaryText = theme.brightness == Brightness.dark ? Colors.white54 : Colors.grey.shade600,
         accentColor = Colors.greenAccent,
         // Usamos withOpacity para mayor compatibilidad
-        rangeColor = Colors.greenAccent.withOpacity(0.2),
+        rangeColor = Colors.greenAccent.withValues(alpha : 0.2),
         pastDateColor = theme.brightness == Brightness.dark ? Colors.white38 : Colors.grey.shade400,
         inactiveChipColor = theme.brightness == Brightness.dark 
-            ? Colors.greenAccent.withOpacity(0.2) 
+            ? Colors.greenAccent.withValues(alpha : 0.2) 
             : Colors.grey.shade300,
         disabledColor = theme.brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade300;
 }
+
