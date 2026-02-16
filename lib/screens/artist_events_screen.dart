@@ -25,7 +25,7 @@ class ArtistEventsScreen extends StatelessWidget {
     final cardBg = isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
     final primaryText = isDarkMode ? Colors.white : Colors.black87;
     final secondaryText = isDarkMode ? Colors.white54 : Colors.grey[600]!;
-    final borderColor = isDarkMode ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.2);
+    final borderColor = isDarkMode ? Colors.white.withValues(alpha : 0.1) : Colors.grey.withValues(alpha : 0.2);
     final accentColor = AppColors.secondaryAccent;
 
     return Scaffold(
@@ -90,7 +90,7 @@ class ArtistEventsScreen extends StatelessWidget {
           Icon(
             Icons.event_busy_rounded,
             size: 80,
-            color: secondaryText.withOpacity(0.5),
+            color: secondaryText.withValues(alpha : 0.5),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
@@ -135,7 +135,7 @@ class ArtistEventsScreen extends StatelessWidget {
           border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha : 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -158,22 +158,22 @@ class ArtistEventsScreen extends StatelessWidget {
                       errorBuilder: (context, error, stackTrace) => Container(
                         width: 120,
                         height: 140,
-                        color: secondaryText.withOpacity(0.1),
+                        color: secondaryText.withValues(alpha : 0.1),
                         child: Icon(
                           Icons.music_note,
                           size: 40,
-                          color: secondaryText.withOpacity(0.3),
+                          color: secondaryText.withValues(alpha : 0.3),
                         ),
                       ),
                     )
                   : Container(
                       width: 120,
                       height: 140,
-                      color: secondaryText.withOpacity(0.1),
+                      color: secondaryText.withValues(alpha : 0.1),
                       child: Icon(
                         Icons.music_note,
                         size: 40,
-                        color: secondaryText.withOpacity(0.3),
+                        color: secondaryText.withValues(alpha : 0.3),
                       ),
                     ),
             ),
@@ -272,7 +272,7 @@ class ArtistEventsScreen extends StatelessWidget {
                           vertical: AppSpacing.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: accentColor.withOpacity(0.1),
+                          color: accentColor.withValues(alpha : 0.1),
                           borderRadius: BorderRadius.circular(AppBorders.radiusSmall),
                         ),
                         child: Text(
@@ -294,7 +294,7 @@ class ArtistEventsScreen extends StatelessWidget {
               padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: secondaryText.withOpacity(0.5),
+                color: secondaryText.withValues(alpha : 0.5),
                 size: 16,
               ),
             ),

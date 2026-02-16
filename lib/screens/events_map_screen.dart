@@ -233,7 +233,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                             height: 60,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.primaryAccent.withOpacity(0.3),
+                              color: AppColors.primaryAccent.withValues(alpha : 0.3),
                             ),
                           ),
                           Container(
@@ -281,8 +281,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                             ),
                           );
                         })
-                        .whereType<Marker>()
-                        .toList(),
+                        .whereType<Marker>(),
                   ],
                 ),
               ],
@@ -353,7 +352,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.glassmorphismStart.withOpacity(0.8),
+                    color: AppColors.glassmorphismStart.withValues(alpha : 0.8),
                     border: Border.all(color: Colors.white12),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -409,9 +408,9 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                                 _fetchNearbyEvents();
                               });
                             },
-                            activeColor: AppColors.primaryAccent,
+                            activeThumbColor: AppColors.primaryAccent,
                             activeTrackColor: AppColors.primaryAccent
-                                .withOpacity(0.5),
+                                .withValues(alpha : 0.5),
                             inactiveThumbColor: Colors.white54,
                             inactiveTrackColor: Colors.white24,
                           ),
@@ -506,8 +505,8 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.glassmorphismStart.withOpacity(0.95),
-                          AppColors.glassmorphismEnd.withOpacity(0.95),
+                          AppColors.glassmorphismStart.withValues(alpha : 0.95),
+                          AppColors.glassmorphismEnd.withValues(alpha : 0.95),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -516,7 +515,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha : 0.5),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -532,7 +531,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppColors.secondaryAccent.withOpacity(
+                                color: AppColors.secondaryAccent.withValues(alpha : 
                                   0.2,
                                 ), // Spotify Green tint
                                 borderRadius: BorderRadius.circular(12),

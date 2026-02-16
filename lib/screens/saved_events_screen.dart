@@ -186,7 +186,7 @@ class _SavedEventsScreenState extends State<SavedEventsScreen> {
                       : Center(
                           child: Icon(
                             Icons.music_note,
-                            color: theme.secondaryText.withOpacity(0.5),
+                            color: theme.secondaryText.withValues(alpha : 0.5),
                           ),
                         ),
                 ),
@@ -218,7 +218,7 @@ class _SavedEventsScreenState extends State<SavedEventsScreen> {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: theme.secondaryText.withOpacity(0.5),
+                            color: theme.secondaryText.withValues(alpha : 0.5),
                             shape: BoxShape.circle,
                           ),
                         ),

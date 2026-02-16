@@ -36,7 +36,7 @@ class TicketScreen extends StatelessWidget {
             Icon(
               Icons.confirmation_number_outlined,
               size: 80,
-              color: theme.secondaryText.withOpacity(0.5),
+              color: theme.secondaryText.withValues(alpha : 0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
