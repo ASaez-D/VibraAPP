@@ -197,11 +197,11 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha : 0.08),
           ), // withValues -> withOpacity para compatibilidad
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha : 0.4),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -409,3 +409,4 @@ class _ConcertsInRangeScreenState extends State<ConcertsInRangeScreen> {
     );
   }
 }
+

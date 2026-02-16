@@ -103,7 +103,7 @@ class HomeDrawer extends StatelessWidget {
 
             // --- LÓGICA DE REGIÓN ---
             ListTile(
-              leading: Icon(Icons.public, color: primaryText.withOpacity(0.8)),
+              leading: Icon(Icons.public, color: primaryText.withValues(alpha : 0.8)),
               title: Text("Región", style: TextStyle(color: primaryText)),
               trailing: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 120),
@@ -137,7 +137,7 @@ class HomeDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.music_note_rounded,
-                color: primaryText.withOpacity(0.8),
+                color: primaryText.withValues(alpha : 0.8),
               ),
               title: Text(
                 "Identificar Canción",
@@ -215,7 +215,7 @@ class HomeDrawer extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final primaryText = isDarkMode ? Colors.white : Colors.black;
     return ListTile(
-      leading: Icon(icon, color: primaryText.withOpacity(0.8)),
+      leading: Icon(icon, color: primaryText.withValues(alpha : 0.8)),
       title: Text(title, style: TextStyle(color: primaryText)),
       onTap: () {
         Navigator.of(context).pop();

@@ -96,7 +96,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
       // Extract Metadata
       String title = music.title;
       String artist = music.artists.map((a) => a.name).join(", ");
-      String? album = music.album?.name;
+      String? album = music.album.name;
 
       // Attempt to find Spotify ID safely
       String? spotifyId;
@@ -240,10 +240,10 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.glassmorphismStart.withOpacity(
-                    AppColors.opacityGlass,
+                  AppColors.glassmorphismStart.withValues(
+                    alpha : AppColors.opacityGlass,
                   ),
-                  AppColors.glassmorphismEnd.withOpacity(
+                  AppColors.glassmorphismEnd.withValues(alpha : 
                     AppColors.opacityGlass,
                   ),
                 ],
@@ -255,7 +255,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
               borderRadius: BorderRadius.circular(AppBorders.radiusRound),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha : 0.5),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -283,7 +283,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.listeningPulseStart.withOpacity(
+                            color: AppColors.listeningPulseStart.withValues(alpha : 
                               0.4,
                             ),
                             blurRadius: 30,
@@ -314,7 +314,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       l10n?.songRecCancel ?? "Cancelar",
-                      style: TextStyle(color: textColor.withOpacity(0.5)),
+                      style: TextStyle(color: textColor.withValues(alpha:0.5)),
                     ),
                   ),
 
@@ -333,7 +333,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.purpleAccent.withOpacity(0.4),
+                          color: Colors.purpleAccent.withValues(alpha : 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -409,7 +409,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     child: Text(
                       l10n?.songRecUpcomingEvents ?? "PRÓXIMOS EVENTOS",
                       style: TextStyle(
-                        color: textColor.withOpacity(0.6),
+                        color: textColor.withValues(alpha : 0.6),
                         fontSize: AppTypography.fontSizeSmall,
                         fontWeight: AppTypography.fontWeightBold,
                         letterSpacing: AppTypography.letterSpacingExtraWide,
@@ -431,7 +431,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                       child: Container(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(AppColors.opacityLow),
+                          color: Colors.white.withValues(alpha : AppColors.opacityLow),
                           borderRadius: BorderRadius.circular(
                             AppBorders.radiusMedium,
                           ),
@@ -446,7 +446,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                                 vertical: AppSpacing.sm,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(
+                                color: Colors.white.withValues(alpha : 
                                   AppColors.opacityMedium,
                                 ),
                                 borderRadius: BorderRadius.circular(
@@ -466,7 +466,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                                   Text(
                                     _monthName(_upcomingEvent!.date.month),
                                     style: TextStyle(
-                                      color: textColor.withOpacity(0.7),
+                                      color: textColor.withValues(alpha : 0.7),
                                       fontSize: AppTypography.fontSizeSmall,
                                     ),
                                   ),
@@ -489,7 +489,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                                   Text(
                                     _upcomingEvent!.venue,
                                     style: TextStyle(
-                                      color: textColor.withOpacity(0.7),
+                                      color: textColor.withValues(alpha : 0.7),
                                       fontSize: AppTypography.fontSizeMedium,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -514,7 +514,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                             (l10n?.songRecNoEvents ??
                                 "No hay fechas disponibles."),
                         style: TextStyle(
-                          color: textColor.withOpacity(0.5),
+                          color: textColor.withValues(alpha : 0.5),
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -577,7 +577,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                   Icon(
                     Icons.error_outline,
                     size: AppSizes.iconSizeMassive,
-                    color: textColor.withOpacity(0.5),
+                    color: textColor.withValues(alpha : 0.5),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
