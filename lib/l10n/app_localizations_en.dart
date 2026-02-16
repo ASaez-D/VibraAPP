@@ -705,6 +705,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songRecListenAgain => 'Listen again';
 
   @override
+  String get songRecViewAllEvents => 'VIEW ALL EVENTS';
+
+  @override
+  String get artistEventsSubtitle => 'Upcoming concerts worldwide';
+
+  @override
+  String get artistEventsEmpty => 'No scheduled concerts';
+
+  @override
   String get commonMonthShort1 => 'JAN';
 
   @override

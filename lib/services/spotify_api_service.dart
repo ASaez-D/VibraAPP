@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/environment_config.dart';
 import '../utils/api_constants.dart';
 import '../utils/app_logger.dart';
 import '../utils/text_constants.dart';
@@ -11,11 +11,11 @@ import '../utils/text_constants.dart';
 /// Service for Spotify API operations
 /// Handles artist search and user top artists retrieval
 class SpotifyAPIService {
-  /// Spotify client ID from environment variables
-  String get clientId => dotenv.env['SPOTIFY_CLIENT_ID'] ?? '';
+  /// Spotify client ID from environment configuration
+  String get clientId => EnvironmentConfig.spotifyClientId;
 
-  /// Spotify client secret from environment variables
-  String get clientSecret => dotenv.env['SPOTIFY_CLIENT_SECRET'] ?? '';
+  /// Spotify client secret from environment configuration
+  String get clientSecret => EnvironmentConfig.spotifyClientSecret;
 
   String? _token;
   DateTime? _tokenExpiration;

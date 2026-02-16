@@ -1,6 +1,6 @@
 name: vibra_project
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -27,7 +27,7 @@ dependencies:
   app_settings: ^7.0.0
   permission_handler: ^12.0.1
   cloud_firestore: ^5.0.1
-  logger: ^2.3.0 
+  logger: ^2.3.0
   flutter_localizations:
     sdk: flutter
   flutter_dotenv: ^6.0.0
@@ -50,6 +50,9 @@ flutter:
     - assets/spotifyLogo.png
     - assets/vibraLogo.png
     - .env
+    - .env.dev
+    - .env.pre
+    - .env.prod
   fonts:
     - family: Montserrat
       fonts:

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/environment_config.dart';
 import '../models/concert_detail.dart';
 import '../utils/api_constants.dart';
 import '../utils/app_logger.dart';
@@ -16,8 +16,8 @@ class TicketmasterService {
   TicketmasterService({http.Client? client})
     : _client = client ?? http.Client();
 
-  /// Ticketmaster API key from environment variables
-  String get _apiKey => dotenv.env['TICKETMASTER_API_KEY'] ?? '';
+  /// Ticketmaster API key from environment configuration
+  String get _apiKey => EnvironmentConfig.ticketmasterApiKey;
 
   /// Retrieves concerts within a date range with optional filters
   ///

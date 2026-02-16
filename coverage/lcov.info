@@ -350,7 +350,7 @@ DA:69,0
 DA:70,0
 DA:74,0
 DA:75,0
-DA:1480,4
+DA:1480,1
 DA:1482,0
 DA:1484,0
 DA:1487,0
@@ -1896,7 +1896,7 @@ DA:65,0
 DA:68,0
 DA:69,0
 DA:70,0
-DA:77,4
+DA:77,1
 DA:79,1
 DA:82,1
 DA:84,0
@@ -1943,7 +1943,7 @@ LF:15
 LH:15
 end_of_record
 SF:lib\screens\login_screen.dart
-DA:12,4
+DA:12,1
 DA:14,0
 DA:15,0
 DA:26,0
@@ -2890,7 +2890,7 @@ LF:54
 LH:0
 end_of_record
 SF:lib\screens\events_map_screen.dart
-DA:16,4
+DA:16,1
 DA:18,0
 DA:19,0
 DA:39,0
@@ -3237,7 +3237,7 @@ LF:106
 LH:0
 end_of_record
 SF:lib\screens\help_screen.dart
-DA:11,4
+DA:11,1
 DA:14,0
 DA:15,0
 DA:22,0
@@ -3947,7 +3947,7 @@ LF:21
 LH:0
 end_of_record
 SF:lib\screens\saved_events_screen.dart
-DA:13,4
+DA:13,1
 DA:15,0
 DA:16,0
 DA:24,0
@@ -4343,7 +4343,7 @@ LF:148
 LH:0
 end_of_record
 SF:lib\screens\permission_manager_screen.dart
-DA:9,4
+DA:9,1
 DA:11,0
 DA:13,0
 DA:30,0
@@ -4663,7 +4663,7 @@ LF:184
 LH:0
 end_of_record
 SF:lib\screens\settings_screen.dart
-DA:21,4
+DA:21,1
 DA:23,0
 DA:24,0
 DA:34,0
@@ -5085,7 +5085,7 @@ DA:901,0
 DA:907,0
 DA:909,0
 DA:911,0
-DA:926,4
+DA:926,1
 DA:927,0
 DA:929,0
 DA:930,0
@@ -5196,7 +5196,7 @@ LF:22
 LH:0
 end_of_record
 SF:lib\widgets\song_recognition_dialog.dart
-DA:14,4
+DA:14,1
 DA:16,0
 DA:17,0
 DA:37,0

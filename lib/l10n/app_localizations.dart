@@ -1402,6 +1402,24 @@ abstract class AppLocalizations {
   /// **'Escuchar otra vez'**
   String get songRecListenAgain;
 
+  /// No description provided for @songRecViewAllEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'VER TODOS LOS EVENTOS'**
+  String get songRecViewAllEvents;
+
+  /// No description provided for @artistEventsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Próximos conciertos a nivel global'**
+  String get artistEventsSubtitle;
+
+  /// No description provided for @artistEventsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conciertos programados'**
+  String get artistEventsEmpty;
+
   /// No description provided for @commonMonthShort1.
   ///
   /// In es, this message translates to:

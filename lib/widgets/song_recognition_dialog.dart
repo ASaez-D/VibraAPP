@@ -9,6 +9,7 @@ import '../utils/app_logger.dart';
 import '../utils/app_constants.dart';
 import '../l10n/app_localizations.dart';
 import '../screens/concert_detail_screen.dart';
+import '../screens/artist_events_screen.dart';
 
 class SongRecognitionDialog extends StatefulWidget {
   const SongRecognitionDialog({super.key});
@@ -29,6 +30,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
   // Result Data
   Map<String, dynamic>? _songResult;
   ConcertDetail? _upcomingEvent;
+  List<ConcertDetail> _allEvents = []; // Store all events
   bool _isLoadingEvent = false;
   String? _eventError;
 
@@ -140,8 +142,9 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
 
       setState(() {
         _isLoadingEvent = false;
+        _allEvents = events; // Store all events
         if (events.isNotEmpty) {
-          _upcomingEvent = events.first; // Pick the first relevant event
+          _upcomingEvent = events.first; // Pick the first relevant event as preview
         } else {
           _eventError =
               l10n?.songRecNoDatesAvailable ?? "No hay fechas disponibles.";
@@ -151,6 +154,7 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
       if (!mounted) return;
       setState(() {
         _isLoadingEvent = false;
+        _allEvents = [];
         _eventError =
             l10n?.songRecErrorLoadingEvents ??
             "No se pudo cargar la info de conciertos.";
@@ -517,6 +521,49 @@ class _SongRecognitionDialogState extends State<SongRecognitionDialog>
                     ),
 
                   const SizedBox(height: AppSpacing.xl),
+
+                  // View All Events Button (only show if there are multiple events)
+                  if (_allEvents.length > 1)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: const Icon(
+                          Icons.list_alt_rounded,
+                          size: AppSizes.iconSizeMedium,
+                        ),
+                        label: Text(
+                          l10n?.songRecViewAllEvents ?? "VER TODOS LOS EVENTOS",
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: textColor,
+                          side: BorderSide(color: textColor.withOpacity(0.3)),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppBorders.radiusMedium,
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          final artistName = _songResult!['artist'];
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ArtistEventsScreen(
+                                artistName: artistName,
+                                events: _allEvents,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                  if (_allEvents.length > 1)
+                    const SizedBox(height: AppSpacing.md),
+
                   TextButton(
                     onPressed: _startListening,
                     child: Text(

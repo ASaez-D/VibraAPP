@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/environment_config.dart';
 import '../utils/api_constants.dart';
 import '../utils/app_logger.dart';
 
 /// Service for Spotify OAuth authentication
 /// Handles user authorization and token management
 class SpotifyAuth {
-  /// Spotify client ID from environment variables
-  String get clientId => dotenv.env['SPOTIFY_CLIENT_ID'] ?? '';
+  /// Spotify client ID from environment configuration
+  String get clientId => EnvironmentConfig.spotifyClientId;
 
-  /// Spotify client secret from environment variables
-  String get clientSecret => dotenv.env['SPOTIFY_CLIENT_SECRET'] ?? '';
+  /// Spotify client secret from environment configuration
+  String get clientSecret => EnvironmentConfig.spotifyClientSecret;
 
   /// SharedPreferences key for storing Spotify token
   static const String _tokenKey = 'spotify_token';

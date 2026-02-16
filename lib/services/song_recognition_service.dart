@@ -1,8 +1,7 @@
 import 'package:flutter_acrcloud/flutter_acrcloud.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../utils/app_logger.dart';
 
-import '../utils/api_constants.dart';
+import '../config/environment_config.dart';
+import '../utils/app_logger.dart';
 
 class SongRecognitionService {
   static final SongRecognitionService _instance =
@@ -20,13 +19,12 @@ class SongRecognitionService {
     if (_isInitialized) return;
 
     try {
-      final host = dotenv.env[AcrCloudApiConstants.envHost] ?? '';
-      final accessKey = dotenv.env[AcrCloudApiConstants.envAccessKey] ?? '';
-      final accessSecret =
-          dotenv.env[AcrCloudApiConstants.envAccessSecret] ?? '';
+      final host = EnvironmentConfig.acrCloudHost;
+      final accessKey = EnvironmentConfig.acrCloudAccessKey;
+      final accessSecret = EnvironmentConfig.acrCloudAccessSecret;
 
       if (host.isEmpty || accessKey.isEmpty || accessSecret.isEmpty) {
-        AppLogger.error('ACRCloud credentials missing in .env');
+        AppLogger.error('ACRCloud credentials missing in environment config');
         return;
       }
 

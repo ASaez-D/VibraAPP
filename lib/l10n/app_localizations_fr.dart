@@ -715,6 +715,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get songRecListenAgain => 'Écouter à nouveau';
 
   @override
+  String get songRecViewAllEvents => 'VER TODOS LOS EVENTOS';
+
+  @override
+  String get artistEventsSubtitle => 'Próximos conciertos a nivel global';
+
+  @override
+  String get artistEventsEmpty => 'No hay conciertos programados';
+
+  @override
   String get commonMonthShort1 => 'JAN';
 
   @override

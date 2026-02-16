@@ -4,9 +4,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // <--- 1. IMPORTAR DOTENV
 
 // --- IMPORTACIONES INTERNAS ---
+import 'config/environment_config.dart'; // <--- CONFIGURACIÓN DE ENTORNOS
 import 'l10n/app_localizations.dart';
 import 'providers/language_provider.dart';
 import 'screens/login_screen.dart';
@@ -44,8 +44,9 @@ void main() async {
   // Asegura que el motor de Flutter esté listo antes de ejecutar código asíncrono
   WidgetsFlutterBinding.ensureInitialized();
 
-  // --- 2. CARGAR VARIABLES DE ENTORNO (CRUCIAL PARA SPOTIFY) ---
-  await dotenv.load(fileName: ".env");
+  // --- INICIALIZAR CONFIGURACIÓN DE ENTORNO ---
+  // Cambiar Environment.development por Environment.preProduction o Environment.production según necesites
+  await EnvironmentConfig.initialize(Environment.development);
 
   // Inicializar Firebase
   await Firebase.initializeApp();
