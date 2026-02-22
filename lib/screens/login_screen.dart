@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/session_manager.dart';
 import '../services/spotify_auth.dart';
 import '../services/google_auth.dart';
 import '../services/user_data_service.dart';
@@ -111,6 +112,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final userMap = _mapSpotifyToUser(profile);
       await _userDataService.saveUserFromMap(userMap);
+      // Guardar perfil para restaurar sesión al reiniciar la app
+      await SessionManager.saveSpotifyProfile(userMap);
 
       if (!mounted) return;
       _navigateToHome(userMap, 'spotify', profile['access_token']);

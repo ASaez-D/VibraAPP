@@ -284,6 +284,9 @@
     "nearbyEventsLoadError": "Erreur de chargement.",
     "songRecNoDatesAvailable": "Pas de dates disponibles.",
     "songRecListenAgain": "Écouter à nouveau",
+    "songRecViewAllEvents": "VOIR TOUS LES ÉVÉNEMENTS",
+    "artistEventsSubtitle": "Prochains concerts dans le monde",
+    "artistEventsEmpty": "Aucun concert programmé",
     "commonMonthShort1": "JAN",
     "commonMonthShort2": "FÉV",
     "commonMonthShort3": "MAR",
@@ -305,5 +308,9 @@
     "songRecErrorGeneric": "Erreur inconnue",
     "songRecOpenSpotifyError": "Impossible d'ouvrir Spotify",
     "songRecOpenTicket": "Ouvrir",
-    "songRecSearchArtistEvents": "Recherche d'événements pour {artist}..."
+    "songRecSearchArtistEvents": "Recherche d'événements pour {artist}...",
+    "downloadDataTitle": "Exporter mes données",
+    "downloadDataShare": "Partager",
+    "downloadDataSave": "Enregistrer sur l'appareil",
+    "downloadDataSaved": "Données enregistrées avec succès"
 }

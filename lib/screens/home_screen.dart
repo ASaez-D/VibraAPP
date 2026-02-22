@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // LOCALIZACIÓN E IMPORTS INTERNOS
 import '../l10n/app_localizations.dart';
@@ -112,8 +113,48 @@ class _HomeScreenState extends State<HomeScreen> {
       _dbService.saveUserProfile(FirebaseAuth.instance.currentUser!);
       _loadInteractions();
     }
-    _detectCountry();
+    _loadSavedRegion();
     _searchCtrl.addListener(_onSearch);
+  }
+
+  /// Loads previously saved region from SharedPreferences
+  Future<void> _loadSavedRegion() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedCountry = prefs.getString('selected_country');
+      final savedCity = prefs.getString('selected_city');
+      if (savedCountry != null) {
+        setState(() {
+          _country = savedCountry;
+          _city = savedCity;
+        });
+        AppLogger.info('Región cargada: $_country / $_city');
+        _reloadAll();
+      } else {
+        _detectCountry();
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'No se pudo cargar la región guardada, usando detección automática',
+      );
+      _detectCountry();
+    }
+  }
+
+  /// Saves the selected region to SharedPreferences
+  Future<void> _saveRegion(String countryCode, String? city) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('selected_country', countryCode);
+      if (city != null) {
+        await prefs.setString('selected_city', city);
+      } else {
+        await prefs.remove('selected_city');
+      }
+      AppLogger.info('Región guardada: $countryCode / $city');
+    } catch (e) {
+      AppLogger.warning('No se pudo guardar la región');
+    }
   }
 
   /// Loads user's liked and saved events from Firestore
@@ -388,6 +429,11 @@ class _HomeScreenState extends State<HomeScreen> {
       'date': c.date.toIso8601String(),
       'imageUrl': c.imageUrl,
       'venue': c.venue,
+      'ticketUrl': c.ticketUrl,
+      'priceRange': c.priceRange,
+      'city': c.city,
+      'address': c.address,
+      'genre': c.genre,
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -793,7 +839,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (i == 2)
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const SavedEventsScreen()),
+              MaterialPageRoute(
+                builder: (_) => SavedEventsScreen(
+                  userProfile: widget.userProfile,
+                  authSource: widget.authSource,
+                ),
+              ),
             );
           if (i == 3)
             Navigator.push(
@@ -836,6 +887,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _secondary.clear();
               _page = 0;
             });
+            _saveRegion(code, city);
             _reloadAll();
           }
         },

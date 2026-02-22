@@ -711,13 +711,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get songRecListenAgain => 'Nochmal hören';
 
   @override
-  String get songRecViewAllEvents => 'VER TODOS LOS EVENTOS';
+  String get songRecViewAllEvents => 'ALLE EVENTS ANSEHEN';
 
   @override
-  String get artistEventsSubtitle => 'Próximos conciertos a nivel global';
+  String get artistEventsSubtitle => 'Bevorstehende Konzerte weltweit';
 
   @override
-  String get artistEventsEmpty => 'No hay conciertos programados';
+  String get artistEventsEmpty => 'Keine geplanten Konzerte';
 
   @override
   String get commonMonthShort1 => 'JAN';
@@ -754,4 +754,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get commonMonthShort12 => 'DEZ';
+
+  @override
+  String get downloadDataTitle => 'Meine Daten exportieren';
+
+  @override
+  String get downloadDataShare => 'Teilen';
+
+  @override
+  String get downloadDataSave => 'Auf Gerät speichern';
+
+  @override
+  String get downloadDataSaved => 'Daten erfolgreich gespeichert';
 }

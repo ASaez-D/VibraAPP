@@ -308,6 +308,10 @@
     "songRecErrorGeneric": "Unknown error",
     "songRecOpenSpotifyError": "Could not open Spotify",
     "songRecOpenTicket": "Open",
-    "songRecSearchArtistEvents": "Searching events for {artist}..."
+    "songRecSearchArtistEvents": "Searching events for {artist}...",
+    "downloadDataTitle": "Export my data",
+    "downloadDataShare": "Share",
+    "downloadDataSave": "Save to device",
+    "downloadDataSaved": "Data saved successfully"
 }
 

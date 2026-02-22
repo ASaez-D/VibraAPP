@@ -1491,6 +1491,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'DIC'**
   String get commonMonthShort12;
+
+  /// No description provided for @downloadDataTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar mis datos'**
+  String get downloadDataTitle;
+
+  /// No description provided for @downloadDataShare.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir'**
+  String get downloadDataShare;
+
+  /// No description provided for @downloadDataSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar en dispositivo'**
+  String get downloadDataSave;
+
+  /// No description provided for @downloadDataSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos guardados correctamente'**
+  String get downloadDataSaved;
 }
 
 class _AppLocalizationsDelegate

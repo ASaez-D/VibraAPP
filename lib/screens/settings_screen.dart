@@ -339,14 +339,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _handleDownloadData() async {
     final l10n = AppLocalizations.of(context)!;
+    final theme = AppTheme(context);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => Center(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: theme.cardBackground,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -356,29 +361,148 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 16),
               Text(
                 l10n.dialogGenerating,
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
+                style: TextStyle(color: theme.primaryText),
               ),
             ],
           ),
         ),
       ),
     );
+
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      final Map<String, dynamic> userData = {
-        "app": "Vibra",
-        "date": DateTime.now().toString(),
-      };
-      final String jsonString = const JsonEncoder.withIndent(
-        '  ',
-      ).convert(userData);
+      // Fetch profile data from Firestore
+      final firestore = FirebaseFirestore.instance;
+      final uid = user.uid;
+
+      // Get user profile document
+      final profileDoc = await firestore.collection('users').doc(uid).get();
+      final profileData = profileDoc.data() ?? {};
+
+      // Get saved events
+      final savedSnap = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('saved_events')
+          .orderBy('savedAt', descending: true)
+          .get();
+
+      // Get favorite events
+      final favSnap = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('favorites')
+          .get();
+
+      // Build TXT content
+      final buffer = StringBuffer();
+      buffer.writeln('=== VIBRA – MIS DATOS ===');
+      buffer.writeln('Generado: ${DateTime.now().toLocal()}');
+      buffer.writeln('');
+      buffer.writeln('--- PERFIL ---');
+      buffer.writeln(
+        'Nombre: ${user.displayName ?? profileData['displayName'] ?? '-'}',
+      );
+      buffer.writeln('Email: ${user.email ?? '-'}');
+      buffer.writeln('UID: $uid');
+      if (profileData['nickname'] != null) {
+        buffer.writeln('Apodo: ${profileData['nickname']}');
+      }
+      buffer.writeln('');
+      buffer.writeln('--- EVENTOS GUARDADOS (${savedSnap.docs.length}) ---');
+      for (final doc in savedSnap.docs) {
+        final d = doc.data();
+        buffer.writeln('• ${d['name'] ?? doc.id}');
+        if (d['venue'] != null) buffer.writeln('  Lugar: ${d['venue']}');
+        if (d['date'] != null) buffer.writeln('  Fecha: ${d['date']}');
+        if (d['ticketUrl'] != null && (d['ticketUrl'] as String).isNotEmpty) {
+          buffer.writeln('  Entradas: ${d['ticketUrl']}');
+        }
+      }
+      buffer.writeln('');
+      buffer.writeln('--- FAVORITOS (${favSnap.docs.length}) ---');
+      for (final doc in favSnap.docs) {
+        buffer.writeln('• ${doc.id}');
+      }
+
+      final txtContent = buffer.toString();
       final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/vibra_data.json');
-      await file.writeAsString(jsonString);
-      if (mounted) Navigator.pop(context);
-      await Share.shareXFiles([XFile(file.path)], text: l10n.shareDataText);
+      final file = File('${directory.path}/vibra_datos.txt');
+      await file.writeAsString(txtContent);
+
+      if (mounted) Navigator.pop(context); // close loading
+
+      // Show share/save options sheet
+      if (mounted) {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: theme.cardBackground,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (ctx) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 20,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.downloadDataTitle,
+                      style: TextStyle(
+                        color: theme.primaryText,
+                        fontSize: 18,
+                        fontWeight: AppTypography.fontWeightBold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.share_rounded,
+                        color: AppColors.primaryAccent,
+                      ),
+                      title: Text(
+                        l10n.downloadDataShare,
+                        style: TextStyle(color: theme.primaryText),
+                      ),
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        await Share.shareXFiles([
+                          XFile(file.path),
+                        ], text: l10n.shareDataText);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.download_rounded,
+                        color: AppColors.primaryAccent,
+                      ),
+                      title: Text(
+                        l10n.downloadDataSave,
+                        style: TextStyle(color: theme.primaryText),
+                      ),
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.downloadDataSaved),
+                              backgroundColor: AppColors.primaryAccent,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
@@ -1055,4 +1179,3 @@ class SharedDataScreen extends StatelessWidget {
     );
   }
 }
-

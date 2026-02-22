@@ -284,6 +284,9 @@
     "nearbyEventsLoadError": "Error en carregar esdeveniments.",
     "songRecNoDatesAvailable": "No hi ha dates disponibles.",
     "songRecListenAgain": "Escoltar de nou",
+    "songRecViewAllEvents": "VEURE TOTS ELS ESDEVENIMENTS",
+    "artistEventsSubtitle": "Propers concerts arreu del món",
+    "artistEventsEmpty": "Sense concerts programats",
     "commonMonthShort1": "GEN",
     "commonMonthShort2": "FEB",
     "commonMonthShort3": "MAR",
@@ -305,5 +308,9 @@
     "songRecErrorGeneric": "Error desconegut",
     "songRecOpenSpotifyError": "No s'ha pogut obrir Spotify",
     "songRecOpenTicket": "Obrir",
-    "songRecSearchArtistEvents": "Cercant esdeveniments de {artist}..."
+    "songRecSearchArtistEvents": "Cercant esdeveniments de {artist}...",
+    "downloadDataTitle": "Exportar les meves dades",
+    "downloadDataShare": "Compartir",
+    "downloadDataSave": "Desar al dispositiu",
+    "downloadDataSaved": "Dades desades correctament"
 }

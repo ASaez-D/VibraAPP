@@ -310,5 +310,9 @@
     "commonMonthShort9": "SEP",
     "commonMonthShort10": "OCT",
     "commonMonthShort11": "NOV",
-    "commonMonthShort12": "DIC"
+    "commonMonthShort12": "DIC",
+    "downloadDataTitle": "Exportar mis datos",
+    "downloadDataShare": "Compartir",
+    "downloadDataSave": "Guardar en dispositivo",
+    "downloadDataSaved": "Datos guardados correctamente"
 }

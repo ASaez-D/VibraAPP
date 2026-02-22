@@ -10,7 +10,14 @@ import '../utils/app_theme.dart';
 import '../widgets/empty_state_widget.dart';
 
 class SavedEventsScreen extends StatefulWidget {
-  const SavedEventsScreen({super.key});
+  final Map<String, dynamic>? userProfile;
+  final String authSource;
+
+  const SavedEventsScreen({
+    super.key,
+    this.userProfile,
+    this.authSource = 'google',
+  });
 
   @override
   State<SavedEventsScreen> createState() => _SavedEventsScreenState();
@@ -147,6 +154,8 @@ class _SavedEventsScreenState extends State<SavedEventsScreen> {
               concert: concert,
               heroTag: uniqueHeroTag,
               initialIsSaved: true,
+              userProfile: widget.userProfile,
+              authSource: widget.authSource,
             ),
           ),
         );
@@ -186,7 +195,7 @@ class _SavedEventsScreenState extends State<SavedEventsScreen> {
                       : Center(
                           child: Icon(
                             Icons.music_note,
-                            color: theme.secondaryText.withValues(alpha : 0.5),
+                            color: theme.secondaryText.withValues(alpha: 0.5),
                           ),
                         ),
                 ),
@@ -218,7 +227,7 @@ class _SavedEventsScreenState extends State<SavedEventsScreen> {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: theme.secondaryText.withValues(alpha : 0.5),
+                            color: theme.secondaryText.withValues(alpha: 0.5),
                             shape: BoxShape.circle,
                           ),
                         ),

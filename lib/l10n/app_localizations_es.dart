@@ -754,4 +754,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get commonMonthShort12 => 'DIC';
+
+  @override
+  String get downloadDataTitle => 'Exportar mis datos';
+
+  @override
+  String get downloadDataShare => 'Compartir';
+
+  @override
+  String get downloadDataSave => 'Guardar en dispositivo';
+
+  @override
+  String get downloadDataSaved => 'Datos guardados correctamente';
 }

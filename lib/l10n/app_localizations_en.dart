@@ -748,4 +748,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonMonthShort12 => 'DEC';
+
+  @override
+  String get downloadDataTitle => 'Export my data';
+
+  @override
+  String get downloadDataShare => 'Share';
+
+  @override
+  String get downloadDataSave => 'Save to device';
+
+  @override
+  String get downloadDataSaved => 'Data saved successfully';
 }

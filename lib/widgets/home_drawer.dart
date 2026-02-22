@@ -10,6 +10,7 @@ import '../widgets/song_recognition_dialog.dart';
 import '../screens/events_map_screen.dart';
 import '../services/auth_services.dart';
 import '../services/spotify_auth.dart';
+import '../services/session_manager.dart';
 
 class HomeDrawer extends StatelessWidget {
   final Map<String, dynamic> userProfile;
@@ -103,7 +104,10 @@ class HomeDrawer extends StatelessWidget {
 
             // --- LÓGICA DE REGIÓN ---
             ListTile(
-              leading: Icon(Icons.public, color: primaryText.withValues(alpha : 0.8)),
+              leading: Icon(
+                Icons.public,
+                color: primaryText.withValues(alpha: 0.8),
+              ),
               title: Text("Región", style: TextStyle(color: primaryText)),
               trailing: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 120),
@@ -137,7 +141,7 @@ class HomeDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.music_note_rounded,
-                color: primaryText.withValues(alpha : 0.8),
+                color: primaryText.withValues(alpha: 0.8),
               ),
               title: Text(
                 "Identificar Canción",
@@ -186,10 +190,11 @@ class HomeDrawer extends StatelessWidget {
               ),
               onTap: () async {
                 Navigator.of(context).pop();
-                
+
                 // Cerrar sesión en servicios
                 await AuthServices().signOut();
                 await SpotifyAuth.logout();
+                await SessionManager.clearSpotifyProfile();
 
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
@@ -215,7 +220,7 @@ class HomeDrawer extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final primaryText = isDarkMode ? Colors.white : Colors.black;
     return ListTile(
-      leading: Icon(icon, color: primaryText.withValues(alpha : 0.8)),
+      leading: Icon(icon, color: primaryText.withValues(alpha: 0.8)),
       title: Text(title, style: TextStyle(color: primaryText)),
       onTap: () {
         Navigator.of(context).pop();
